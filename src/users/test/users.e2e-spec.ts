@@ -5,11 +5,7 @@ import { Connection } from 'mongoose';
 import { DatabaseService } from '../../database/database.service';
 import { AppModule } from '../../app.module';
 
-import {
-  UserStub,
-  UserStubWithoutPassword,
-  UserStubWithoutPasswordAndDates,
-} from './stub/user.stub';
+import { UserStub, UserStubWithoutPasswordAndDates } from './stub/user.stub';
 import { clearDatabase } from './utils';
 
 describe('UsersController (e2e)', () => {
@@ -40,7 +36,7 @@ describe('UsersController (e2e)', () => {
       await dbConnection.collection('users').insertOne(UserStub());
       const response = await request(httpServer).get('/users');
       expect(response.status).toBe(200);
-      expect(response.body).toMatchObject([UserStubWithoutPassword()]);
+      expect(response.body).toMatchObject([UserStubWithoutPasswordAndDates()]);
     });
   });
 
