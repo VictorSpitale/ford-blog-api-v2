@@ -6,7 +6,7 @@ import { DatabaseService } from '../../database/database.service';
 import { AppModule } from '../../app.module';
 
 import { UserStub, UserStubWithoutPasswordAndDates } from './stub/user.stub';
-import { clearDatabase } from './utils';
+import { clearDatabase } from '../../shared/test/utils';
 
 describe('UsersController (e2e)', () => {
   let app: INestApplication;
@@ -29,7 +29,7 @@ describe('UsersController (e2e)', () => {
 
   describe('getUsers', function () {
     beforeEach(async () => {
-      await dbConnection.collection('users').deleteMany({});
+      await clearDatabase(dbConnection, 'users');
     });
 
     it('should return an array of users', async () => {
