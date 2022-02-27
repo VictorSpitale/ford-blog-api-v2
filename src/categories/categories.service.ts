@@ -9,6 +9,7 @@ import { Category, CategoryDocument } from './entities/category.entity';
 import { isValidObjectId, Model, Types } from 'mongoose';
 import { CategoryDto } from './dto/category.dto';
 import { CreateCategoryDto } from './dto/create-category.dto';
+import { MatchType } from '../shared/types/match.types';
 
 @Injectable()
 export class CategoriesService {
@@ -41,7 +42,7 @@ export class CategoriesService {
     return this.asDto(category);
   }
 
-  private async find(match: Record<string, unknown> = {}) {
+  private async find(match: MatchType = {}) {
     if (match._id) {
       if (!isValidObjectId(match._id)) {
         throw new BadRequestException();
@@ -55,7 +56,7 @@ export class CategoriesService {
     });
   }
 
-  async findOne(match: Record<string, unknown>): Promise<Category | null> {
+  async findOne(match: MatchType): Promise<Category | null> {
     const category = await this.find(match);
     if (category.length > 0) {
       return category[0];
