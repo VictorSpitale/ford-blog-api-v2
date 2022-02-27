@@ -4,6 +4,8 @@ import config from './config/config';
 import { DatabaseModule } from './database/database.module';
 import { UsersModule } from './users/users.module';
 import { AuthModule } from './auth/auth.module';
+import { PostsModule } from './posts/posts.module';
+import { CategoriesModule } from './categories/categories.module';
 
 @Module({
   imports: [
@@ -15,6 +17,8 @@ import { AuthModule } from './auth/auth.module';
     DatabaseModule.forRoot(),
     AuthModule,
     UsersModule,
+    PostsModule,
+    CategoriesModule,
   ],
 })
 export class AppModule {}
