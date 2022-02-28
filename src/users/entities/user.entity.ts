@@ -24,7 +24,7 @@ export class User {
     unique: true,
     required: true,
     match: [
-      /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/,
+      /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/,
       'Please fill a valid email address',
     ],
     lowercase: true,
@@ -49,10 +49,9 @@ export class User {
   checkPassword: (plainPassword: string) => Promise<boolean>;
 }
 
-export const UserEntity = SchemaFactory.createForClass(User).set(
-  'timestamps',
-  true,
-);
+export const UserEntity = SchemaFactory.createForClass(User)
+  .set('timestamps', true)
+  .set('versionKey', false);
 
 UserEntity.pre<User>('save', async function (next) {
   const salt = await bcrypt.genSalt();

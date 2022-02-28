@@ -16,4 +16,7 @@ export class Category {
   name: string;
 }
 
-export const CategoryEntity = SchemaFactory.createForClass(Category);
+export const CategoryEntity = SchemaFactory.createForClass(Category).set(
+  'versionKey',
+  false,
+);
