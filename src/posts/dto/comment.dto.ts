@@ -19,7 +19,6 @@ export class CommentDto {
     type: CommenterDto,
     description: "Commenter's informations",
     example: `{
-        _id: 61f59acf09f089c9df951c37
         pseudo: 'John',
         picture: 'url_to_picture'
     }`,

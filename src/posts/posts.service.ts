@@ -9,6 +9,7 @@ import { isValidObjectId, Model, Types } from 'mongoose';
 import { MatchType } from '../shared/types/match.types';
 import { PostDto } from './dto/post.dto';
 import { CreatePostDto } from './dto/create-post.dto';
+import { User } from '../users/entities/user.entity';
 
 @Injectable()
 export class PostsService {
@@ -23,13 +24,13 @@ export class PostsService {
     const createdPost = await this.postModel.create(createPostDto);
     await createdPost.populate('categories');
     await createdPost.save();
-    return this.asDto(createdPost);
+    return this.asDto(createdPost, null);
   }
 
-  async getPosts(): Promise<PostDto[]> {
+  async getPosts(user: User): Promise<PostDto[]> {
     const posts = await this.find();
     const populatedPost = await PostsService.populate(posts);
-    return Promise.all(populatedPost.map((post) => this.asDto(post)));
+    return Promise.all(populatedPost.map((post) => this.asDto(post, user)));
   }
 
   private static async populate(posts: PostDocument[]): Promise<Post[]> {
@@ -40,7 +41,7 @@ export class PostsService {
 
   private async checkIfPostIsDuplicatedBySlug(slug: string): Promise<PostDto> {
     const post = await this.findOne({ slug });
-    return post ? this.asDto(post) : null;
+    return post ? this.asDto(post, null) : null;
   }
 
   private async find(match: MatchType = {}) {
@@ -78,13 +79,20 @@ export class PostsService {
     }
   }
 
-  asDto(post: Post): PostDto {
+  asDto(post: Post, authUser: User): PostDto {
+    let likeStatus = false;
+    if (authUser) {
+      likeStatus = !!post.likers.find(
+        (u) => u._id.toString() === authUser._id.toString(),
+      );
+    }
     return {
       _id: post._id,
       slug: post.slug,
       title: post.title,
       categories: post.categories,
-      likers: post.likers.map((u) => u._id),
+      likes: post.likers.length,
+      authUserLiked: likeStatus,
       desc: post.desc,
       sourceName: post.sourceName,
       sourceLink: post.sourceLink,

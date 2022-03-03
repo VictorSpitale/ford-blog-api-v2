@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Post, Req, UseGuards } from '@nestjs/common';
 import { PostsService } from './posts.service';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { PostDto } from './dto/post.dto';
@@ -7,6 +7,7 @@ import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { Role } from '../auth/decorators/roles.decorator';
 import { IUserRole } from '../users/entities/users.role.interface';
 import { RolesGuard } from '../auth/guards/roles.guard';
+import { AllowAny } from '../auth/decorators/allow-any.decorator';
 
 @Controller('posts')
 @ApiTags('Posts')
@@ -35,7 +36,8 @@ export class PostsController {
   @Get()
   @ApiOperation({ summary: 'Get all posts' })
   @ApiResponse({ status: 200, description: 'List all posts', type: [PostDto] })
-  async getPosts(): Promise<PostDto[]> {
-    return this.postsService.getPosts();
+  @AllowAny()
+  async getPosts(@Req() req): Promise<PostDto[]> {
+    return this.postsService.getPosts(req.user);
   }
 }
