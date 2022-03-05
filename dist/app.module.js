@@ -17,7 +17,11 @@ const posts_module_1 = require("./posts/posts.module");
 const categories_module_1 = require("./categories/categories.module");
 const core_1 = require("@nestjs/core");
 const jwt_auth_guard_1 = require("./auth/guards/jwt-auth.guard");
+const apikey_middleware_1 = require("./auth/middleware/apikey.middleware");
 let AppModule = class AppModule {
+    configure(consumer) {
+        consumer.apply(apikey_middleware_1.ApikeyMiddleware).forRoutes('');
+    }
 };
 AppModule = __decorate([
     (0, common_1.Module)({

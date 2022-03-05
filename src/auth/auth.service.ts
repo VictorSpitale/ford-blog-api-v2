@@ -4,12 +4,14 @@ import { User } from '../users/entities/user.entity';
 import { UserDto } from '../users/dto/user.dto';
 import { JwtService } from '@nestjs/jwt';
 import { JwtAccessToken, JwtPayload } from './jwt/jwt-payload.interface';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class AuthService {
   constructor(
     private readonly usersService: UsersService,
     private readonly jwtService: JwtService,
+    private readonly configService: ConfigService,
   ) {}
 
   async validateUser(email, password): Promise<UserDto | null> {
@@ -39,5 +41,10 @@ export class AuthService {
   async login(user: UserDto): Promise<JwtAccessToken> {
     const payload = { email: user.email, sub: user._id };
     return { access_token: this.jwtService.sign(payload) };
+  }
+
+  validateApiKey(apiKey: string): boolean {
+    const key = this.configService.get('api_key.key');
+    return apiKey === key;
   }
 }
