@@ -12,6 +12,7 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { UserDto } from './dto/user.dto';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { AllowAny } from '../auth/decorators/allow-any.decorator';
 
 @Controller('users')
 @ApiTags('Users')
@@ -19,6 +20,7 @@ export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
   @Post()
+  @AllowAny()
   @ApiOperation({ summary: 'Create a user' })
   @ApiResponse({
     status: 201,

@@ -15,6 +15,7 @@ import { AuthUser } from '../users/user.decorator';
 import { UserDto } from '../users/dto/user.dto';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { JwtAccessToken } from './jwt/jwt-payload.interface';
+import { AllowAny } from './decorators/allow-any.decorator';
 
 @Controller('auth')
 @ApiTags('Auth')
@@ -25,8 +26,10 @@ export class AuthController {
   @Post('login')
   @HttpCode(HttpStatus.OK)
   @UseInterceptors(TokenInterceptor)
+  @AllowAny()
   @ApiOperation({ summary: 'Get an access token for a user' })
   async login(@AuthUser() user: UserDto): Promise<JwtAccessToken> {
+    console.log('ici');
     return this.authService.login(user);
   }
 

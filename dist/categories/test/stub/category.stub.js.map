@@ -1,0 +1,1 @@
+{"version":3,"file":"category.stub.js","sourceRoot":"","sources":["../../../../src/categories/test/stub/category.stub.ts"],"names":[],"mappings":";;;AAAA,qCAAqC;AAGrC,MAAM,YAAY,GAAG,IAAI,QAAQ,CAAC,KAAK,CAAC,QAAQ,EAAE,CAAC;AAE5C,MAAM,YAAY,GAAG,GAAgB,EAAE;IAC5C,OAAO;QACL,GAAG,EAAE,YAAY;QACjB,IAAI,EAAE,OAAO;KACd,CAAC;AACJ,CAAC,CAAC;AALW,QAAA,YAAY,gBAKvB"}

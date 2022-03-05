@@ -3,6 +3,8 @@ import { CategoriesService } from './categories.service';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { CategoryDto } from './dto/category.dto';
 import { CreateCategoryDto } from './dto/create-category.dto';
+import { Role } from '../auth/decorators/roles.decorator';
+import { IUserRole } from '../users/entities/users.role.interface';
 
 @Controller('categories')
 @ApiTags('Categories')
@@ -18,6 +20,7 @@ export class CategoriesController {
   })
   @ApiResponse({ status: 400, description: 'Validations failed' })
   @ApiResponse({ status: 409, description: 'The category already exist' })
+  @Role(IUserRole.ADMIN)
   create(@Body() createCategoryDto: CreateCategoryDto): Promise<CategoryDto> {
     return this.categoriesService.create(createCategoryDto);
   }
