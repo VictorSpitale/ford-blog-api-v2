@@ -104,6 +104,7 @@ let PostsService = class PostsService {
             sourceName: post.sourceName,
             sourceLink: post.sourceLink,
             comments: post.comments,
+            picture: post.picture,
             createdAt: post.createdAt,
             updatedAt: post.updatedAt,
         };

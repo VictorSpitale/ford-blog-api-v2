@@ -7,6 +7,7 @@ import {
   IsMongoId,
   IsNotEmpty,
   IsNumber,
+  IsString,
 } from 'class-validator';
 import * as Mongoose from 'mongoose';
 import { CommentDto } from './comment.dto';
@@ -67,6 +68,14 @@ export class PostDto extends OmitType(CreatePostDto, ['categories'] as const) {
     type: [CommentDto],
   })
   readonly comments: CommentDto[];
+
+  @ApiProperty({
+    description: 'Picture url',
+    example: 'url to picture',
+    type: String,
+  })
+  @IsString()
+  readonly picture: string;
 
   @IsDateString()
   @IsNotEmpty()
