@@ -10,6 +10,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { User, UserDocument } from './entities/user.entity';
 import { isValidObjectId, Model, Types } from 'mongoose';
 import { UserDto } from './dto/user.dto';
+import { MatchType } from '../shared/types/match.types';
 
 @Injectable()
 export class UsersService {
@@ -58,7 +59,7 @@ export class UsersService {
     await this.userModel.replaceOne({ _id: user._id }, user, { upsert: true });
   }
 
-  private async find(match: Record<string, unknown> = {}) {
+  private async find(match: MatchType = {}) {
     if (match._id) {
       if (!isValidObjectId(match._id)) {
         throw new BadRequestException();
@@ -66,32 +67,18 @@ export class UsersService {
         match._id = new Types.ObjectId(match._id as string);
       }
     }
-    const pipeline: Array<any> = [
-      {
-        $match: match,
-      },
-      {
-        $project: {
-          _id: 1,
-          password: 1,
-          pseudo: 1,
-          email: 1,
-          role: 1,
-          createdAt: 1,
-          updatedAt: 1,
-        },
-      },
-    ];
-
-    const users = this.userModel.aggregate(pipeline);
-    const formattedUsers: User[] = [];
-    for await (const user of users) {
-      formattedUsers.push(user);
-    }
-    return formattedUsers;
+    return this.userModel.find(match, {
+      _id: 1,
+      password: 1,
+      pseudo: 1,
+      email: 1,
+      role: 1,
+      createdAt: 1,
+      updatedAt: 1,
+    });
   }
 
-  private async findOne(match: Record<string, unknown>): Promise<User | null> {
+  async findOne(match: MatchType): Promise<User | null> {
     const users = await this.find(match);
     if (users.length > 0) {
       return users[0];

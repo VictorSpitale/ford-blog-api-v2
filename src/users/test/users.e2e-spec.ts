@@ -5,12 +5,8 @@ import { Connection } from 'mongoose';
 import { DatabaseService } from '../../database/database.service';
 import { AppModule } from '../../app.module';
 
-import {
-  UserStub,
-  UserStubWithoutPassword,
-  UserStubWithoutPasswordAndDates,
-} from './stub/user.stub';
-import { clearDatabase } from './utils';
+import { UserStub, UserStubWithoutPasswordAndDates } from './stub/user.stub';
+import { clearDatabase } from '../../shared/test/utils';
 
 describe('UsersController (e2e)', () => {
   let app: INestApplication;
@@ -33,14 +29,14 @@ describe('UsersController (e2e)', () => {
 
   describe('getUsers', function () {
     beforeEach(async () => {
-      await dbConnection.collection('users').deleteMany({});
+      await clearDatabase(dbConnection, 'users');
     });
 
     it('should return an array of users', async () => {
       await dbConnection.collection('users').insertOne(UserStub());
       const response = await request(httpServer).get('/users');
       expect(response.status).toBe(200);
-      expect(response.body).toMatchObject([UserStubWithoutPassword()]);
+      expect(response.body).toMatchObject([UserStubWithoutPasswordAndDates()]);
     });
   });
 

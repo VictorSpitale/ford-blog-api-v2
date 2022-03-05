@@ -1,8 +1,8 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
+import * as Mongoose from 'mongoose';
 import { Document } from 'mongoose';
 import * as bcrypt from 'bcrypt';
 import { IUserRole } from './users.role.interface';
-import * as Mongoose from 'mongoose';
 
 export type UserDocument = User & Document;
 
@@ -24,7 +24,7 @@ export class User {
     unique: true,
     required: true,
     match: [
-      /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/,
+      /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/,
       'Please fill a valid email address',
     ],
     lowercase: true,
@@ -45,14 +45,23 @@ export class User {
 
   updatedAt: string;
   createdAt: string;
+
+  checkPassword: (plainPassword: string) => Promise<boolean>;
 }
 
-export const UserEntity = SchemaFactory.createForClass(User).set(
-  'timestamps',
-  true,
-);
+export const UserEntity = SchemaFactory.createForClass(User)
+  .set('timestamps', true)
+  .set('versionKey', false);
+
 UserEntity.pre<User>('save', async function (next) {
   const salt = await bcrypt.genSalt();
   this.password = await bcrypt.hash(this.password, salt);
   next();
 });
+
+UserEntity.methods.checkPassword = async function (
+  plainPassword: string,
+): Promise<boolean> {
+  const user = <UserDocument>this;
+  return await bcrypt.compare(plainPassword, user.password);
+};
