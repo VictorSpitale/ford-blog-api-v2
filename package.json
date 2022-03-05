@@ -2,9 +2,9 @@
   "name": "ford-blog-api-v2",
   "version": "0.0.1",
   "description": "",
-  "author": "",
+  "author": "Victor Spitale",
   "private": true,
-  "license": "UNLICENSED",
+  "license": "CC-BY-NC-ND-4.0",
   "scripts": {
     "prebuild": "rimraf dist",
     "build": "nest build",
