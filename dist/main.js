@@ -31,7 +31,13 @@ async function bootstrap() {
             }
         },
         credentials: true,
-        allowedHeaders: ['Origin', 'X-Requested-With', 'Content-Type', 'Accept'],
+        allowedHeaders: [
+            'Origin',
+            'X-Requested-With',
+            'Content-Type',
+            'Accept',
+            'x-api-key',
+        ],
         preflightContinue: false,
     });
     await app.listen(process.env.PORT || 5000);
