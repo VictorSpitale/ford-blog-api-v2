@@ -2,6 +2,7 @@ import {
   BadRequestException,
   ConflictException,
   Injectable,
+  NotFoundException,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Post, PostDocument } from './entities/post.entity';
@@ -28,15 +29,21 @@ export class PostsService {
   }
 
   async getPosts(user: User): Promise<PostDto[]> {
-    const posts = await this.find();
-    const populatedPost = await PostsService.populate(posts);
-    return Promise.all(populatedPost.map((post) => this.asDto(post, user)));
+    const posts = await this.find({});
+    return posts.map((p) => this.asDto(p, user));
   }
 
-  private static async populate(posts: PostDocument[]): Promise<Post[]> {
-    return await Promise.all(
-      posts.map((post) => post.populate('categories likers')),
-    );
+  async getLastPosts(user: User): Promise<PostDto[]> {
+    const posts = await this.find({}, 6);
+    return posts.map((p) => this.asDto(p, user));
+  }
+
+  async getPost(slug: string, user: User): Promise<PostDto> {
+    const post = await this.findOne({ slug });
+    if (!post) {
+      throw new NotFoundException();
+    }
+    return this.asDto(post, user);
   }
 
   private async checkIfPostIsDuplicatedBySlug(slug: string): Promise<PostDto> {
@@ -44,7 +51,7 @@ export class PostsService {
     return post ? this.asDto(post, null) : null;
   }
 
-  private async find(match: MatchType = {}) {
+  private async find(match: MatchType = {}, limit = 0) {
     if (match._id) {
       if (!isValidObjectId(match._id)) {
         throw new BadRequestException();
@@ -52,7 +59,7 @@ export class PostsService {
         match._id = new Types.ObjectId(match._id as string);
       }
     }
-    return this.postModel
+    const docs = this.postModel
       .find(match, {
         _id: 1,
         title: 1,
@@ -68,6 +75,9 @@ export class PostsService {
         updatedAt: 1,
       })
       .sort({ createdAt: -1 });
+    docs.populate('categories likers');
+    if (limit) docs.limit(limit);
+    return docs;
   }
 
   async findOne(match: MatchType): Promise<Post | null> {

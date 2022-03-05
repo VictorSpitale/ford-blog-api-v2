@@ -1,4 +1,12 @@
-import { Body, Controller, Get, Post, Req, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  Post,
+  Req,
+  UseGuards,
+} from '@nestjs/common';
 import { PostsService } from './posts.service';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { PostDto } from './dto/post.dto';
@@ -39,5 +47,23 @@ export class PostsController {
   @AllowAny()
   async getPosts(@Req() req): Promise<PostDto[]> {
     return this.postsService.getPosts(req.user);
+  }
+
+  @Get('last')
+  @ApiOperation({ summary: 'Get 6 last posts' })
+  @ApiResponse({
+    status: 200,
+    description: 'List the 6 last posts',
+    type: [PostDto],
+  })
+  @AllowAny()
+  async getLastPosts(@Req() req): Promise<PostDto[]> {
+    return this.postsService.getLastPosts(req.user);
+  }
+
+  @Get(':slug')
+  @AllowAny()
+  async getPost(@Req() req, @Param('slug') slug): Promise<PostDto> {
+    return this.postsService.getPost(slug, req.user);
   }
 }
