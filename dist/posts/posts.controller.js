@@ -23,12 +23,13 @@ const roles_decorator_1 = require("../auth/decorators/roles.decorator");
 const users_role_interface_1 = require("../users/entities/users.role.interface");
 const roles_guard_1 = require("../auth/guards/roles.guard");
 const allow_any_decorator_1 = require("../auth/decorators/allow-any.decorator");
+const platform_express_1 = require("@nestjs/platform-express");
 let PostsController = class PostsController {
     constructor(postsService) {
         this.postsService = postsService;
     }
-    create(createPostDto) {
-        return this.postsService.create(createPostDto);
+    create(createPostDto, file) {
+        return this.postsService.create(createPostDto, file);
     }
     async getPosts(req) {
         return this.postsService.getPosts(req.user);
@@ -55,10 +56,12 @@ __decorate([
         description: 'The post with this slug already exist',
     }),
     (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard, roles_guard_1.RolesGuard),
+    (0, common_1.UseInterceptors)((0, platform_express_1.FileInterceptor)('file')),
     (0, roles_decorator_1.Role)(users_role_interface_1.IUserRole.POSTER),
     __param(0, (0, common_1.Body)()),
+    __param(1, (0, common_1.UploadedFile)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [create_post_dto_1.CreatePostDto]),
+    __metadata("design:paramtypes", [create_post_dto_1.CreatePostDto, Object]),
     __metadata("design:returntype", Promise)
 ], PostsController.prototype, "create", null);
 __decorate([

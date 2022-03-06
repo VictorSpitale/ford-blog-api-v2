@@ -26,6 +26,8 @@ export class DatabaseModule {
                 '/' +
                 (configService.get<string>('NODE_ENV') === 'test'
                   ? dbConfig.test_name
+                  : configService.get<string>('NODE_ENV') === 'development'
+                  ? dbConfig.dev_name
                   : dbConfig.name),
             };
           },
