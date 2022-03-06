@@ -44,7 +44,6 @@ export class PostsController {
   @Get()
   @ApiOperation({ summary: 'Get all posts' })
   @ApiResponse({ status: 200, description: 'List all posts', type: [PostDto] })
-  @AllowAny()
   async getPosts(@Req() req): Promise<PostDto[]> {
     return this.postsService.getPosts(req.user);
   }
