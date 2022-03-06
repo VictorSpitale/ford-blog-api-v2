@@ -65,7 +65,6 @@ __decorate([
     (0, common_1.Get)(),
     (0, swagger_1.ApiOperation)({ summary: 'Get all posts' }),
     (0, swagger_1.ApiResponse)({ status: 200, description: 'List all posts', type: [post_dto_1.PostDto] }),
-    (0, allow_any_decorator_1.AllowAny)(),
     __param(0, (0, common_1.Req)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Object]),

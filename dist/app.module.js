@@ -40,9 +40,9 @@ AppModule = __decorate([
         providers: [
             {
                 provide: core_1.APP_GUARD,
-                useFactory: (ref) => new jwt_auth_guard_1.JwtAuthGuard(ref),
-                inject: [core_1.Reflector],
+                useExisting: jwt_auth_guard_1.JwtAuthGuard,
             },
+            jwt_auth_guard_1.JwtAuthGuard,
         ],
     })
 ], AppModule);

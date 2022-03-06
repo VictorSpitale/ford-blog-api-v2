@@ -6,7 +6,7 @@ import { UsersModule } from './users/users.module';
 import { AuthModule } from './auth/auth.module';
 import { PostsModule } from './posts/posts.module';
 import { CategoriesModule } from './categories/categories.module';
-import { APP_GUARD, Reflector } from '@nestjs/core';
+import { APP_GUARD } from '@nestjs/core';
 import { JwtAuthGuard } from './auth/guards/jwt-auth.guard';
 import { ApikeyMiddleware } from './auth/middleware/apikey.middleware';
 
@@ -26,9 +26,9 @@ import { ApikeyMiddleware } from './auth/middleware/apikey.middleware';
   providers: [
     {
       provide: APP_GUARD,
-      useFactory: (ref) => new JwtAuthGuard(ref),
-      inject: [Reflector],
+      useExisting: JwtAuthGuard,
     },
+    JwtAuthGuard,
   ],
 })
 export class AppModule implements NestModule {
