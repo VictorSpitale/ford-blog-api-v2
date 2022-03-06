@@ -11,5 +11,8 @@ declare const _default: () => {
     jwt: {
         secret: string;
     };
+    api_key: {
+        key: string;
+    };
 };
 export default _default;
