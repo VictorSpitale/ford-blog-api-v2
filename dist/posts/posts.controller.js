@@ -18,10 +18,8 @@ const posts_service_1 = require("./posts.service");
 const swagger_1 = require("@nestjs/swagger");
 const post_dto_1 = require("./dto/post.dto");
 const create_post_dto_1 = require("./dto/create-post.dto");
-const jwt_auth_guard_1 = require("../auth/guards/jwt-auth.guard");
 const roles_decorator_1 = require("../auth/decorators/roles.decorator");
 const users_role_interface_1 = require("../users/entities/users.role.interface");
-const roles_guard_1 = require("../auth/guards/roles.guard");
 const allow_any_decorator_1 = require("../auth/decorators/allow-any.decorator");
 const platform_express_1 = require("@nestjs/platform-express");
 let PostsController = class PostsController {
@@ -55,7 +53,6 @@ __decorate([
         status: 409,
         description: 'The post with this slug already exist',
     }),
-    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard, roles_guard_1.RolesGuard),
     (0, common_1.UseInterceptors)((0, platform_express_1.FileInterceptor)('file')),
     (0, roles_decorator_1.Role)(users_role_interface_1.IUserRole.POSTER),
     __param(0, (0, common_1.Body)()),

@@ -6,17 +6,14 @@ import {
   Post,
   Req,
   UploadedFile,
-  UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
 import { PostsService } from './posts.service';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { PostDto } from './dto/post.dto';
 import { CreatePostDto } from './dto/create-post.dto';
-import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { Role } from '../auth/decorators/roles.decorator';
 import { IUserRole } from '../users/entities/users.role.interface';
-import { RolesGuard } from '../auth/guards/roles.guard';
 import { AllowAny } from '../auth/decorators/allow-any.decorator';
 import { FileInterceptor } from '@nestjs/platform-express';
 
@@ -38,7 +35,6 @@ export class PostsController {
     status: 409,
     description: 'The post with this slug already exist',
   })
-  @UseGuards(JwtAuthGuard, RolesGuard)
   @UseInterceptors(FileInterceptor('file'))
   @Role(IUserRole.POSTER)
   create(

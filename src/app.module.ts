@@ -9,6 +9,7 @@ import { CategoriesModule } from './categories/categories.module';
 import { APP_GUARD } from '@nestjs/core';
 import { JwtAuthGuard } from './auth/guards/jwt-auth.guard';
 import { ApikeyMiddleware } from './auth/middleware/apikey.middleware';
+import { RolesGuard } from './auth/guards/roles.guard';
 
 @Module({
   imports: [
@@ -28,7 +29,12 @@ import { ApikeyMiddleware } from './auth/middleware/apikey.middleware';
       provide: APP_GUARD,
       useExisting: JwtAuthGuard,
     },
+    {
+      provide: APP_GUARD,
+      useExisting: RolesGuard,
+    },
     JwtAuthGuard,
+    RolesGuard,
   ],
 })
 export class AppModule implements NestModule {

@@ -25,7 +25,7 @@ let JwtAuthGuard = class JwtAuthGuard extends (0, passport_1.AuthGuard)('jwt') {
             return user;
         if (allowAny)
             return null;
-        throw new common_1.UnauthorizedException();
+        throw new common_1.UnauthorizedException('Jwt failed');
     }
 };
 JwtAuthGuard = __decorate([

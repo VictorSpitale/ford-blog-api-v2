@@ -22,7 +22,7 @@ describe('CategoriesController (e2e)', () => {
 
   describe('getCategories', () => {
     beforeEach(async () => {
-      await dbConnection.collection('categories').deleteMany({});
+      await clearDatabase(dbConnection, 'categories');
     });
 
     it('should return an array of categories', async () => {

@@ -26,7 +26,9 @@ let RolesGuard = class RolesGuard {
             return true;
         }
         const { user } = context.switchToHttp().getRequest();
-        return user.role >= requiredRole;
+        if (user.role >= requiredRole)
+            return true;
+        throw new common_1.UnauthorizedException('Insufficient permissions');
     }
 };
 RolesGuard = __decorate([
