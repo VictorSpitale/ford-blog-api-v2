@@ -7,11 +7,14 @@ import { DatabaseService } from '../../database/database.service';
 import { ConfigService } from '@nestjs/config';
 import { getRequest } from './superagent';
 import * as request from 'supertest';
+import { RolesGuard } from '../../auth/guards/roles.guard';
 
 export async function init_e2e() {
   const moduleFixture: TestingModule = await Test.createTestingModule({
     imports: [AppModule],
   })
+    .overrideProvider(RolesGuard)
+    .useClass(AuthGuardMock)
     .overrideProvider(JwtAuthGuard)
     .useClass(AuthGuardMock)
     .compile();

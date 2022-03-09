@@ -19,7 +19,7 @@ let ApikeyStrategy = class ApikeyStrategy extends (0, passport_1.PassportStrateg
         super({ header: 'x-api-key', prefix: '' }, true, (apiKey, verified) => {
             const checkKey = authService.validateApiKey(apiKey);
             if (!checkKey) {
-                return verified(false);
+                throw new common_1.UnauthorizedException('Api Key Unauthorized');
             }
             return verified(true);
         });

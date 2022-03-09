@@ -10,10 +10,13 @@ const database_service_1 = require("../../database/database.service");
 const config_1 = require("@nestjs/config");
 const superagent_1 = require("./superagent");
 const request = require("supertest");
+const roles_guard_1 = require("../../auth/guards/roles.guard");
 async function init_e2e() {
     const moduleFixture = await testing_1.Test.createTestingModule({
         imports: [app_module_1.AppModule],
     })
+        .overrideProvider(roles_guard_1.RolesGuard)
+        .useClass(auth_guard_mock_1.AuthGuardMock)
         .overrideProvider(jwt_auth_guard_1.JwtAuthGuard)
         .useClass(auth_guard_mock_1.AuthGuardMock)
         .compile();
