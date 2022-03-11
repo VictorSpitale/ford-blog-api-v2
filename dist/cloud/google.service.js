@@ -31,7 +31,6 @@ let GoogleService = class GoogleService {
             file.mimetype !== 'image/png') {
             throw new common_1.BadRequestException('File format not supported');
         }
-        console.log(file);
         try {
             const bucket = this.storage.bucket(this.configService.get('bucket_name'));
             let folder;

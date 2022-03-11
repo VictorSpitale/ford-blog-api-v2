@@ -31,7 +31,6 @@ export class GoogleService {
     ) {
       throw new BadRequestException('File format not supported');
     }
-    console.log(file);
     try {
       const bucket = this.storage.bucket(this.configService.get('bucket_name'));
       let folder;
