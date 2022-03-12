@@ -74,11 +74,10 @@ export class CreatePostDto {
 
   @ApiProperty({
     description: 'File to upload, converted to picture url',
-    example: 'https://storage.googleapis.com/name',
-    type: String,
-    pattern: urlPattern,
+    required: false,
+    type: 'string',
+    format: 'binary',
   })
   @IsOptional()
-  @Matches(urlPattern)
-  readonly picture?: string;
+  readonly file?: any;
 }

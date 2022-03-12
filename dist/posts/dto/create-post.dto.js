@@ -86,13 +86,12 @@ __decorate([
 __decorate([
     (0, swagger_1.ApiProperty)({
         description: 'File to upload, converted to picture url',
-        example: 'https://storage.googleapis.com/name',
-        type: String,
-        pattern: regex_validation_1.urlPattern,
+        required: false,
+        type: 'string',
+        format: 'binary',
     }),
     (0, class_validator_1.IsOptional)(),
-    (0, class_validator_1.Matches)(regex_validation_1.urlPattern),
-    __metadata("design:type", String)
-], CreatePostDto.prototype, "picture", void 0);
+    __metadata("design:type", Object)
+], CreatePostDto.prototype, "file", void 0);
 exports.CreatePostDto = CreatePostDto;
 //# sourceMappingURL=create-post.dto.js.map
