@@ -9,6 +9,8 @@ exports.default = () => ({
         cluster_name: process.env.DB_CLUSTER_NAME,
         name: process.env.DB_NAME,
         test_name: process.env.DB_TEST_NAME,
+        dev_name: process.env.DB_DEV_NAME,
+        bucket_name: process.env.BUCKET_NAME,
     },
     jwt: {
         secret: process.env.JWT_SECRET,

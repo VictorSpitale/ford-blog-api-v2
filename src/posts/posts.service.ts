@@ -11,18 +11,33 @@ import { MatchType } from '../shared/types/match.types';
 import { PostDto } from './dto/post.dto';
 import { CreatePostDto } from './dto/create-post.dto';
 import { User } from '../users/entities/user.entity';
+import { GoogleService } from '../cloud/google.service';
+import { UploadTypes } from '../shared/types/upload.types';
 
 @Injectable()
 export class PostsService {
   constructor(
     @InjectModel(Post.name) private readonly postModel: Model<PostDocument>,
+    private readonly googleService: GoogleService,
   ) {}
 
-  async create(createPostDto: CreatePostDto): Promise<PostDto> {
+  async create(
+    createPostDto: CreatePostDto,
+    file: Express.Multer.File,
+  ): Promise<PostDto | any> {
     if (await this.checkIfPostIsDuplicatedBySlug(createPostDto.slug)) {
       throw new ConflictException('post with this slug already exist');
     }
-    const createdPost = await this.postModel.create(createPostDto);
+    let data = { ...createPostDto };
+    if (file) {
+      const picturePath = await this.googleService.uploadFile(
+        file,
+        createPostDto.slug,
+        UploadTypes.POST,
+      );
+      data = { ...data, picture: picturePath };
+    }
+    const createdPost = await this.postModel.create(data);
     await createdPost.populate('categories');
     await createdPost.save();
     return this.asDto(createdPost, null);

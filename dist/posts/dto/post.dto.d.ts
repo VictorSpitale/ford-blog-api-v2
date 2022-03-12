@@ -9,7 +9,7 @@ export declare class PostDto extends PostDto_base {
     readonly likes: number;
     readonly authUserLiked: boolean;
     readonly comments: CommentDto[];
-    readonly picture: string;
+    readonly picture?: string;
     readonly createdAt: string;
     readonly updatedAt: string;
 }

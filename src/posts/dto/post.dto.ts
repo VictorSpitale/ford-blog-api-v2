@@ -7,6 +7,7 @@ import {
   IsMongoId,
   IsNotEmpty,
   IsNumber,
+  IsOptional,
   IsString,
 } from 'class-validator';
 import * as Mongoose from 'mongoose';
@@ -75,7 +76,8 @@ export class PostDto extends OmitType(CreatePostDto, ['categories'] as const) {
     type: String,
   })
   @IsString()
-  readonly picture: string;
+  @IsOptional()
+  readonly picture?: string;
 
   @IsDateString()
   @IsNotEmpty()

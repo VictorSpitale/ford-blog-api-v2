@@ -1,39 +1,33 @@
-import { INestApplication, ValidationPipe } from '@nestjs/common';
+import { INestApplication } from '@nestjs/common';
 import { Connection } from 'mongoose';
-import { Test, TestingModule } from '@nestjs/testing';
-import { AppModule } from '../../app.module';
-import { DatabaseService } from '../../database/database.service';
 import { CategoryStub } from './stub/category.stub';
-import * as request from 'supertest';
 import { clearDatabase } from '../../shared/test/utils';
+import { init_e2e } from '../../shared/test/init.e2e';
 
 describe('CategoriesController (e2e)', () => {
   let app: INestApplication;
   let dbConnection: Connection;
-  let httpServer: any;
+  let request;
 
   beforeAll(async () => {
-    const moduleFixture: TestingModule = await Test.createTestingModule({
-      imports: [AppModule],
-    }).compile();
-
-    app = moduleFixture.createNestApplication();
-    app.useGlobalPipes(new ValidationPipe());
-    await app.init();
-    dbConnection = moduleFixture
-      .get<DatabaseService>(DatabaseService)
-      .getDbHandle();
-    httpServer = app.getHttpServer();
+    const {
+      httpRequest: req,
+      dbConnection: db,
+      app: nestApp,
+    } = await init_e2e();
+    request = req;
+    dbConnection = db;
+    app = nestApp;
   });
 
   describe('getCategories', () => {
     beforeEach(async () => {
-      await dbConnection.collection('categories').deleteMany({});
+      await clearDatabase(dbConnection, 'categories');
     });
 
     it('should return an array of categories', async () => {
       await dbConnection.collection('categories').insertOne(CategoryStub());
-      const response = await request(httpServer).get('/categories');
+      const response = await request.get('/categories');
       expect(response.status).toBe(200);
       expect(response.body).toMatchObject([CategoryStub()]);
     });
@@ -45,7 +39,7 @@ describe('CategoriesController (e2e)', () => {
     });
     let createdCategoryId;
     it('should create a category', async () => {
-      const response = await request(httpServer).post('/categories').send({
+      const response = await request.post('/categories').send({
         name: CategoryStub().name,
       });
       expect(response.status).toBe(201);
@@ -53,13 +47,11 @@ describe('CategoriesController (e2e)', () => {
       createdCategoryId = response.body._id;
     });
     it('should get the created category', async () => {
-      const response = await request(httpServer).get(
-        '/categories/' + createdCategoryId,
-      );
+      const response = await request.get('/categories/' + createdCategoryId);
       expect(response.status).toBe(200);
     });
     it('should not create a duplicate category', async () => {
-      const response = await request(httpServer).post('/categories').send({
+      const response = await request.post('/categories').send({
         name: CategoryStub().name,
       });
       expect(response.status).toBe(409);

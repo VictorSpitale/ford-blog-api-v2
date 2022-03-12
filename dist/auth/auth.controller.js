@@ -20,14 +20,12 @@ const auth_service_1 = require("./auth.service");
 const token_interceptor_1 = require("./interceptors/token.interceptor");
 const user_decorator_1 = require("../users/user.decorator");
 const user_dto_1 = require("../users/dto/user.dto");
-const jwt_auth_guard_1 = require("./guards/jwt-auth.guard");
 const allow_any_decorator_1 = require("./decorators/allow-any.decorator");
 let AuthController = class AuthController {
     constructor(authService) {
         this.authService = authService;
     }
     async login(user) {
-        console.log('ici');
         return this.authService.login(user);
     }
     async getProfile(user) {
@@ -48,7 +46,6 @@ __decorate([
 ], AuthController.prototype, "login", null);
 __decorate([
     (0, common_1.Get)('/me'),
-    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
     __param(0, (0, user_decorator_1.AuthUser)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [user_dto_1.UserDto]),

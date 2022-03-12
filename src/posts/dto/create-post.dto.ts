@@ -1,5 +1,11 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsMongoId, IsNotEmpty, IsString, Matches } from 'class-validator';
+import {
+  IsMongoId,
+  IsNotEmpty,
+  IsOptional,
+  IsString,
+  Matches,
+} from 'class-validator';
 import { urlPattern } from '../../shared/utils/regex.validation';
 import * as Mongoose from 'mongoose';
 
@@ -65,4 +71,14 @@ export class CreatePostDto {
   @IsMongoId({ each: true })
   @IsNotEmpty()
   readonly categories: Mongoose.Types.ObjectId[];
+
+  @ApiProperty({
+    description: 'File to upload, converted to picture url',
+    example: 'https://storage.googleapis.com/name',
+    type: String,
+    pattern: urlPattern,
+  })
+  @IsOptional()
+  @Matches(urlPattern)
+  readonly picture?: string;
 }

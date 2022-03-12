@@ -17,15 +17,23 @@ const common_1 = require("@nestjs/common");
 const mongoose_1 = require("@nestjs/mongoose");
 const post_entity_1 = require("./entities/post.entity");
 const mongoose_2 = require("mongoose");
+const google_service_1 = require("../cloud/google.service");
+const upload_types_1 = require("../shared/types/upload.types");
 let PostsService = class PostsService {
-    constructor(postModel) {
+    constructor(postModel, googleService) {
         this.postModel = postModel;
+        this.googleService = googleService;
     }
-    async create(createPostDto) {
+    async create(createPostDto, file) {
         if (await this.checkIfPostIsDuplicatedBySlug(createPostDto.slug)) {
             throw new common_1.ConflictException('post with this slug already exist');
         }
-        const createdPost = await this.postModel.create(createPostDto);
+        let data = Object.assign({}, createPostDto);
+        if (file) {
+            const picturePath = await this.googleService.uploadFile(file, createPostDto.slug, upload_types_1.UploadTypes.POST);
+            data = Object.assign(Object.assign({}, data), { picture: picturePath });
+        }
+        const createdPost = await this.postModel.create(data);
         await createdPost.populate('categories');
         await createdPost.save();
         return this.asDto(createdPost, null);
@@ -113,7 +121,8 @@ let PostsService = class PostsService {
 PostsService = __decorate([
     (0, common_1.Injectable)(),
     __param(0, (0, mongoose_1.InjectModel)(post_entity_1.Post.name)),
-    __metadata("design:paramtypes", [mongoose_2.Model])
+    __metadata("design:paramtypes", [mongoose_2.Model,
+        google_service_1.GoogleService])
 ], PostsService);
 exports.PostsService = PostsService;
 //# sourceMappingURL=posts.service.js.map

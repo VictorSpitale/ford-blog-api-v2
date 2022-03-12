@@ -30,7 +30,9 @@ let DatabaseModule = DatabaseModule_1 = class DatabaseModule {
                                 '/' +
                                 (configService.get('NODE_ENV') === 'test'
                                     ? dbConfig.test_name
-                                    : dbConfig.name),
+                                    : configService.get('NODE_ENV') === 'development'
+                                        ? dbConfig.dev_name
+                                        : dbConfig.name),
                         };
                     },
                     inject: [config_1.ConfigService],

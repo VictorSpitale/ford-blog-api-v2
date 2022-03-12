@@ -18,6 +18,7 @@ const categories_module_1 = require("./categories/categories.module");
 const core_1 = require("@nestjs/core");
 const jwt_auth_guard_1 = require("./auth/guards/jwt-auth.guard");
 const apikey_middleware_1 = require("./auth/middleware/apikey.middleware");
+const roles_guard_1 = require("./auth/guards/roles.guard");
 let AppModule = class AppModule {
     configure(consumer) {
         consumer.apply(apikey_middleware_1.ApikeyMiddleware).forRoutes('');
@@ -40,9 +41,14 @@ AppModule = __decorate([
         providers: [
             {
                 provide: core_1.APP_GUARD,
-                useFactory: (ref) => new jwt_auth_guard_1.JwtAuthGuard(ref),
-                inject: [core_1.Reflector],
+                useExisting: jwt_auth_guard_1.JwtAuthGuard,
             },
+            {
+                provide: core_1.APP_GUARD,
+                useExisting: roles_guard_1.RolesGuard,
+            },
+            jwt_auth_guard_1.JwtAuthGuard,
+            roles_guard_1.RolesGuard,
         ],
     })
 ], AppModule);
