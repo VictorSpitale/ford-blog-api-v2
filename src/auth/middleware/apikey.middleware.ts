@@ -16,7 +16,7 @@ export class ApikeyMiddleware implements NestMiddleware {
         if (value) {
           next();
         } else {
-          throw new UnauthorizedException();
+          throw new UnauthorizedException('Api Key Unauthorized');
         }
       },
     )(req, res, next);
