@@ -4,12 +4,20 @@ import {
   Get,
   Param,
   Post,
+  Query,
   Req,
   UploadedFile,
   UseInterceptors,
 } from '@nestjs/common';
 import { PostsService } from './posts.service';
-import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiOperation,
+  ApiQuery,
+  ApiResponse,
+  ApiSecurity,
+  ApiTags,
+} from '@nestjs/swagger';
 import { PostDto } from './dto/post.dto';
 import { CreatePostDto } from './dto/create-post.dto';
 import { Role } from '../auth/decorators/roles.decorator';
@@ -23,6 +31,8 @@ export class PostsController {
   constructor(private readonly postsService: PostsService) {}
 
   @Post()
+  @ApiSecurity('x-api-key')
+  @ApiBearerAuth()
   @ApiOperation({ summary: 'Create a post' })
   @ApiResponse({
     status: 201,
@@ -52,6 +62,7 @@ export class PostsController {
   }
 
   @Get('last')
+  @ApiSecurity('x-api-key')
   @ApiOperation({ summary: 'Get 6 last posts' })
   @ApiResponse({
     status: 200,
@@ -61,6 +72,24 @@ export class PostsController {
   @AllowAny()
   async getLastPosts(@Req() req): Promise<PostDto[]> {
     return this.postsService.getLastPosts(req.user);
+  }
+
+  @Get('query')
+  @ApiSecurity('x-api-key')
+  @ApiQuery({ name: 'search' })
+  @ApiResponse({
+    status: 200,
+    description: 'List the 5 queried posts',
+    type: [PostDto],
+  })
+  @ApiResponse({
+    status: 400,
+    description:
+      'Search query failed, search must be defined and more than 2 characters',
+  })
+  @AllowAny()
+  async getQueriedPosts(@Query('search') search) {
+    return this.postsService.getQueriedPosts(search);
   }
 
   @Get(':slug')

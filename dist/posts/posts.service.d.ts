@@ -14,8 +14,9 @@ export declare class PostsService {
     getPosts(user: User): Promise<PostDto[]>;
     getLastPosts(user: User): Promise<PostDto[]>;
     getPost(slug: string, user: User): Promise<PostDto>;
+    getQueriedPosts(search: string): Promise<PostDto[]>;
     private checkIfPostIsDuplicatedBySlug;
     private find;
     findOne(match: MatchType): Promise<Post | null>;
-    asDto(post: Post, authUser: User): PostDto;
+    asDto(post: Post, authUser?: User): PostDto;
 }
