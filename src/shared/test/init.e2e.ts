@@ -19,6 +19,12 @@ export async function init_e2e() {
     .useClass(AuthGuardMock)
     .compile();
 
+  return {
+    ...(await getInitConst(moduleFixture)),
+  };
+}
+
+async function getInitConst(moduleFixture: TestingModule) {
   const app = moduleFixture.createNestApplication();
   app.useGlobalPipes(new ValidationPipe());
   await app.init();
@@ -29,10 +35,19 @@ export async function init_e2e() {
   const config = moduleFixture.get<ConfigService>(ConfigService);
   const apiKeyHeader = { 'x-api-key': config.get('api_key.key') };
   const httpRequest = getRequest(request(httpServer), apiKeyHeader);
-
   return {
     app,
     dbConnection,
     httpRequest,
+  };
+}
+
+export async function initE2eWithGuards() {
+  const moduleFixture: TestingModule = await Test.createTestingModule({
+    imports: [AppModule],
+  }).compile();
+
+  return {
+    ...(await getInitConst(moduleFixture)),
   };
 }

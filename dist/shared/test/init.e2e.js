@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.init_e2e = void 0;
+exports.initE2eWithGuards = exports.init_e2e = void 0;
 const testing_1 = require("@nestjs/testing");
 const app_module_1 = require("../../app.module");
 const jwt_auth_guard_1 = require("../../auth/guards/jwt-auth.guard");
@@ -20,6 +20,10 @@ async function init_e2e() {
         .overrideProvider(jwt_auth_guard_1.JwtAuthGuard)
         .useClass(auth_guard_mock_1.AuthGuardMock)
         .compile();
+    return Object.assign({}, (await getInitConst(moduleFixture)));
+}
+exports.init_e2e = init_e2e;
+async function getInitConst(moduleFixture) {
     const app = moduleFixture.createNestApplication();
     app.useGlobalPipes(new common_1.ValidationPipe());
     await app.init();
@@ -36,5 +40,11 @@ async function init_e2e() {
         httpRequest,
     };
 }
-exports.init_e2e = init_e2e;
+async function initE2eWithGuards() {
+    const moduleFixture = await testing_1.Test.createTestingModule({
+        imports: [app_module_1.AppModule],
+    }).compile();
+    return Object.assign({}, (await getInitConst(moduleFixture)));
+}
+exports.initE2eWithGuards = initE2eWithGuards;
 //# sourceMappingURL=init.e2e.js.map
