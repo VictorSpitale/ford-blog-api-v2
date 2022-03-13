@@ -8,5 +8,6 @@ export declare class PostsController {
     create(createPostDto: CreatePostDto, file: Express.Multer.File): Promise<PostDto>;
     getPosts(req: any): Promise<PostDto[]>;
     getLastPosts(req: any): Promise<PostDto[]>;
+    getQueriedPosts(search: any): Promise<PostDto[]>;
     getPost(req: any, slug: any): Promise<PostDto>;
 }

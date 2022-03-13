@@ -35,12 +35,17 @@ let PostsController = class PostsController {
     async getLastPosts(req) {
         return this.postsService.getLastPosts(req.user);
     }
+    async getQueriedPosts(search) {
+        return this.postsService.getQueriedPosts(search);
+    }
     async getPost(req, slug) {
         return this.postsService.getPost(slug, req.user);
     }
 };
 __decorate([
     (0, common_1.Post)(),
+    (0, swagger_1.ApiSecurity)('x-api-key'),
+    (0, swagger_1.ApiBearerAuth)(),
     (0, swagger_1.ApiOperation)({ summary: 'Create a post' }),
     (0, swagger_1.ApiResponse)({
         status: 201,
@@ -72,6 +77,7 @@ __decorate([
 ], PostsController.prototype, "getPosts", null);
 __decorate([
     (0, common_1.Get)('last'),
+    (0, swagger_1.ApiSecurity)('x-api-key'),
     (0, swagger_1.ApiOperation)({ summary: 'Get 6 last posts' }),
     (0, swagger_1.ApiResponse)({
         status: 200,
@@ -84,6 +90,25 @@ __decorate([
     __metadata("design:paramtypes", [Object]),
     __metadata("design:returntype", Promise)
 ], PostsController.prototype, "getLastPosts", null);
+__decorate([
+    (0, common_1.Get)('query'),
+    (0, swagger_1.ApiSecurity)('x-api-key'),
+    (0, swagger_1.ApiQuery)({ name: 'search' }),
+    (0, swagger_1.ApiResponse)({
+        status: 200,
+        description: 'List the 5 queried posts',
+        type: [post_dto_1.PostDto],
+    }),
+    (0, swagger_1.ApiResponse)({
+        status: 400,
+        description: 'Search query failed, search must be defined and more than 2 characters',
+    }),
+    (0, allow_any_decorator_1.AllowAny)(),
+    __param(0, (0, common_1.Query)('search')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", Promise)
+], PostsController.prototype, "getQueriedPosts", null);
 __decorate([
     (0, common_1.Get)(':slug'),
     (0, allow_any_decorator_1.AllowAny)(),

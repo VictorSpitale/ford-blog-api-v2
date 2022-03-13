@@ -53,6 +53,27 @@ let PostsService = class PostsService {
         }
         return this.asDto(post, user);
     }
+    async getQueriedPosts(search) {
+        if (!search || (search && search.length < 3)) {
+            throw new common_1.BadRequestException('Search query is missing or should be more than 2 characters');
+        }
+        const searchReg = new RegExp('.*' + search + '.*', 'i');
+        const posts = await this.find({
+            $or: [
+                {
+                    title: {
+                        $regex: searchReg,
+                    },
+                },
+                {
+                    desc: {
+                        $regex: searchReg,
+                    },
+                },
+            ],
+        }, 5);
+        return posts.map((p) => this.asDto(p));
+    }
     async checkIfPostIsDuplicatedBySlug(slug) {
         const post = await this.findOne({ slug });
         return post ? this.asDto(post, null) : null;
@@ -81,8 +102,8 @@ let PostsService = class PostsService {
             createdAt: 1,
             updatedAt: 1,
         })
-            .sort({ createdAt: -1 });
-        docs.populate('categories likers');
+            .sort({ createdAt: -1 })
+            .populate('categories likers');
         if (limit)
             docs.limit(limit);
         return docs;

@@ -6,5 +6,5 @@ export declare class CreatePostDto {
     readonly sourceName: string;
     readonly sourceLink: string;
     readonly categories: Mongoose.Types.ObjectId[];
-    readonly picture?: string;
+    readonly file?: any;
 }
