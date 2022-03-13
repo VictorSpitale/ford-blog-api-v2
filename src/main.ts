@@ -14,6 +14,8 @@ async function bootstrap() {
     .setTitle('Ford Blog API v2')
     .setDescription('The Ford Blog API')
     .setVersion('2.0.1')
+    .addApiKey({ name: 'x-api-key', type: 'apiKey', in: 'header' }, 'x-api-key')
+    .addBearerAuth()
     .build();
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('docs', app, document);

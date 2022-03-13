@@ -83,5 +83,15 @@ __decorate([
     (0, class_validator_1.IsNotEmpty)(),
     __metadata("design:type", Array)
 ], CreatePostDto.prototype, "categories", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({
+        description: 'File to upload, converted to picture url',
+        required: false,
+        type: 'string',
+        format: 'binary',
+    }),
+    (0, class_validator_1.IsOptional)(),
+    __metadata("design:type", Object)
+], CreatePostDto.prototype, "file", void 0);
 exports.CreatePostDto = CreatePostDto;
 //# sourceMappingURL=create-post.dto.js.map

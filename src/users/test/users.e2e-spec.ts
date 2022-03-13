@@ -1,30 +1,24 @@
-import { Test, TestingModule } from '@nestjs/testing';
-import { INestApplication, ValidationPipe } from '@nestjs/common';
-import * as request from 'supertest';
+import { INestApplication } from '@nestjs/common';
 import { Connection } from 'mongoose';
-import { DatabaseService } from '../../database/database.service';
-import { AppModule } from '../../app.module';
 
 import { UserStub, UserStubWithoutPasswordAndDates } from './stub/user.stub';
 import { clearDatabase } from '../../shared/test/utils';
+import { init_e2e } from '../../shared/test/init.e2e';
 
 describe('UsersController (e2e)', () => {
   let app: INestApplication;
   let dbConnection: Connection;
-  let httpServer: any;
+  let request;
 
   beforeAll(async () => {
-    const moduleFixture: TestingModule = await Test.createTestingModule({
-      imports: [AppModule],
-    }).compile();
-
-    app = moduleFixture.createNestApplication();
-    app.useGlobalPipes(new ValidationPipe());
-    await app.init();
-    dbConnection = moduleFixture
-      .get<DatabaseService>(DatabaseService)
-      .getDbHandle();
-    httpServer = app.getHttpServer();
+    const {
+      httpRequest: req,
+      dbConnection: db,
+      app: nestApp,
+    } = await init_e2e();
+    request = req;
+    dbConnection = db;
+    app = nestApp;
   });
 
   describe('getUsers', function () {
@@ -34,7 +28,7 @@ describe('UsersController (e2e)', () => {
 
     it('should return an array of users', async () => {
       await dbConnection.collection('users').insertOne(UserStub());
-      const response = await request(httpServer).get('/users');
+      const response = await request.get('/users');
       expect(response.status).toBe(200);
       expect(response.body).toMatchObject([UserStubWithoutPasswordAndDates()]);
     });
@@ -45,7 +39,7 @@ describe('UsersController (e2e)', () => {
       await clearDatabase(dbConnection, 'users');
     });
     it('should not create a user with too short pseudo', async () => {
-      const response = await request(httpServer).post('/users').send({
+      const response = await request.post('/users').send({
         password: UserStub().password,
         pseudo: 'John',
         email: UserStub().email,
@@ -53,7 +47,7 @@ describe('UsersController (e2e)', () => {
       expect(response.status).toBe(400);
     });
     it('should not create a user with too short password', async () => {
-      const response = await request(httpServer).post('/users').send({
+      const response = await request.post('/users').send({
         password: 'pass',
         pseudo: UserStub().pseudo,
         email: UserStub().email,
@@ -61,7 +55,7 @@ describe('UsersController (e2e)', () => {
       expect(response.status).toBe(400);
     });
     it('should not create a user with too long pseudo', async () => {
-      const response = await request(httpServer).post('/users').send({
+      const response = await request.post('/users').send({
         password: UserStub().password,
         pseudo: 'JohnJohnJohnJohnJohnJohnJohn',
         email: UserStub().email,
@@ -69,7 +63,7 @@ describe('UsersController (e2e)', () => {
       expect(response.status).toBe(400);
     });
     it('should not create a user with not valid email', async () => {
-      const response = await request(httpServer).post('/users').send({
+      const response = await request.post('/users').send({
         password: UserStub().password,
         pseudo: UserStub().pseudo,
         email: 'john@doe',
@@ -78,7 +72,7 @@ describe('UsersController (e2e)', () => {
     });
     let createdUserId;
     it('should create a user', async () => {
-      const response = await request(httpServer).post('/users').send({
+      const response = await request.post('/users').send({
         password: UserStub().password,
         pseudo: UserStub().pseudo,
         email: UserStub().email,
@@ -88,11 +82,11 @@ describe('UsersController (e2e)', () => {
       createdUserId = response.body._id;
     });
     it('should get the created user', async () => {
-      const response = await request(httpServer).get('/users/' + createdUserId);
+      const response = await request.get('/users/' + createdUserId);
       expect(response.status).toBe(200);
     });
     it('should not create a duplicate user', async () => {
-      const response = await request(httpServer).post('/users').send({
+      const response = await request.post('/users').send({
         password: UserStub().password,
         pseudo: UserStub().pseudo,
         email: UserStub().email,

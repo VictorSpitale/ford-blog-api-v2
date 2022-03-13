@@ -16,7 +16,7 @@ let ApikeyMiddleware = class ApikeyMiddleware {
                 next();
             }
             else {
-                throw new common_1.UnauthorizedException();
+                throw new common_1.UnauthorizedException('Api Key Unauthorized');
             }
         })(req, res, next);
     }

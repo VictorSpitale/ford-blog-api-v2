@@ -17,15 +17,23 @@ const common_1 = require("@nestjs/common");
 const mongoose_1 = require("@nestjs/mongoose");
 const post_entity_1 = require("./entities/post.entity");
 const mongoose_2 = require("mongoose");
+const google_service_1 = require("../cloud/google.service");
+const upload_types_1 = require("../shared/types/upload.types");
 let PostsService = class PostsService {
-    constructor(postModel) {
+    constructor(postModel, googleService) {
         this.postModel = postModel;
+        this.googleService = googleService;
     }
-    async create(createPostDto) {
+    async create(createPostDto, file) {
         if (await this.checkIfPostIsDuplicatedBySlug(createPostDto.slug)) {
             throw new common_1.ConflictException('post with this slug already exist');
         }
-        const createdPost = await this.postModel.create(createPostDto);
+        let data = Object.assign({}, createPostDto);
+        if (file) {
+            const picturePath = await this.googleService.uploadFile(file, createPostDto.slug, upload_types_1.UploadTypes.POST);
+            data = Object.assign(Object.assign({}, data), { picture: picturePath });
+        }
+        const createdPost = await this.postModel.create(data);
         await createdPost.populate('categories');
         await createdPost.save();
         return this.asDto(createdPost, null);
@@ -44,6 +52,27 @@ let PostsService = class PostsService {
             throw new common_1.NotFoundException();
         }
         return this.asDto(post, user);
+    }
+    async getQueriedPosts(search) {
+        if (!search || (search && search.length < 3)) {
+            throw new common_1.BadRequestException('Search query is missing or should be more than 2 characters');
+        }
+        const searchReg = new RegExp('.*' + search + '.*', 'i');
+        const posts = await this.find({
+            $or: [
+                {
+                    title: {
+                        $regex: searchReg,
+                    },
+                },
+                {
+                    desc: {
+                        $regex: searchReg,
+                    },
+                },
+            ],
+        }, 5);
+        return posts.map((p) => this.asDto(p));
     }
     async checkIfPostIsDuplicatedBySlug(slug) {
         const post = await this.findOne({ slug });
@@ -73,8 +102,8 @@ let PostsService = class PostsService {
             createdAt: 1,
             updatedAt: 1,
         })
-            .sort({ createdAt: -1 });
-        docs.populate('categories likers');
+            .sort({ createdAt: -1 })
+            .populate('categories likers');
         if (limit)
             docs.limit(limit);
         return docs;
@@ -113,7 +142,8 @@ let PostsService = class PostsService {
 PostsService = __decorate([
     (0, common_1.Injectable)(),
     __param(0, (0, mongoose_1.InjectModel)(post_entity_1.Post.name)),
-    __metadata("design:paramtypes", [mongoose_2.Model])
+    __metadata("design:paramtypes", [mongoose_2.Model,
+        google_service_1.GoogleService])
 ], PostsService);
 exports.PostsService = PostsService;
 //# sourceMappingURL=posts.service.js.map

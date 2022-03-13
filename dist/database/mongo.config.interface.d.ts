@@ -8,4 +8,5 @@ export interface IMongoConfigOptions {
     cluster_name: string;
     name: string;
     test_name: string;
+    dev_name: string;
 }

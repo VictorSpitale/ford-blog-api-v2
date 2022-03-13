@@ -16,7 +16,11 @@ const class_validator_1 = require("class-validator");
 const Mongoose = require("mongoose");
 const comment_dto_1 = require("./comment.dto");
 const category_dto_1 = require("../../categories/dto/category.dto");
-class PostDto extends (0, swagger_1.OmitType)(create_post_dto_1.CreatePostDto, ['categories']) {
+const regex_validation_1 = require("../../shared/utils/regex.validation");
+class PostDto extends (0, swagger_1.OmitType)(create_post_dto_1.CreatePostDto, [
+    'categories',
+    'file',
+]) {
 }
 __decorate([
     (0, class_validator_1.IsNotEmpty)(),
@@ -80,11 +84,13 @@ __decorate([
 ], PostDto.prototype, "comments", void 0);
 __decorate([
     (0, swagger_1.ApiProperty)({
-        description: 'Picture url',
-        example: 'url to picture',
+        description: 'Url to the picture',
+        example: 'https://storage.googleapis.com/name',
         type: String,
+        pattern: regex_validation_1.urlPattern,
     }),
-    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.Matches)(regex_validation_1.urlPattern),
     __metadata("design:type", String)
 ], PostDto.prototype, "picture", void 0);
 __decorate([

@@ -12,6 +12,7 @@ const posts_service_1 = require("./posts.service");
 const posts_controller_1 = require("./posts.controller");
 const mongoose_1 = require("@nestjs/mongoose");
 const post_entity_1 = require("./entities/post.entity");
+const google_service_1 = require("../cloud/google.service");
 let PostsModule = class PostsModule {
 };
 PostsModule = __decorate([
@@ -20,7 +21,7 @@ PostsModule = __decorate([
             mongoose_1.MongooseModule.forFeature([{ name: post_entity_1.Post.name, schema: post_entity_1.PostEntity }]),
         ],
         controllers: [posts_controller_1.PostsController],
-        providers: [posts_service_1.PostsService],
+        providers: [posts_service_1.PostsService, google_service_1.GoogleService],
     })
 ], PostsModule);
 exports.PostsModule = PostsModule;

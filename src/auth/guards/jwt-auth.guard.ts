@@ -16,6 +16,6 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
     );
     if (user) return user;
     if (allowAny) return null;
-    throw new UnauthorizedException();
+    throw new UnauthorizedException('Jwt failed');
   }
 }

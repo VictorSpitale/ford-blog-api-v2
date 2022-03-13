@@ -7,13 +7,18 @@ import {
   IsMongoId,
   IsNotEmpty,
   IsNumber,
-  IsString,
+  IsOptional,
+  Matches,
 } from 'class-validator';
 import * as Mongoose from 'mongoose';
 import { CommentDto } from './comment.dto';
 import { CategoryDto } from '../../categories/dto/category.dto';
+import { urlPattern } from '../../shared/utils/regex.validation';
 
-export class PostDto extends OmitType(CreatePostDto, ['categories'] as const) {
+export class PostDto extends OmitType(CreatePostDto, [
+  'categories',
+  'file',
+] as const) {
   @IsNotEmpty()
   @IsMongoId()
   @ApiProperty({
@@ -70,12 +75,14 @@ export class PostDto extends OmitType(CreatePostDto, ['categories'] as const) {
   readonly comments: CommentDto[];
 
   @ApiProperty({
-    description: 'Picture url',
-    example: 'url to picture',
+    description: 'Url to the picture',
+    example: 'https://storage.googleapis.com/name',
     type: String,
+    pattern: urlPattern,
   })
-  @IsString()
-  readonly picture: string;
+  @IsOptional()
+  @Matches(urlPattern)
+  readonly picture?: string;
 
   @IsDateString()
   @IsNotEmpty()

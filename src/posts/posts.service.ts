@@ -11,18 +11,33 @@ import { MatchType } from '../shared/types/match.types';
 import { PostDto } from './dto/post.dto';
 import { CreatePostDto } from './dto/create-post.dto';
 import { User } from '../users/entities/user.entity';
+import { GoogleService } from '../cloud/google.service';
+import { UploadTypes } from '../shared/types/upload.types';
 
 @Injectable()
 export class PostsService {
   constructor(
     @InjectModel(Post.name) private readonly postModel: Model<PostDocument>,
+    private readonly googleService: GoogleService,
   ) {}
 
-  async create(createPostDto: CreatePostDto): Promise<PostDto> {
+  async create(
+    createPostDto: CreatePostDto,
+    file: Express.Multer.File,
+  ): Promise<PostDto | any> {
     if (await this.checkIfPostIsDuplicatedBySlug(createPostDto.slug)) {
       throw new ConflictException('post with this slug already exist');
     }
-    const createdPost = await this.postModel.create(createPostDto);
+    let data = { ...createPostDto } as any;
+    if (file) {
+      const picturePath = await this.googleService.uploadFile(
+        file,
+        createPostDto.slug,
+        UploadTypes.POST,
+      );
+      data = { ...data, picture: picturePath };
+    }
+    const createdPost = await this.postModel.create(data);
     await createdPost.populate('categories');
     await createdPost.save();
     return this.asDto(createdPost, null);
@@ -44,6 +59,33 @@ export class PostsService {
       throw new NotFoundException();
     }
     return this.asDto(post, user);
+  }
+
+  async getQueriedPosts(search: string) {
+    if (!search || (search && search.length < 3)) {
+      throw new BadRequestException(
+        'Search query is missing or should be more than 2 characters',
+      );
+    }
+    const searchReg = new RegExp('.*' + search + '.*', 'i');
+    const posts = await this.find(
+      {
+        $or: [
+          {
+            title: {
+              $regex: searchReg,
+            },
+          },
+          {
+            desc: {
+              $regex: searchReg,
+            },
+          },
+        ],
+      },
+      5,
+    );
+    return posts.map((p) => this.asDto(p));
   }
 
   private async checkIfPostIsDuplicatedBySlug(slug: string): Promise<PostDto> {
@@ -74,8 +116,8 @@ export class PostsService {
         createdAt: 1,
         updatedAt: 1,
       })
-      .sort({ createdAt: -1 });
-    docs.populate('categories likers');
+      .sort({ createdAt: -1 })
+      .populate('categories likers');
     if (limit) docs.limit(limit);
     return docs;
   }
@@ -89,7 +131,7 @@ export class PostsService {
     }
   }
 
-  asDto(post: Post, authUser: User): PostDto {
+  asDto(post: Post, authUser?: User): PostDto {
     let likeStatus = false;
     if (authUser) {
       likeStatus = !!post.likers.find(
