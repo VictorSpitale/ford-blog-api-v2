@@ -38,6 +38,12 @@ export class AuthService {
     return this.usersService.asDtoWithoutPassword(user);
   }
 
+  async decodePayload(jwtToken: string) {
+    const bearerRegex = /Bearer (.*)/gm;
+    const token = bearerRegex.exec(jwtToken)[1];
+    return this.jwtService.decode(token)?.sub;
+  }
+
   async login(user: UserDto): Promise<JwtAccessToken> {
     const payload = { email: user.email, sub: user._id };
     return { access_token: this.jwtService.sign(payload) };

@@ -28,6 +28,9 @@ let AuthController = class AuthController {
     async login(user) {
         return this.authService.login(user);
     }
+    async verifyToken(headers) {
+        return this.authService.decodePayload(headers);
+    }
     async getProfile(user) {
         return user;
     }
@@ -44,6 +47,14 @@ __decorate([
     __metadata("design:paramtypes", [user_dto_1.UserDto]),
     __metadata("design:returntype", Promise)
 ], AuthController.prototype, "login", null);
+__decorate([
+    (0, common_1.Get)('/jwt'),
+    (0, allow_any_decorator_1.AllowAny)(),
+    __param(0, (0, common_1.Headers)('authorization')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", Promise)
+], AuthController.prototype, "verifyToken", null);
 __decorate([
     (0, common_1.Get)('/me'),
     __param(0, (0, user_decorator_1.AuthUser)()),

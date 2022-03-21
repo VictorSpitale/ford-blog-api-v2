@@ -11,6 +11,7 @@ export declare class AuthService {
     validateUser(email: any, password: any): Promise<UserDto | null>;
     signToken(user: UserDto): string;
     verifyPayload(payload: JwtPayload): Promise<UserDto>;
+    decodePayload(jwtToken: string): Promise<any>;
     login(user: UserDto): Promise<JwtAccessToken>;
     validateApiKey(apiKey: string): boolean;
 }

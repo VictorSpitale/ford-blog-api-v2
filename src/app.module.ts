@@ -1,4 +1,9 @@
-import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
+import {
+  MiddlewareConsumer,
+  Module,
+  NestModule,
+  RequestMethod,
+} from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import config from './config/config';
 import { DatabaseModule } from './database/database.module';
@@ -39,6 +44,12 @@ import { RolesGuard } from './auth/guards/roles.guard';
 })
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
-    consumer.apply(ApikeyMiddleware).forRoutes('');
+    consumer
+      .apply(ApikeyMiddleware)
+      .exclude({
+        path: '/api/auth/jwt',
+        method: RequestMethod.GET,
+      })
+      .forRoutes('');
   }
 }

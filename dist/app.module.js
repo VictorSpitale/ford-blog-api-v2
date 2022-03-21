@@ -21,7 +21,13 @@ const apikey_middleware_1 = require("./auth/middleware/apikey.middleware");
 const roles_guard_1 = require("./auth/guards/roles.guard");
 let AppModule = class AppModule {
     configure(consumer) {
-        consumer.apply(apikey_middleware_1.ApikeyMiddleware).forRoutes('');
+        consumer
+            .apply(apikey_middleware_1.ApikeyMiddleware)
+            .exclude({
+            path: '/api/auth/jwt',
+            method: common_1.RequestMethod.GET,
+        })
+            .forRoutes('');
     }
 };
 AppModule = __decorate([

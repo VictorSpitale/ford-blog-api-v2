@@ -1,6 +1,7 @@
 import {
   Controller,
   Get,
+  Headers,
   HttpCode,
   HttpStatus,
   Post,
@@ -29,6 +30,12 @@ export class AuthController {
   @ApiOperation({ summary: 'Get an access token for a user' })
   async login(@AuthUser() user: UserDto): Promise<JwtAccessToken> {
     return this.authService.login(user);
+  }
+
+  @Get('/jwt')
+  @AllowAny()
+  async verifyToken(@Headers('authorization') headers) {
+    return this.authService.decodePayload(headers);
   }
 
   @Get('/me')

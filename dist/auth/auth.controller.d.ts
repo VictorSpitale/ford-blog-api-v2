@@ -5,5 +5,6 @@ export declare class AuthController {
     private readonly authService;
     constructor(authService: AuthService);
     login(user: UserDto): Promise<JwtAccessToken>;
+    verifyToken(headers: any): Promise<any>;
     getProfile(user: UserDto): Promise<UserDto>;
 }
