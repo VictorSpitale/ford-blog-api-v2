@@ -26,6 +26,9 @@ let AppModule = class AppModule {
             .exclude({
             path: '/api/auth/jwt',
             method: common_1.RequestMethod.GET,
+        }, {
+            path: '/api/auth/login',
+            method: common_1.RequestMethod.POST,
         })
             .forRoutes('');
     }

@@ -23,7 +23,7 @@ let AuthService = class AuthService {
     async validateUser(email, password) {
         const user = await this.usersService.findOne({ email });
         if (!user) {
-            throw new common_1.UnauthorizedException('Not user with this email');
+            throw new common_1.UnauthorizedException('No user with this email');
         }
         if (!(await user.checkPassword(password))) {
             throw new common_1.UnauthorizedException('Wrong password');
