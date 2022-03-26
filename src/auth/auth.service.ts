@@ -17,7 +17,7 @@ export class AuthService {
   async validateUser(email, password): Promise<UserDto | null> {
     const user: User = await this.usersService.findOne({ email });
     if (!user) {
-      throw new UnauthorizedException('Not user with this email');
+      throw new UnauthorizedException('No user with this email');
     }
     if (!(await user.checkPassword(password))) {
       throw new UnauthorizedException('Wrong password');
