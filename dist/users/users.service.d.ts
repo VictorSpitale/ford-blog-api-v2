@@ -9,7 +9,7 @@ export declare class UsersService {
     constructor(userModel: Model<UserDocument>);
     create(createUserDto: CreateUserDto): Promise<UserDto>;
     getUsers(): Promise<UserDto[]>;
-    private getUserByEmail;
+    getUserByEmail(email: string): Promise<UserDto>;
     getUserById(id: string): Promise<UserDto>;
     private getUserByPseudo;
     update(id: number, updateUserDto: UpdateUserDto): string;

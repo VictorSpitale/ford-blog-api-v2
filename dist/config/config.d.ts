@@ -16,5 +16,11 @@ declare const _default: () => {
     api_key: {
         key: string;
     };
+    google: {
+        client_id: string;
+        secret: string;
+        callback: string;
+        client_url: string;
+    };
 };
 export default _default;

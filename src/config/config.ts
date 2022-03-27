@@ -16,4 +16,10 @@ export default () => ({
   api_key: {
     key: process.env.API_KEY,
   },
+  google: {
+    client_id: process.env.GOOGLE_CLIENT_ID,
+    secret: process.env.GOOGLE_SECRET,
+    callback: process.env.GOOGLE_CALLBACK_URL,
+    client_url: process.env.CLIENT_URL,
+  },
 });

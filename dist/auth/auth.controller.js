@@ -21,6 +21,7 @@ const token_interceptor_1 = require("./interceptors/token.interceptor");
 const user_decorator_1 = require("../users/user.decorator");
 const user_dto_1 = require("../users/dto/user.dto");
 const allow_any_decorator_1 = require("./decorators/allow-any.decorator");
+const passport_1 = require("@nestjs/passport");
 let AuthController = class AuthController {
     constructor(authService) {
         this.authService = authService;
@@ -33,6 +34,10 @@ let AuthController = class AuthController {
     }
     async getProfile(user) {
         return user;
+    }
+    async googleAuth(req) { }
+    googleAuthRedirect(req, res) {
+        return this.authService.googleLogin(req, res);
     }
 };
 __decorate([
@@ -62,6 +67,25 @@ __decorate([
     __metadata("design:paramtypes", [user_dto_1.UserDto]),
     __metadata("design:returntype", Promise)
 ], AuthController.prototype, "getProfile", null);
+__decorate([
+    (0, common_1.Get)('/google'),
+    (0, allow_any_decorator_1.AllowAny)(),
+    (0, common_1.UseGuards)((0, passport_1.AuthGuard)('google')),
+    __param(0, (0, common_1.Req)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", Promise)
+], AuthController.prototype, "googleAuth", null);
+__decorate([
+    (0, common_1.Get)('/google/redirect'),
+    (0, allow_any_decorator_1.AllowAny)(),
+    (0, common_1.UseGuards)((0, passport_1.AuthGuard)('google')),
+    __param(0, (0, common_1.Req)()),
+    __param(1, (0, common_1.Res)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, Object]),
+    __metadata("design:returntype", void 0)
+], AuthController.prototype, "googleAuthRedirect", null);
 AuthController = __decorate([
     (0, common_1.Controller)('auth'),
     (0, swagger_1.ApiTags)('Auth'),

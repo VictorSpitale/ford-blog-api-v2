@@ -14,6 +14,7 @@ const common_1 = require("@nestjs/common");
 const users_service_1 = require("../users/users.service");
 const jwt_1 = require("@nestjs/jwt");
 const config_1 = require("@nestjs/config");
+const password_utils_1 = require("../shared/utils/password.utils");
 let AuthService = class AuthService {
     constructor(usersService, jwtService, configService) {
         this.usersService = usersService;
@@ -54,6 +55,34 @@ let AuthService = class AuthService {
     validateApiKey(apiKey) {
         const key = this.configService.get('api_key.key');
         return apiKey === key;
+    }
+    async googleLogin(req, res) {
+        if (!req.user) {
+            return 'No user from google';
+        }
+        let userDto;
+        try {
+            userDto = await this.usersService.create({
+                email: req.user.email,
+                pseudo: req.user.pseudo.substring(0, 18),
+                password: (0, password_utils_1.uuid)(),
+            });
+        }
+        catch (e) {
+            if (e.status !== 409) {
+                return res.redirect(`${this.configService.get('google.client_url')}/login?status=failed`);
+            }
+            else {
+                userDto = await this.usersService.getUserByEmail(req.user.email);
+            }
+        }
+        try {
+            const { access_token } = await this.login(userDto);
+            return res.redirect(`${this.configService.get('google.client_url')}/account?token=${access_token}`);
+        }
+        catch (e) {
+            return res.redirect(`${this.configService.get('google.client_url')}/login?status=failed`);
+        }
     }
 };
 AuthService = __decorate([

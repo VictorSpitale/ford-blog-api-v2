@@ -29,6 +29,12 @@ let AppModule = class AppModule {
         }, {
             path: '/api/auth/login',
             method: common_1.RequestMethod.POST,
+        }, {
+            path: '/api/auth/google',
+            method: common_1.RequestMethod.GET,
+        }, {
+            path: '/api/auth/google/redirect',
+            method: common_1.RequestMethod.GET,
         })
             .forRoutes('');
     }

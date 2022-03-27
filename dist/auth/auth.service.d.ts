@@ -3,6 +3,7 @@ import { UserDto } from '../users/dto/user.dto';
 import { JwtService } from '@nestjs/jwt';
 import { JwtAccessToken, JwtPayload } from './jwt/jwt-payload.interface';
 import { ConfigService } from '@nestjs/config';
+import { Response } from 'express';
 export declare class AuthService {
     private readonly usersService;
     private readonly jwtService;
@@ -14,4 +15,5 @@ export declare class AuthService {
     decodePayload(jwtToken: string): Promise<any>;
     login(user: UserDto): Promise<JwtAccessToken>;
     validateApiKey(apiKey: string): boolean;
+    googleLogin(req: any, res: Response): Promise<void | "No user from google">;
 }
