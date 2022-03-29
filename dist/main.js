@@ -39,6 +39,7 @@ async function bootstrap() {
             'Content-Type',
             'Accept',
             'x-api-key',
+            'Authorization',
         ],
         preflightContinue: false,
     });

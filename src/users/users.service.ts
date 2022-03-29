@@ -31,7 +31,7 @@ export class UsersService {
     return users.map((u) => this.asDtoWithoutPassword(u));
   }
 
-  private async getUserByEmail(email: string): Promise<UserDto> {
+  async getUserByEmail(email: string): Promise<UserDto> {
     const user = await this.findOne({ email });
     return user ? this.asDtoWithoutPassword(user) : null;
   }

@@ -9,6 +9,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { IJwtConfigOptions } from './jwt/jwt.config.interface';
 import { JwtStrategy } from './strategies/jwt.strategy';
 import { ApikeyStrategy } from './strategies/apikey.strategy';
+import { GoogleStrategy } from './strategies/google.strategy';
 
 @Module({
   imports: [
@@ -28,6 +29,12 @@ import { ApikeyStrategy } from './strategies/apikey.strategy';
     }),
   ],
   controllers: [AuthController],
-  providers: [AuthService, LocalStrategy, JwtStrategy, ApikeyStrategy],
+  providers: [
+    AuthService,
+    LocalStrategy,
+    JwtStrategy,
+    ApikeyStrategy,
+    GoogleStrategy,
+  ],
 })
 export class AuthModule {}
