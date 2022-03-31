@@ -11,10 +11,8 @@ export class DatabaseModule {
       module: DatabaseModule,
       imports: [
         MongooseModule.forRootAsync({
-          // imports: [ConfigModule],
           useFactory: (configService: ConfigService) => {
-            const dbConfig =
-              configService.get<IMongoConfigOptions>('database')!;
+            const dbConfig = configService.get<IMongoConfigOptions>('database');
             return {
               uri:
                 'mongodb+srv://' +
