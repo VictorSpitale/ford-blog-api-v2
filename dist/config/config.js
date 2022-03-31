@@ -15,9 +15,6 @@ exports.default = () => ({
     jwt: {
         secret: process.env.JWT_SECRET,
     },
-    api_key: {
-        key: process.env.API_KEY,
-    },
     google: {
         client_id: process.env.GOOGLE_CLIENT_ID,
         secret: process.env.GOOGLE_SECRET,

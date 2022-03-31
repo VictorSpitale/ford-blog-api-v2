@@ -13,9 +13,6 @@ declare const _default: () => {
     jwt: {
         secret: string;
     };
-    api_key: {
-        key: string;
-    };
     google: {
         client_id: string;
         secret: string;

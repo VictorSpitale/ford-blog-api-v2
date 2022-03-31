@@ -1,9 +1,4 @@
-import {
-  MiddlewareConsumer,
-  Module,
-  NestModule,
-  RequestMethod,
-} from '@nestjs/common';
+import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import config from './config/config';
 import { DatabaseModule } from './database/database.module';
@@ -13,7 +8,6 @@ import { PostsModule } from './posts/posts.module';
 import { CategoriesModule } from './categories/categories.module';
 import { APP_GUARD } from '@nestjs/core';
 import { JwtAuthGuard } from './auth/guards/jwt-auth.guard';
-import { ApikeyMiddleware } from './auth/middleware/apikey.middleware';
 import { RolesGuard } from './auth/guards/roles.guard';
 
 @Module({
@@ -42,28 +36,4 @@ import { RolesGuard } from './auth/guards/roles.guard';
     RolesGuard,
   ],
 })
-export class AppModule implements NestModule {
-  configure(consumer: MiddlewareConsumer) {
-    consumer
-      .apply(ApikeyMiddleware)
-      .exclude(
-        {
-          path: '/api/auth/jwt',
-          method: RequestMethod.GET,
-        },
-        {
-          path: '/api/auth/login',
-          method: RequestMethod.POST,
-        },
-        {
-          path: '/api/auth/google',
-          method: RequestMethod.GET,
-        },
-        {
-          path: '/api/auth/google/redirect',
-          method: RequestMethod.GET,
-        },
-      )
-      .forRoutes('');
-  }
-}
+export class AppModule {}

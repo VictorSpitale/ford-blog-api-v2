@@ -15,7 +15,6 @@ import {
   ApiOperation,
   ApiQuery,
   ApiResponse,
-  ApiSecurity,
   ApiTags,
 } from '@nestjs/swagger';
 import { PostDto } from './dto/post.dto';
@@ -31,7 +30,6 @@ export class PostsController {
   constructor(private readonly postsService: PostsService) {}
 
   @Post()
-  @ApiSecurity('x-api-key')
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Create a post' })
   @ApiResponse({
@@ -62,7 +60,6 @@ export class PostsController {
   }
 
   @Get('last')
-  @ApiSecurity('x-api-key')
   @ApiOperation({ summary: 'Get 6 last posts' })
   @ApiResponse({
     status: 200,
@@ -75,7 +72,6 @@ export class PostsController {
   }
 
   @Get('query')
-  @ApiSecurity('x-api-key')
   @ApiQuery({ name: 'search' })
   @ApiResponse({
     status: 200,

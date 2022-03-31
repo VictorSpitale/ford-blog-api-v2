@@ -4,7 +4,6 @@ import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
 import { AuthGuardMock } from './mocks/auth.guard.mock';
 import { ValidationPipe } from '@nestjs/common';
 import { DatabaseService } from '../../database/database.service';
-import { ConfigService } from '@nestjs/config';
 import { getRequest } from './superagent';
 import * as request from 'supertest';
 import { RolesGuard } from '../../auth/guards/roles.guard';
@@ -32,9 +31,7 @@ async function getInitConst(moduleFixture: TestingModule) {
     .get<DatabaseService>(DatabaseService)
     .getDbHandle();
   const httpServer = app.getHttpServer();
-  const config = moduleFixture.get<ConfigService>(ConfigService);
-  const apiKeyHeader = { 'x-api-key': config.get('api_key.key') };
-  const httpRequest = getRequest(request(httpServer), apiKeyHeader);
+  const httpRequest = getRequest(request(httpServer));
   return {
     app,
     dbConnection,

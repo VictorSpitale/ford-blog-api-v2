@@ -7,7 +7,6 @@ const jwt_auth_guard_1 = require("../../auth/guards/jwt-auth.guard");
 const auth_guard_mock_1 = require("./mocks/auth.guard.mock");
 const common_1 = require("@nestjs/common");
 const database_service_1 = require("../../database/database.service");
-const config_1 = require("@nestjs/config");
 const superagent_1 = require("./superagent");
 const request = require("supertest");
 const roles_guard_1 = require("../../auth/guards/roles.guard");
@@ -31,9 +30,7 @@ async function getInitConst(moduleFixture) {
         .get(database_service_1.DatabaseService)
         .getDbHandle();
     const httpServer = app.getHttpServer();
-    const config = moduleFixture.get(config_1.ConfigService);
-    const apiKeyHeader = { 'x-api-key': config.get('api_key.key') };
-    const httpRequest = (0, superagent_1.getRequest)(request(httpServer), apiKeyHeader);
+    const httpRequest = (0, superagent_1.getRequest)(request(httpServer));
     return {
         app,
         dbConnection,
