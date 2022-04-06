@@ -35,6 +35,7 @@ async function getInitConst(moduleFixture) {
         app,
         dbConnection,
         httpRequest,
+        moduleFixture,
     };
 }
 async function initE2eWithGuards() {

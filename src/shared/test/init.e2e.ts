@@ -8,7 +8,7 @@ import { getRequest } from './superagent';
 import * as request from 'supertest';
 import { RolesGuard } from '../../auth/guards/roles.guard';
 
-export async function init_e2e() {
+export async function initE2eWithoutGuards() {
   const moduleFixture: TestingModule = await Test.createTestingModule({
     imports: [AppModule],
   })
@@ -36,6 +36,7 @@ async function getInitConst(moduleFixture: TestingModule) {
     app,
     dbConnection,
     httpRequest,
+    moduleFixture,
   };
 }
 
