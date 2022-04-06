@@ -20,6 +20,7 @@ const category_dto_1 = require("./dto/category.dto");
 const create_category_dto_1 = require("./dto/create-category.dto");
 const roles_decorator_1 = require("../auth/decorators/roles.decorator");
 const users_role_interface_1 = require("../users/entities/users.role.interface");
+const allow_any_decorator_1 = require("../auth/decorators/allow-any.decorator");
 let CategoriesController = class CategoriesController {
     constructor(categoriesService) {
         this.categoriesService = categoriesService;
@@ -58,6 +59,7 @@ __decorate([
         description: 'List all categories',
         type: [category_dto_1.CategoryDto],
     }),
+    (0, allow_any_decorator_1.AllowAny)(),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", []),
     __metadata("design:returntype", Promise)
@@ -72,6 +74,7 @@ __decorate([
     }),
     (0, swagger_1.ApiResponse)({ status: 400, description: 'Id is not a valid id' }),
     (0, swagger_1.ApiResponse)({ status: 404, description: 'Category not found' }),
+    (0, allow_any_decorator_1.AllowAny)(),
     __param(0, (0, common_1.Param)('id')),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String]),
