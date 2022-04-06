@@ -17,7 +17,6 @@ const common_1 = require("@nestjs/common");
 const local_auth_guard_1 = require("./guards/local-auth.guard");
 const swagger_1 = require("@nestjs/swagger");
 const auth_service_1 = require("./auth.service");
-const token_interceptor_1 = require("./interceptors/token.interceptor");
 const user_decorator_1 = require("../users/user.decorator");
 const user_dto_1 = require("../users/dto/user.dto");
 const allow_any_decorator_1 = require("./decorators/allow-any.decorator");
@@ -26,11 +25,18 @@ let AuthController = class AuthController {
     constructor(authService) {
         this.authService = authService;
     }
-    async login(user) {
-        return this.authService.login(user);
+    async login(user, response) {
+        const { access_token } = await this.authService.login(user);
+        return response
+            .cookie('access_token', access_token, {
+            httpOnly: true,
+            expires: new Date(Date.now() + 1000 * 60 * 60 * 24 * 2),
+            sameSite: 'none',
+        })
+            .send({ access_token });
     }
-    async verifyToken(headers) {
-        return this.authService.decodePayload(headers);
+    async verifyToken(req) {
+        return this.authService.decodePayload(req.cookies.access_token);
     }
     async getProfile(user) {
         return user;
@@ -44,18 +50,18 @@ __decorate([
     (0, common_1.UseGuards)(local_auth_guard_1.LocalAuthGuard),
     (0, common_1.Post)('login'),
     (0, common_1.HttpCode)(common_1.HttpStatus.OK),
-    (0, common_1.UseInterceptors)(token_interceptor_1.TokenInterceptor),
     (0, allow_any_decorator_1.AllowAny)(),
     (0, swagger_1.ApiOperation)({ summary: 'Get an access token for a user' }),
     __param(0, (0, user_decorator_1.AuthUser)()),
+    __param(1, (0, common_1.Res)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [user_dto_1.UserDto]),
+    __metadata("design:paramtypes", [user_dto_1.UserDto, Object]),
     __metadata("design:returntype", Promise)
 ], AuthController.prototype, "login", null);
 __decorate([
     (0, common_1.Get)('/jwt'),
     (0, allow_any_decorator_1.AllowAny)(),
-    __param(0, (0, common_1.Headers)('authorization')),
+    __param(0, (0, common_1.Req)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Object]),
     __metadata("design:returntype", Promise)
