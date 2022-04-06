@@ -52,9 +52,9 @@ describe('UsersController (e2e)', () => {
       const authUser = adminStub();
       await dbConnection.collection('users').insertMany([user, authUser]);
       const token = authService.signToken(authUser);
-      const response = await request.get('/users').set({
-        Authorization: `Bearer ${token}`,
-      });
+      const response = await request
+        .get('/users')
+        .set('Cookie', `access_token=${token};`);
       expect(response.status).toBe(200);
       expect(response.body.length).toBe(2);
       expect(response.body[0]).toEqual(
@@ -82,9 +82,9 @@ describe('UsersController (e2e)', () => {
       };
       await dbConnection.collection('users').insertMany([user, authUser]);
       const token = authService.signToken(authUser);
-      const response = await request.get('/users').set({
-        Authorization: `Bearer ${token}`,
-      });
+      const response = await request
+        .get('/users')
+        .set('Cookie', `access_token=${token};`);
       expect(response.status).toBe(401);
     });
   });
@@ -141,9 +141,9 @@ describe('UsersController (e2e)', () => {
       createdUserId = response.body._id;
     });
     it('should get the created user', async () => {
-      const response = await request.get('/users/' + createdUserId).set({
-        Authorization: `Bearer ${token}`,
-      });
+      const response = await request
+        .get('/users/' + createdUserId)
+        .set('Cookie', `access_token=${token};`);
       expect(response.status).toBe(200);
     });
     it('should not create a duplicate user', async () => {
@@ -177,16 +177,16 @@ describe('UsersController (e2e)', () => {
         token = authService.signToken(authUser);
       });
       it('should not get a user with invalid id', async () => {
-        const response = await request.get('/users/eee').set({
-          Authorization: `Bearer ${token}`,
-        });
+        const response = await request
+          .get('/users/eee')
+          .set('Cookie', `access_token=${token};`);
         expect(response.status).toBe(400);
       });
       it('should not return a user that does not exist', async () => {
         const mockObjectId = new Mongoose.Types.ObjectId();
-        const response = await request.get(`/users/${mockObjectId}`).set({
-          Authorization: `Bearer ${token}`,
-        });
+        const response = await request
+          .get(`/users/${mockObjectId}`)
+          .set('Cookie', `access_token=${token};`);
         expect(response.status).toBe(404);
       });
     });

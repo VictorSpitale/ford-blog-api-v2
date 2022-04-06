@@ -7,6 +7,7 @@ import { DatabaseService } from '../../database/database.service';
 import { getRequest } from './superagent';
 import * as request from 'supertest';
 import { RolesGuard } from '../../auth/guards/roles.guard';
+import * as cookieParser from 'cookie-parser';
 
 export async function initE2eWithoutGuards() {
   const moduleFixture: TestingModule = await Test.createTestingModule({
@@ -26,6 +27,7 @@ export async function initE2eWithoutGuards() {
 async function getInitConst(moduleFixture: TestingModule) {
   const app = moduleFixture.createNestApplication();
   app.useGlobalPipes(new ValidationPipe());
+  app.use(cookieParser());
   await app.init();
   const dbConnection = moduleFixture
     .get<DatabaseService>(DatabaseService)

@@ -36,7 +36,8 @@ let AuthController = class AuthController {
             .send({ access_token });
     }
     async verifyToken(req) {
-        return this.authService.decodePayload(req.cookies.access_token);
+        var _a;
+        return this.authService.decodePayload((_a = req.cookies) === null || _a === void 0 ? void 0 : _a.access_token);
     }
     async getProfile(user) {
         return user;

@@ -42,7 +42,7 @@ export class AuthController {
   @Get('/jwt')
   @AllowAny()
   async verifyToken(@Req() req: Request) {
-    return this.authService.decodePayload(req.cookies.access_token);
+    return this.authService.decodePayload(req.cookies?.access_token);
   }
 
   @Get('/me')

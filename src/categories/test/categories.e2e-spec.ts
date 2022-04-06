@@ -62,9 +62,7 @@ describe.only('CategoriesController (e2e)', () => {
         .send({
           name: CategoryStub().name,
         })
-        .set({
-          Authorization: `Bearer ${token}`,
-        });
+        .set('Cookie', `access_token=${token};`);
       expect(response.status).toBe(201);
       expect(response.body).toMatchObject(CategoryStub());
       createdCategoryId = response.body._id;
@@ -79,9 +77,7 @@ describe.only('CategoriesController (e2e)', () => {
         .send({
           name: CategoryStub().name,
         })
-        .set({
-          Authorization: `Bearer ${token}`,
-        });
+        .set('Cookie', `access_token=${token};`);
       expect(response.status).toBe(409);
     });
     afterAll(async () => {
@@ -104,9 +100,7 @@ describe.only('CategoriesController (e2e)', () => {
         .send({
           name: CategoryStub().name,
         })
-        .set({
-          Authorization: `Bearer ${token}`,
-        });
+        .set('Cookie', `access_token=${token};`);
       expect(response.status).toBe(401);
     });
   });
