@@ -1,2 +1,2 @@
 import { PostDto } from '../../dto/post.dto';
-export declare const CreatedPostStub: (categoryId: any) => PostDto;
+export declare const PostStub: (slug?: string) => Omit<PostDto, 'authUserLiked'>;

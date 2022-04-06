@@ -39,7 +39,6 @@ export class PostsService {
     }
     const createdPost = await this.postModel.create(data);
     await createdPost.populate('categories');
-    await createdPost.save();
     return this.asDto(createdPost, null);
   }
 
@@ -78,6 +77,11 @@ export class PostsService {
           },
           {
             desc: {
+              $regex: searchReg,
+            },
+          },
+          {
+            slug: {
               $regex: searchReg,
             },
           },

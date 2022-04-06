@@ -38,10 +38,10 @@ export class PostsController {
     type: PostDto,
   })
   @ApiResponse({ status: 400, description: 'Validations failed' })
-  @ApiResponse({ status: 403, description: 'Forbidden ressource' })
+  @ApiResponse({ status: 401, description: 'Unauthorized access' })
   @ApiResponse({
     status: 409,
-    description: 'The post with this slug already exist',
+    description: 'A post with this slug already exist',
   })
   @UseInterceptors(FileInterceptor('file'))
   @Role(IUserRole.POSTER)
@@ -90,6 +90,15 @@ export class PostsController {
 
   @Get(':slug')
   @AllowAny()
+  @ApiResponse({
+    status: 200,
+    description: 'The post got by its slug',
+    type: PostDto,
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'The post doesnt exist',
+  })
   async getPost(@Req() req, @Param('slug') slug): Promise<PostDto> {
     return this.postsService.getPost(slug, req.user);
   }

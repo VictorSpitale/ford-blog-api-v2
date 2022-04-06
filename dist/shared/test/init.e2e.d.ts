@@ -1,5 +1,5 @@
 import { TestingModule } from '@nestjs/testing';
-export declare function init_e2e(): Promise<{
+export declare function initE2eWithoutGuards(): Promise<{
     app: import("@nestjs/common").INestApplication;
     dbConnection: import("mongoose").Connection;
     httpRequest: any;

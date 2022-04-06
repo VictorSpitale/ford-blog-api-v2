@@ -35,7 +35,6 @@ let PostsService = class PostsService {
         }
         const createdPost = await this.postModel.create(data);
         await createdPost.populate('categories');
-        await createdPost.save();
         return this.asDto(createdPost, null);
     }
     async getPosts(user) {
@@ -67,6 +66,11 @@ let PostsService = class PostsService {
                 },
                 {
                     desc: {
+                        $regex: searchReg,
+                    },
+                },
+                {
+                    slug: {
                         $regex: searchReg,
                     },
                 },
