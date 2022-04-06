@@ -1,24 +1,23 @@
 import {
+  BadRequestException,
   Controller,
   Get,
-  Headers,
   HttpCode,
   HttpStatus,
+  Param,
   Post,
   Req,
   Res,
   UseGuards,
-  UseInterceptors,
 } from '@nestjs/common';
 import { LocalAuthGuard } from './guards/local-auth.guard';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { AuthService } from './auth.service';
-import { TokenInterceptor } from './interceptors/token.interceptor';
 import { AuthUser } from '../users/user.decorator';
 import { UserDto } from '../users/dto/user.dto';
-import { JwtAccessToken } from './jwt/jwt-payload.interface';
 import { AllowAny } from './decorators/allow-any.decorator';
 import { AuthGuard } from '@nestjs/passport';
+import { Request, Response } from 'express';
 
 @Controller('auth')
 @ApiTags('Auth')
@@ -28,17 +27,42 @@ export class AuthController {
   @UseGuards(LocalAuthGuard)
   @Post('login')
   @HttpCode(HttpStatus.OK)
-  @UseInterceptors(TokenInterceptor)
+  // @UseInterceptors(TokenInterceptor)
   @AllowAny()
   @ApiOperation({ summary: 'Get an access token for a user' })
-  async login(@AuthUser() user: UserDto): Promise<JwtAccessToken> {
-    return this.authService.login(user);
+  async login(@AuthUser() user: UserDto, @Res() response: Response) {
+    const { access_token } = await this.authService.login(user);
+    return response
+      .cookie('access_token', access_token, {
+        expires: new Date(Date.now() + 1000 * 60 * 60 * 24 * 2),
+        sameSite: 'none',
+        secure: true,
+        httpOnly: true,
+      })
+      .send({ access_token });
   }
 
   @Get('/jwt')
   @AllowAny()
-  async verifyToken(@Headers('authorization') headers) {
-    return this.authService.decodePayload(headers);
+  async verifyToken(@Req() req: Request) {
+    return this.authService.decodePayload(req.cookies?.access_token);
+  }
+
+  @Get('/g-jwt/:token')
+  @HttpCode(HttpStatus.OK)
+  @AllowAny()
+  async setCookieFromGoogle(@Res() res: Response, @Param('token') token) {
+    if (await this.authService.decodePayload(token)) {
+      return res
+        .cookie('access_token', token, {
+          httpOnly: true,
+          expires: new Date(Date.now() + 1000 * 60 * 60 * 24 * 2),
+          secure: true,
+          sameSite: 'none',
+        })
+        .send();
+    }
+    throw new BadRequestException();
   }
 
   @Get('/me')

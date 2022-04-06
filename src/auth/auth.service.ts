@@ -41,9 +41,7 @@ export class AuthService {
   }
 
   async decodePayload(jwtToken: string) {
-    const bearerRegex = /Bearer (.*)/gm;
-    const token = bearerRegex.exec(jwtToken)[1];
-    return this.jwtService.decode(token)?.sub;
+    return this.jwtService.decode(jwtToken)?.sub;
   }
 
   async login(user: UserDto): Promise<JwtAccessToken> {
