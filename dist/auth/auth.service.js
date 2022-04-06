@@ -52,10 +52,6 @@ let AuthService = class AuthService {
         const payload = { email: user.email, sub: user._id };
         return { access_token: this.jwtService.sign(payload) };
     }
-    validateApiKey(apiKey) {
-        const key = this.configService.get('api_key.key');
-        return apiKey === key;
-    }
     async googleLogin(req, res) {
         if (!req.user) {
             return 'No user from google';

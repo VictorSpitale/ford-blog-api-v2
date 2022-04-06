@@ -51,11 +51,6 @@ export class AuthService {
     return { access_token: this.jwtService.sign(payload) };
   }
 
-  validateApiKey(apiKey: string): boolean {
-    const key = this.configService.get('api_key.key');
-    return apiKey === key;
-  }
-
   async googleLogin(req, res: Response) {
     if (!req.user) {
       return 'No user from google';

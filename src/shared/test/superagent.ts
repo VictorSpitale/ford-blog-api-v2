@@ -1,7 +1,7 @@
 import * as defaults from 'superagent-defaults';
 
-export function getRequest(request, header) {
+export function getRequest(request, header = null) {
   const requestAgent = defaults(request);
-  requestAgent.set(header);
+  if (header) requestAgent.set(header);
   return requestAgent;
 }

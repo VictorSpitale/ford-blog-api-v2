@@ -44,7 +44,6 @@ let PostsController = class PostsController {
 };
 __decorate([
     (0, common_1.Post)(),
-    (0, swagger_1.ApiSecurity)('x-api-key'),
     (0, swagger_1.ApiBearerAuth)(),
     (0, swagger_1.ApiOperation)({ summary: 'Create a post' }),
     (0, swagger_1.ApiResponse)({
@@ -77,7 +76,6 @@ __decorate([
 ], PostsController.prototype, "getPosts", null);
 __decorate([
     (0, common_1.Get)('last'),
-    (0, swagger_1.ApiSecurity)('x-api-key'),
     (0, swagger_1.ApiOperation)({ summary: 'Get 6 last posts' }),
     (0, swagger_1.ApiResponse)({
         status: 200,
@@ -92,7 +90,6 @@ __decorate([
 ], PostsController.prototype, "getLastPosts", null);
 __decorate([
     (0, common_1.Get)('query'),
-    (0, swagger_1.ApiSecurity)('x-api-key'),
     (0, swagger_1.ApiQuery)({ name: 'search' }),
     (0, swagger_1.ApiResponse)({
         status: 200,

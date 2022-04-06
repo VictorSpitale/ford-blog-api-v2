@@ -8,7 +8,6 @@ import { JwtModule } from '@nestjs/jwt';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { IJwtConfigOptions } from './jwt/jwt.config.interface';
 import { JwtStrategy } from './strategies/jwt.strategy';
-import { ApikeyStrategy } from './strategies/apikey.strategy';
 import { GoogleStrategy } from './strategies/google.strategy';
 
 @Module({
@@ -29,12 +28,6 @@ import { GoogleStrategy } from './strategies/google.strategy';
     }),
   ],
   controllers: [AuthController],
-  providers: [
-    AuthService,
-    LocalStrategy,
-    JwtStrategy,
-    ApikeyStrategy,
-    GoogleStrategy,
-  ],
+  providers: [AuthService, LocalStrategy, JwtStrategy, GoogleStrategy],
 })
 export class AuthModule {}

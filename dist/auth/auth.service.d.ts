@@ -14,6 +14,5 @@ export declare class AuthService {
     verifyPayload(payload: JwtPayload): Promise<UserDto>;
     decodePayload(jwtToken: string): Promise<any>;
     login(user: UserDto): Promise<JwtAccessToken>;
-    validateApiKey(apiKey: string): boolean;
     googleLogin(req: any, res: Response): Promise<void | "No user from google">;
 }

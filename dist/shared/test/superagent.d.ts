@@ -1,1 +1,1 @@
-export declare function getRequest(request: any, header: any): any;
+export declare function getRequest(request: any, header?: any): any;
