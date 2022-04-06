@@ -20,6 +20,8 @@ const update_user_dto_1 = require("./dto/update-user.dto");
 const user_dto_1 = require("./dto/user.dto");
 const swagger_1 = require("@nestjs/swagger");
 const allow_any_decorator_1 = require("../auth/decorators/allow-any.decorator");
+const roles_decorator_1 = require("../auth/decorators/roles.decorator");
+const users_role_interface_1 = require("./entities/users.role.interface");
 let UsersController = class UsersController {
     constructor(usersService) {
         this.usersService = usersService;
@@ -60,6 +62,7 @@ __decorate([
     (0, common_1.Get)(),
     (0, swagger_1.ApiOperation)({ summary: 'Get all users' }),
     (0, swagger_1.ApiResponse)({ status: 200, description: 'List all users', type: [user_dto_1.UserDto] }),
+    (0, roles_decorator_1.Role)(users_role_interface_1.IUserRole.ADMIN),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", []),
     __metadata("design:returntype", Promise)
@@ -70,6 +73,7 @@ __decorate([
     (0, swagger_1.ApiResponse)({ status: 200, description: 'User founded', type: user_dto_1.UserDto }),
     (0, swagger_1.ApiResponse)({ status: 400, description: 'Id is not a valid id' }),
     (0, swagger_1.ApiResponse)({ status: 404, description: 'User not found' }),
+    (0, roles_decorator_1.Role)(users_role_interface_1.IUserRole.ADMIN),
     __param(0, (0, common_1.Param)('id')),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String]),

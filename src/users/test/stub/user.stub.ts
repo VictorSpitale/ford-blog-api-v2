@@ -3,13 +3,24 @@ import { UserDto } from '../../dto/user.dto';
 import * as Mongoose from 'mongoose';
 
 const mockObjectId = new Mongoose.Types.ObjectId();
-const mockDate = '2016-05-18T16:00:00Z';
-
-export const UserStub = (): UserDto => {
+export const mockDate = '2016-05-18T16:00:00Z';
+const authId = new Mongoose.Types.ObjectId();
+export const adminStub = (): UserDto => {
   return {
-    _id: mockObjectId,
+    email: 'admin@doe.fr',
+    _id: authId,
+    password: 'password',
+    pseudo: 'adminDoe',
+    role: IUserRole.ADMIN,
+    createdAt: mockDate,
+    updatedAt: mockDate,
+  };
+};
+export const UserStub = (role = IUserRole.USER, id = mockObjectId): UserDto => {
+  return {
+    _id: id,
     pseudo: 'JohnDoe',
-    role: IUserRole.USER,
+    role,
     password: 'password',
     email: 'john@doe.fr',
     createdAt: mockDate,

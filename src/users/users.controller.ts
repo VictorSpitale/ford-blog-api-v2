@@ -13,6 +13,8 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { UserDto } from './dto/user.dto';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { AllowAny } from '../auth/decorators/allow-any.decorator';
+import { Role } from '../auth/decorators/roles.decorator';
+import { IUserRole } from './entities/users.role.interface';
 
 @Controller('users')
 @ApiTags('Users')
@@ -36,6 +38,7 @@ export class UsersController {
   @Get()
   @ApiOperation({ summary: 'Get all users' })
   @ApiResponse({ status: 200, description: 'List all users', type: [UserDto] })
+  @Role(IUserRole.ADMIN)
   async getUsers(): Promise<UserDto[]> {
     return this.usersService.getUsers();
   }
@@ -45,6 +48,7 @@ export class UsersController {
   @ApiResponse({ status: 200, description: 'User founded', type: UserDto })
   @ApiResponse({ status: 400, description: 'Id is not a valid id' })
   @ApiResponse({ status: 404, description: 'User not found' })
+  @Role(IUserRole.ADMIN)
   async getUserById(@Param('id') id: string) {
     return this.usersService.getUserById(id);
   }
