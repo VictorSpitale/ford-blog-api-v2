@@ -52,10 +52,10 @@ __decorate([
         type: post_dto_1.PostDto,
     }),
     (0, swagger_1.ApiResponse)({ status: 400, description: 'Validations failed' }),
-    (0, swagger_1.ApiResponse)({ status: 403, description: 'Forbidden ressource' }),
+    (0, swagger_1.ApiResponse)({ status: 401, description: 'Unauthorized access' }),
     (0, swagger_1.ApiResponse)({
         status: 409,
-        description: 'The post with this slug already exist',
+        description: 'A post with this slug already exist',
     }),
     (0, common_1.UseInterceptors)((0, platform_express_1.FileInterceptor)('file')),
     (0, roles_decorator_1.Role)(users_role_interface_1.IUserRole.POSTER),
@@ -109,6 +109,15 @@ __decorate([
 __decorate([
     (0, common_1.Get)(':slug'),
     (0, allow_any_decorator_1.AllowAny)(),
+    (0, swagger_1.ApiResponse)({
+        status: 200,
+        description: 'The post got by its slug',
+        type: post_dto_1.PostDto,
+    }),
+    (0, swagger_1.ApiResponse)({
+        status: 404,
+        description: 'The post doesnt exist',
+    }),
     __param(0, (0, common_1.Req)()),
     __param(1, (0, common_1.Param)('slug')),
     __metadata("design:type", Function),

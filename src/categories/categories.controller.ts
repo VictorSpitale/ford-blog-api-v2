@@ -5,6 +5,7 @@ import { CategoryDto } from './dto/category.dto';
 import { CreateCategoryDto } from './dto/create-category.dto';
 import { Role } from '../auth/decorators/roles.decorator';
 import { IUserRole } from '../users/entities/users.role.interface';
+import { AllowAny } from '../auth/decorators/allow-any.decorator';
 
 @Controller('categories')
 @ApiTags('Categories')
@@ -32,6 +33,7 @@ export class CategoriesController {
     description: 'List all categories',
     type: [CategoryDto],
   })
+  @AllowAny()
   async getCategories(): Promise<CategoryDto[]> {
     return this.categoriesService.getCategories();
   }
@@ -45,6 +47,7 @@ export class CategoriesController {
   })
   @ApiResponse({ status: 400, description: 'Id is not a valid id' })
   @ApiResponse({ status: 404, description: 'Category not found' })
+  @AllowAny()
   async getCategoryById(@Param('id') id: string) {
     return this.categoriesService.getCategoryById(id);
   }

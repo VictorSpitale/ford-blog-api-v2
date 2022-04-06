@@ -1,42 +1,101 @@
 import { INestApplication } from '@nestjs/common';
+import * as Mongoose from 'mongoose';
 import { Connection } from 'mongoose';
 
-import { UserStub, UserStubWithoutPasswordAndDates } from './stub/user.stub';
+import {
+  adminStub,
+  mockDate,
+  UserStub,
+  UserStubWithoutPasswordAndDates,
+} from './stub/user.stub';
 import { clearDatabase } from '../../shared/test/utils';
-import { init_e2e } from '../../shared/test/init.e2e';
+import { initE2eWithGuards } from '../../shared/test/init.e2e';
+import { AuthService } from '../../auth/auth.service';
+import { IUserRole } from '../entities/users.role.interface';
 
 describe('UsersController (e2e)', () => {
-  let app: INestApplication;
   let dbConnection: Connection;
+  let app: INestApplication;
   let request;
+  let authService: AuthService;
 
   beforeAll(async () => {
     const {
       httpRequest: req,
       dbConnection: db,
       app: nestApp,
-    } = await init_e2e();
+      moduleFixture,
+    } = await initE2eWithGuards();
     request = req;
     dbConnection = db;
     app = nestApp;
+    authService = moduleFixture.get<AuthService>(AuthService);
   });
 
-  describe('getUsers', function () {
-    beforeEach(async () => {
+  describe('getUsers not logged in', () => {
+    afterEach(async () => {
       await clearDatabase(dbConnection, 'users');
     });
 
-    it('should return an array of users', async () => {
+    it('should not return an array of users', async () => {
       await dbConnection.collection('users').insertOne(UserStub());
       const response = await request.get('/users');
+      expect(response.status).toBe(401);
+    });
+  });
+  describe('getUsers logged in', () => {
+    afterEach(async () => {
+      await clearDatabase(dbConnection, 'users');
+    });
+    it('should return an array of users', async () => {
+      const user = UserStub();
+      const authUser = adminStub();
+      await dbConnection.collection('users').insertMany([user, authUser]);
+      const token = authService.signToken(authUser);
+      const response = await request.get('/users').set({
+        Authorization: `Bearer ${token}`,
+      });
       expect(response.status).toBe(200);
-      expect(response.body).toMatchObject([UserStubWithoutPasswordAndDates()]);
+      expect(response.body.length).toBe(2);
+      expect(response.body[0]).toEqual(
+        expect.objectContaining({
+          _id: expect.any(String),
+          pseudo: expect.any(String),
+          email: expect.any(String),
+          role: expect.any(String),
+          updatedAt: expect.any(String),
+          createdAt: expect.any(String),
+        }),
+      );
+    });
+    it('should not return an array of users if auth user is not admin', async () => {
+      const user = UserStub();
+      const mockId = new Mongoose.Types.ObjectId();
+      const authUser = {
+        email: 'blabla@doe.fr',
+        _id: mockId,
+        password: 'password',
+        pseudo: 'john doe blabla',
+        role: IUserRole.USER,
+        createdAt: mockDate,
+        updatedAt: mockDate,
+      };
+      await dbConnection.collection('users').insertMany([user, authUser]);
+      const token = authService.signToken(authUser);
+      const response = await request.get('/users').set({
+        Authorization: `Bearer ${token}`,
+      });
+      expect(response.status).toBe(401);
     });
   });
 
   describe('createUsers', () => {
+    let token;
     beforeAll(async () => {
       await clearDatabase(dbConnection, 'users');
+      const authUser = adminStub();
+      await dbConnection.collection('users').insertOne(authUser);
+      token = authService.signToken(authUser);
     });
     it('should not create a user with too short pseudo', async () => {
       const response = await request.post('/users').send({
@@ -82,7 +141,9 @@ describe('UsersController (e2e)', () => {
       createdUserId = response.body._id;
     });
     it('should get the created user', async () => {
-      const response = await request.get('/users/' + createdUserId);
+      const response = await request.get('/users/' + createdUserId).set({
+        Authorization: `Bearer ${token}`,
+      });
       expect(response.status).toBe(200);
     });
     it('should not create a duplicate user', async () => {
@@ -92,6 +153,42 @@ describe('UsersController (e2e)', () => {
         email: UserStub().email,
       });
       expect(response.status).toBe(409);
+    });
+  });
+
+  describe('get User by id', () => {
+    describe('failing get user not logged in', () => {
+      it('should not get a user with invalid id', async () => {
+        const response = await request.get('/users/eee');
+        expect(response.status).toBe(401);
+      });
+      it('should not return a user that does not exist', async () => {
+        const mockObjectId = new Mongoose.Types.ObjectId();
+        const response = await request.get(`/users/${mockObjectId}`);
+        expect(response.status).toBe(401);
+      });
+    });
+    describe('failing get user logged in', () => {
+      let token;
+      beforeAll(async () => {
+        await clearDatabase(dbConnection, 'users');
+        const authUser = adminStub();
+        await dbConnection.collection('users').insertOne(authUser);
+        token = authService.signToken(authUser);
+      });
+      it('should not get a user with invalid id', async () => {
+        const response = await request.get('/users/eee').set({
+          Authorization: `Bearer ${token}`,
+        });
+        expect(response.status).toBe(400);
+      });
+      it('should not return a user that does not exist', async () => {
+        const mockObjectId = new Mongoose.Types.ObjectId();
+        const response = await request.get(`/users/${mockObjectId}`).set({
+          Authorization: `Bearer ${token}`,
+        });
+        expect(response.status).toBe(404);
+      });
     });
   });
 
