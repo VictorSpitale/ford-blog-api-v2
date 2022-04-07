@@ -27,31 +27,14 @@ let AuthController = class AuthController {
     }
     async login(user, response) {
         const { access_token } = await this.authService.login(user);
-        return response
-            .cookie('access_token', access_token, {
-            expires: new Date(Date.now() + 1000 * 60 * 60 * 24 * 2),
-            sameSite: 'none',
-            secure: true,
-            httpOnly: true,
-        })
-            .send({ access_token });
+        return this.authService.setCookie(response, access_token, { access_token });
     }
     async verifyToken(req) {
         var _a;
         return this.authService.decodePayload((_a = req.cookies) === null || _a === void 0 ? void 0 : _a.access_token);
     }
     async setCookieFromGoogle(res, token) {
-        if (await this.authService.decodePayload(token)) {
-            return res
-                .cookie('access_token', token, {
-                httpOnly: true,
-                expires: new Date(Date.now() + 1000 * 60 * 60 * 24 * 2),
-                secure: true,
-                sameSite: 'none',
-            })
-                .send();
-        }
-        throw new common_1.BadRequestException();
+        return this.authService.setCookieFromGoogle(res, token);
     }
     async getProfile(user) {
         return user;
