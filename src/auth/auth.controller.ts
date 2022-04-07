@@ -1,5 +1,4 @@
 import {
-  BadRequestException,
   Controller,
   Get,
   HttpCode,
@@ -32,14 +31,7 @@ export class AuthController {
   @ApiOperation({ summary: 'Get an access token for a user' })
   async login(@AuthUser() user: UserDto, @Res() response: Response) {
     const { access_token } = await this.authService.login(user);
-    return response
-      .cookie('access_token', access_token, {
-        expires: new Date(Date.now() + 1000 * 60 * 60 * 24 * 2),
-        sameSite: 'none',
-        secure: true,
-        httpOnly: true,
-      })
-      .send({ access_token });
+    return this.authService.setCookie(response, access_token, { access_token });
   }
 
   @Get('/jwt')
@@ -52,17 +44,7 @@ export class AuthController {
   @HttpCode(HttpStatus.OK)
   @AllowAny()
   async setCookieFromGoogle(@Res() res: Response, @Param('token') token) {
-    if (await this.authService.decodePayload(token)) {
-      return res
-        .cookie('access_token', token, {
-          httpOnly: true,
-          expires: new Date(Date.now() + 1000 * 60 * 60 * 24 * 2),
-          secure: true,
-          sameSite: 'none',
-        })
-        .send();
-    }
-    throw new BadRequestException();
+    return this.authService.setCookieFromGoogle(res, token);
   }
 
   @Get('/me')

@@ -1,4 +1,8 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { UsersService } from '../users/users.service';
 import { User } from '../users/entities/user.entity';
 import { UserDto } from '../users/dto/user.dto';
@@ -47,6 +51,24 @@ export class AuthService {
   async login(user: UserDto): Promise<JwtAccessToken> {
     const payload = { email: user.email, sub: user._id };
     return { access_token: this.jwtService.sign(payload) };
+  }
+
+  async setCookieFromGoogle(response: Response, token): Promise<Response> {
+    if (await this.decodePayload(token)) {
+      return this.setCookie(response, token);
+    }
+    throw new BadRequestException('Authentification impossible');
+  }
+
+  setCookie(response: Response, value, body?): Response {
+    return response
+      .cookie('access_token', value, {
+        expires: new Date(Date.now() + 1000 * 60 * 60 * 24 * 2),
+        sameSite: 'none',
+        secure: true,
+        httpOnly: true,
+      })
+      .send(body);
   }
 
   async googleLogin(req, res: Response) {
