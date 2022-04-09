@@ -193,6 +193,7 @@ describe('PostsController (e2e)', () => {
       await clearDatabase(dbConnection, 'posts');
     });
   });
+
   describe('getPostBySlug', () => {
     it('should fail to get non-existent post', async () => {
       const response = await request.get('/posts/slug');
@@ -212,6 +213,91 @@ describe('PostsController (e2e)', () => {
     });
     afterAll(async () => {
       await clearDatabase(dbConnection, 'posts');
+    });
+  });
+
+  describe('change like status on a post', () => {
+    describe('like then unlike a post', () => {
+      let token;
+      let post;
+      it('should like a post', async () => {
+        const user = UserStub();
+        post = PostStub();
+        await dbConnection.collection('users').insertOne(user);
+        await dbConnection.collection('posts').insertOne(post);
+        token = authService.signToken(user);
+        const response = await request
+          .patch(`/posts/like/${post.slug}`)
+          .set('Cookie', `access_token=${token};`);
+        expect(response.status).toBe(200);
+        expect(
+          doArraysIntersect(
+            [...Object.keys(PostStub()), 'authUserLiked'],
+            [...Object.keys(response.body)],
+          ),
+        ).toBe(true);
+        expect(response.body.authUserLiked).toBe(true);
+        expect(response.body.likes).toBe(1);
+      });
+      it('should unlike a post', async () => {
+        const response = await request
+          .patch(`/posts/unlike/${post.slug}`)
+          .set('Cookie', `access_token=${token};`);
+        expect(response.status).toBe(200);
+        expect(
+          doArraysIntersect(
+            [...Object.keys(PostStub()), 'authUserLiked'],
+            [...Object.keys(response.body)],
+          ),
+        ).toBe(true);
+        expect(response.body.authUserLiked).toBe(false);
+        expect(response.body.likes).toBe(0);
+      });
+      afterAll(async () => {
+        await clearDatabase(dbConnection, 'users');
+        await clearDatabase(dbConnection, 'posts');
+      });
+    });
+
+    describe('failing status change', () => {
+      describe('like', () => {
+        it('should not like a post while not being auth', async () => {
+          const post = PostStub();
+          await dbConnection.collection('posts').insertOne(post);
+          const response = await request.patch(`/posts/like/${post.slug}`);
+          expect(response.status).toBe(401);
+        });
+        it('should not like an non-existent post', async () => {
+          const user = UserStub();
+          await dbConnection.collection('users').insertOne(user);
+          const token = authService.signToken(user);
+          const response = await request
+            .patch(`/posts/like/eee`)
+            .set('Cookie', `access_token=${token};`);
+          expect(response.status).toBe(404);
+        });
+      });
+      describe('unlike', () => {
+        it('should not unlike a post while not being auth', async () => {
+          const post = PostStub();
+          await dbConnection.collection('posts').insertOne(post);
+          const response = await request.patch(`/posts/unlike/${post.slug}`);
+          expect(response.status).toBe(401);
+        });
+        it('should not unlike an non-existent post', async () => {
+          const user = UserStub();
+          await dbConnection.collection('users').insertOne(user);
+          const token = authService.signToken(user);
+          const response = await request
+            .patch(`/posts/unlike/eee`)
+            .set('Cookie', `access_token=${token};`);
+          expect(response.status).toBe(404);
+        });
+      });
+      afterEach(async () => {
+        await clearDatabase(dbConnection, 'users');
+        await clearDatabase(dbConnection, 'posts');
+      });
     });
   });
 
