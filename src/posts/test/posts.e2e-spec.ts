@@ -230,28 +230,14 @@ describe('PostsController (e2e)', () => {
           .patch(`/posts/like/${post.slug}`)
           .set('Cookie', `access_token=${token};`);
         expect(response.status).toBe(200);
-        expect(
-          doArraysIntersect(
-            [...Object.keys(PostStub()), 'authUserLiked'],
-            [...Object.keys(response.body)],
-          ),
-        ).toBe(true);
-        expect(response.body.authUserLiked).toBe(true);
-        expect(response.body.likes).toBe(1);
+        expect(response.text).toBe('1');
       });
       it('should unlike a post', async () => {
         const response = await request
           .patch(`/posts/unlike/${post.slug}`)
           .set('Cookie', `access_token=${token};`);
         expect(response.status).toBe(200);
-        expect(
-          doArraysIntersect(
-            [...Object.keys(PostStub()), 'authUserLiked'],
-            [...Object.keys(response.body)],
-          ),
-        ).toBe(true);
-        expect(response.body.authUserLiked).toBe(false);
-        expect(response.body.likes).toBe(0);
+        expect(response.text).toBe('0');
       });
       afterAll(async () => {
         await clearDatabase(dbConnection, 'users');
