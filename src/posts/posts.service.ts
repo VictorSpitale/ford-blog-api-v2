@@ -13,6 +13,7 @@ import { CreatePostDto } from './dto/create-post.dto';
 import { User } from '../users/entities/user.entity';
 import { GoogleService } from '../cloud/google.service';
 import { UploadTypes } from '../shared/types/upload.types';
+import { LikeOperation } from '../shared/types/post.types';
 
 @Injectable()
 export class PostsService {
@@ -40,6 +41,26 @@ export class PostsService {
     const createdPost = await this.postModel.create(data);
     await createdPost.populate('categories');
     return this.asDto(createdPost, null);
+  }
+
+  async likePost(slug, user) {
+    return this.updateLikeStatus(slug, user, LikeOperation.LIKE);
+  }
+
+  async unlikePost(slug, user) {
+    return this.updateLikeStatus(slug, user, LikeOperation.UNLIKE);
+  }
+
+  private async updateLikeStatus(slug, user, operation: LikeOperation) {
+    if (!(await this.postModel.findOne({ slug }))) {
+      throw new NotFoundException('Post not found');
+    }
+    await this.postModel.findOneAndUpdate(
+      { slug },
+      { [operation]: { likers: user._id } },
+    );
+    const post = await this.findOne({ slug });
+    return this.asDto(post, user).likes;
   }
 
   async getPosts(user: User): Promise<PostDto[]> {
@@ -126,7 +147,7 @@ export class PostsService {
     return docs;
   }
 
-  async findOne(match: MatchType): Promise<Post | null> {
+  async findOne(match: MatchType) {
     const posts = await this.find(match);
     if (posts.length > 0) {
       return posts[0];
