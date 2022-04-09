@@ -19,6 +19,7 @@ const post_entity_1 = require("./entities/post.entity");
 const mongoose_2 = require("mongoose");
 const google_service_1 = require("../cloud/google.service");
 const upload_types_1 = require("../shared/types/upload.types");
+const post_types_1 = require("../shared/types/post.types");
 let PostsService = class PostsService {
     constructor(postModel, googleService) {
         this.postModel = postModel;
@@ -36,6 +37,20 @@ let PostsService = class PostsService {
         const createdPost = await this.postModel.create(data);
         await createdPost.populate('categories');
         return this.asDto(createdPost, null);
+    }
+    async likePost(slug, user) {
+        return this.updateLikeStatus(slug, user, post_types_1.LikeOperation.LIKE);
+    }
+    async unlikePost(slug, user) {
+        return this.updateLikeStatus(slug, user, post_types_1.LikeOperation.UNLIKE);
+    }
+    async updateLikeStatus(slug, user, operation) {
+        if (!(await this.postModel.findOne({ slug }))) {
+            throw new common_1.NotFoundException('Post not found');
+        }
+        await this.postModel.findOneAndUpdate({ slug }, { [operation]: { likers: user._id } });
+        const post = await this.findOne({ slug });
+        return this.asDto(post, user).likes;
     }
     async getPosts(user) {
         const posts = await this.find({});

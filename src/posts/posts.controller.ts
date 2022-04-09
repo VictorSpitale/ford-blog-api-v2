@@ -3,6 +3,7 @@ import {
   Controller,
   Get,
   Param,
+  Patch,
   Post,
   Query,
   Req,
@@ -101,5 +102,33 @@ export class PostsController {
   })
   async getPost(@Req() req, @Param('slug') slug): Promise<PostDto> {
     return this.postsService.getPost(slug, req.user);
+  }
+
+  @Patch('/like/:slug')
+  @ApiResponse({
+    status: 200,
+    description: 'The post has been liked, return the number of likes',
+    type: Number,
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'The post doesnt exist',
+  })
+  async likePost(@Req() req, @Param('slug') slug) {
+    return this.postsService.likePost(slug, req.user);
+  }
+
+  @Patch('/unlike/:slug')
+  @ApiResponse({
+    status: 200,
+    description: 'The post has been unliked, return the number of likes',
+    type: Number,
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'The post doesnt exist',
+  })
+  async unlikePost(@Req() req, @Param('slug') slug) {
+    return this.postsService.unlikePost(slug, req.user);
   }
 }
