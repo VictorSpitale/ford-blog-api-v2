@@ -50,6 +50,22 @@ let AuthService = class AuthService {
         const payload = { email: user.email, sub: user._id };
         return { access_token: this.jwtService.sign(payload) };
     }
+    async setCookieFromGoogle(response, token) {
+        if (await this.decodePayload(token)) {
+            return this.setCookie(response, token);
+        }
+        throw new common_1.BadRequestException('Authentification impossible');
+    }
+    setCookie(response, value, body) {
+        return response
+            .cookie('access_token', value, {
+            expires: new Date(Date.now() + 1000 * 60 * 60 * 24 * 2),
+            sameSite: 'none',
+            secure: true,
+            httpOnly: true,
+        })
+            .send(body);
+    }
     async googleLogin(req, res) {
         if (!req.user) {
             return 'No user from google';
