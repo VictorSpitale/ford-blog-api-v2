@@ -14,6 +14,7 @@ const common_1 = require("@nestjs/common");
 const passport_1 = require("@nestjs/passport");
 const core_1 = require("@nestjs/core");
 const allow_any_decorator_1 = require("../decorators/allow-any.decorator");
+const HttpError_1 = require("../../shared/error/HttpError");
 let JwtAuthGuard = class JwtAuthGuard extends (0, passport_1.AuthGuard)('jwt') {
     constructor(reflector) {
         super();
@@ -25,7 +26,7 @@ let JwtAuthGuard = class JwtAuthGuard extends (0, passport_1.AuthGuard)('jwt') {
             return user;
         if (allowAny)
             return null;
-        throw new common_1.UnauthorizedException('Jwt failed');
+        throw new common_1.UnauthorizedException(HttpError_1.HttpError.getHttpError(HttpError_1.HttpErrorCode.JWT_FAILED));
     }
 };
 JwtAuthGuard = __decorate([

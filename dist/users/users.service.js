@@ -17,16 +17,17 @@ const common_1 = require("@nestjs/common");
 const mongoose_1 = require("@nestjs/mongoose");
 const user_entity_1 = require("./entities/user.entity");
 const mongoose_2 = require("mongoose");
+const HttpError_1 = require("../shared/error/HttpError");
 let UsersService = class UsersService {
     constructor(userModel) {
         this.userModel = userModel;
     }
     async create(createUserDto) {
         if (await this.getUserByEmail(createUserDto.email)) {
-            throw new common_1.ConflictException('user already exist');
+            throw new common_1.ConflictException(HttpError_1.HttpError.getHttpError(HttpError_1.HttpErrorCode.USER_ALREADY_EXIST));
         }
         if (await this.getUserByPseudo(createUserDto.pseudo)) {
-            throw new common_1.ConflictException('user already exist');
+            throw new common_1.ConflictException(HttpError_1.HttpError.getHttpError(HttpError_1.HttpErrorCode.USER_ALREADY_EXIST));
         }
         const createdUser = await this.userModel.create(createUserDto);
         return this.asDtoWithoutPassword(createdUser);
