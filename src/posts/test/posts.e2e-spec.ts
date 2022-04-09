@@ -38,9 +38,7 @@ describe('PostsController (e2e)', () => {
         const response = await request
           .post('/posts')
           .send(post)
-          .set({
-            Authorization: `Bearer ${token}`,
-          });
+          .set('Cookie', `access_token=${token};`);
         expect(response.status).toBe(201);
         expect(
           doArraysIntersect(
@@ -67,9 +65,7 @@ describe('PostsController (e2e)', () => {
         const response = await request
           .post('/posts')
           .send(post)
-          .set({
-            Authorization: `Bearer ${token}`,
-          });
+          .set('Cookie', `access_token=${token};`);
         expect(response.status).toBe(401);
       });
       it('should not create a post with missing fields', async () => {
@@ -80,9 +76,7 @@ describe('PostsController (e2e)', () => {
         const response = await request
           .post('/posts')
           .send(other)
-          .set({
-            Authorization: `Bearer ${token}`,
-          });
+          .set('Cookie', `access_token=${token};`);
         expect(response.status).toBe(400);
       });
       it('should not create a post with invalid source link format', async () => {
@@ -96,9 +90,7 @@ describe('PostsController (e2e)', () => {
             ...post,
             sourceLink: 'blabla',
           })
-          .set({
-            Authorization: `Bearer ${token}`,
-          });
+          .set('Cookie', `access_token=${token};`);
         expect(response.status).toBe(400);
       });
       it('should not create a duplicate post', async () => {
@@ -110,9 +102,7 @@ describe('PostsController (e2e)', () => {
         const response = await request
           .post('/posts')
           .send(post)
-          .set({
-            Authorization: `Bearer ${token}`,
-          });
+          .set('Cookie', `access_token=${token};`);
         expect(response.status).toBe(409);
       });
       afterEach(async () => {
@@ -137,9 +127,9 @@ describe('PostsController (e2e)', () => {
         const token = authService.signToken(user);
         await dbConnection.collection('users').insertOne(user);
         await dbConnection.collection('posts').insertOne(post);
-        const response = await request.get('/posts').set({
-          Authorization: `Bearer ${token}`,
-        });
+        const response = await request
+          .get('/posts')
+          .set('Cookie', `access_token=${token};`);
         expect(response.status).toBe(200);
         expect(response.body).toBeInstanceOf(Array);
         expect(response.body.length).toBe(1);

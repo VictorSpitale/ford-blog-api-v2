@@ -57,15 +57,15 @@ describe('auth (e2e)', () => {
       token = response.body.access_token;
     });
     it('should not give the user id if the jwt is not correct', async () => {
-      const response = await request.get('/auth/jwt').set({
-        Authorization: 'Bearer blablabla',
-      });
+      const response = await request
+        .get('/auth/jwt')
+        .set('Cookie', `access_token=blabla;`);
       expect(response.text).toBe('');
     });
     it('should decode the jwt and send the user id', async () => {
-      const response = await request.get('/auth/jwt').set({
-        Authorization: `Bearer ${token}`,
-      });
+      const response = await request
+        .get('/auth/jwt')
+        .set('Cookie', `access_token=${token};`);
       expect(response).not.toBeNull();
       const user = await usersService.getUserByEmail(UserStub().email);
       expect(response.text).toEqual(user._id.toString());
@@ -76,9 +76,9 @@ describe('auth (e2e)', () => {
     });
 
     it('should request a protected route successfully', async () => {
-      const response = await request.get('/posts').set({
-        Authorization: `Bearer ${token}`,
-      });
+      const response = await request
+        .get('/posts')
+        .set('Cookie', `access_token=${token};`);
       expect(response.status).toBe(200);
     });
   });

@@ -10,6 +10,7 @@ const database_service_1 = require("../../database/database.service");
 const superagent_1 = require("./superagent");
 const request = require("supertest");
 const roles_guard_1 = require("../../auth/guards/roles.guard");
+const cookieParser = require("cookie-parser");
 async function initE2eWithoutGuards() {
     const moduleFixture = await testing_1.Test.createTestingModule({
         imports: [app_module_1.AppModule],
@@ -25,6 +26,7 @@ exports.initE2eWithoutGuards = initE2eWithoutGuards;
 async function getInitConst(moduleFixture) {
     const app = moduleFixture.createNestApplication();
     app.useGlobalPipes(new common_1.ValidationPipe());
+    app.use(cookieParser());
     await app.init();
     const dbConnection = moduleFixture
         .get(database_service_1.DatabaseService)
