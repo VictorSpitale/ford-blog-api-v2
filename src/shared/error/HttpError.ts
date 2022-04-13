@@ -3,6 +3,7 @@ export enum HttpErrorCode {
   UNAUTHORIZED_LOGIN,
   G_AUTH_FAILED,
   USER_ALREADY_EXIST,
+  USER_NOT_FOUND,
 }
 
 type HttpErrorObj = {
@@ -28,6 +29,10 @@ export class HttpError {
     [
       HttpErrorCode.USER_ALREADY_EXIST,
       { message: 'Pseudo or email already used', statusCode: 409, code: 3 },
+    ],
+    [
+      HttpErrorCode.USER_NOT_FOUND,
+      { message: 'User not found', statusCode: 404, code: 4 },
     ],
   ]);
 

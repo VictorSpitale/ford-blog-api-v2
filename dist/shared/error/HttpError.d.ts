@@ -2,7 +2,8 @@ export declare enum HttpErrorCode {
     JWT_FAILED = 0,
     UNAUTHORIZED_LOGIN = 1,
     G_AUTH_FAILED = 2,
-    USER_ALREADY_EXIST = 3
+    USER_ALREADY_EXIST = 3,
+    USER_NOT_FOUND = 4
 }
 declare type HttpErrorObj = {
     statusCode: number;

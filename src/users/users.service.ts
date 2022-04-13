@@ -43,7 +43,10 @@ export class UsersService {
 
   async getUserById(id: string): Promise<UserDto> {
     const user = await this.findOne({ _id: id });
-    if (!user) throw new NotFoundException();
+    if (!user)
+      throw new NotFoundException(
+        HttpError.getHttpError(HttpErrorCode.USER_NOT_FOUND),
+      );
     return this.asDtoWithoutPassword(user);
   }
 

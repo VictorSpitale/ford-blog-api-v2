@@ -7,6 +7,7 @@ var HttpErrorCode;
     HttpErrorCode[HttpErrorCode["UNAUTHORIZED_LOGIN"] = 1] = "UNAUTHORIZED_LOGIN";
     HttpErrorCode[HttpErrorCode["G_AUTH_FAILED"] = 2] = "G_AUTH_FAILED";
     HttpErrorCode[HttpErrorCode["USER_ALREADY_EXIST"] = 3] = "USER_ALREADY_EXIST";
+    HttpErrorCode[HttpErrorCode["USER_NOT_FOUND"] = 4] = "USER_NOT_FOUND";
 })(HttpErrorCode = exports.HttpErrorCode || (exports.HttpErrorCode = {}));
 class HttpError {
     static getHttpError(code) {
@@ -30,6 +31,10 @@ HttpError.errors = new Map([
     [
         HttpErrorCode.USER_ALREADY_EXIST,
         { message: 'Pseudo or email already used', statusCode: 409, code: 3 },
+    ],
+    [
+        HttpErrorCode.USER_NOT_FOUND,
+        { message: 'User not found', statusCode: 404, code: 4 },
     ],
 ]);
 //# sourceMappingURL=HttpError.js.map

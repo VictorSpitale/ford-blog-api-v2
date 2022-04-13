@@ -43,7 +43,7 @@ let UsersService = class UsersService {
     async getUserById(id) {
         const user = await this.findOne({ _id: id });
         if (!user)
-            throw new common_1.NotFoundException();
+            throw new common_1.NotFoundException(HttpError_1.HttpError.getHttpError(HttpError_1.HttpErrorCode.USER_NOT_FOUND));
         return this.asDtoWithoutPassword(user);
     }
     async getUserByPseudo(pseudo) {
