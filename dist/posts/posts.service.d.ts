@@ -14,6 +14,7 @@ export declare class PostsService {
     likePost(slug: any, user: any): Promise<number>;
     unlikePost(slug: any, user: any): Promise<number>;
     private updateLikeStatus;
+    deletePost(slug: string, user: User): Promise<void>;
     getPosts(user: User): Promise<PostDto[]>;
     getLastPosts(user: User): Promise<PostDto[]>;
     getPost(slug: string, user: User): Promise<PostDto>;

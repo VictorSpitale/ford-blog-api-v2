@@ -47,6 +47,9 @@ let PostsController = class PostsController {
     async unlikePost(req, slug) {
         return this.postsService.unlikePost(slug, req.user);
     }
+    async deletePost(req, slug) {
+        return this.postsService.deletePost(slug, req.user);
+    }
 };
 __decorate([
     (0, common_1.Post)(),
@@ -164,6 +167,27 @@ __decorate([
     __metadata("design:paramtypes", [Object, Object]),
     __metadata("design:returntype", Promise)
 ], PostsController.prototype, "unlikePost", null);
+__decorate([
+    (0, common_1.Delete)(':slug'),
+    (0, roles_decorator_1.Role)(users_role_interface_1.IUserRole.ADMIN),
+    (0, swagger_1.ApiResponse)({
+        status: 200,
+        description: 'The post has been deleted',
+    }),
+    (0, swagger_1.ApiResponse)({
+        status: 401,
+        description: 'Insuffisant permissions',
+    }),
+    (0, swagger_1.ApiResponse)({
+        status: 404,
+        description: 'The post doesnt exist',
+    }),
+    __param(0, (0, common_1.Req)()),
+    __param(1, (0, common_1.Param)('slug')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, Object]),
+    __metadata("design:returntype", Promise)
+], PostsController.prototype, "deletePost", null);
 PostsController = __decorate([
     (0, common_1.Controller)('posts'),
     (0, swagger_1.ApiTags)('Posts'),

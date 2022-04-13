@@ -8,6 +8,7 @@ var HttpErrorCode;
     HttpErrorCode[HttpErrorCode["G_AUTH_FAILED"] = 2] = "G_AUTH_FAILED";
     HttpErrorCode[HttpErrorCode["USER_ALREADY_EXIST"] = 3] = "USER_ALREADY_EXIST";
     HttpErrorCode[HttpErrorCode["USER_NOT_FOUND"] = 4] = "USER_NOT_FOUND";
+    HttpErrorCode[HttpErrorCode["POST_NOT_FOUND"] = 5] = "POST_NOT_FOUND";
 })(HttpErrorCode = exports.HttpErrorCode || (exports.HttpErrorCode = {}));
 class HttpError {
     static getHttpError(code) {
@@ -35,6 +36,10 @@ HttpError.errors = new Map([
     [
         HttpErrorCode.USER_NOT_FOUND,
         { message: 'User not found', statusCode: 404, code: 4 },
+    ],
+    [
+        HttpErrorCode.POST_NOT_FOUND,
+        { message: 'Post not found', statusCode: 404, code: 5 },
     ],
 ]);
 //# sourceMappingURL=HttpError.js.map

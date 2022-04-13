@@ -20,6 +20,7 @@ const mongoose_2 = require("mongoose");
 const google_service_1 = require("../cloud/google.service");
 const upload_types_1 = require("../shared/types/upload.types");
 const post_types_1 = require("../shared/types/post.types");
+const HttpError_1 = require("../shared/error/HttpError");
 let PostsService = class PostsService {
     constructor(postModel, googleService) {
         this.postModel = postModel;
@@ -46,11 +47,15 @@ let PostsService = class PostsService {
     }
     async updateLikeStatus(slug, user, operation) {
         if (!(await this.postModel.findOne({ slug }))) {
-            throw new common_1.NotFoundException('Post not found');
+            throw new common_1.NotFoundException(HttpError_1.HttpError.getHttpError(HttpError_1.HttpErrorCode.POST_NOT_FOUND));
         }
         await this.postModel.findOneAndUpdate({ slug }, { [operation]: { likers: user._id } });
         const post = await this.findOne({ slug });
         return this.asDto(post, user).likes;
+    }
+    async deletePost(slug, user) {
+        await this.getPost(slug, user);
+        await this.postModel.findOneAndDelete({ slug });
     }
     async getPosts(user) {
         const posts = await this.find({});
@@ -63,7 +68,7 @@ let PostsService = class PostsService {
     async getPost(slug, user) {
         const post = await this.findOne({ slug });
         if (!post) {
-            throw new common_1.NotFoundException();
+            throw new common_1.NotFoundException(HttpError_1.HttpError.getHttpError(HttpError_1.HttpErrorCode.POST_NOT_FOUND));
         }
         return this.asDto(post, user);
     }

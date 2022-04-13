@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   Param,
   Patch,
@@ -130,5 +131,23 @@ export class PostsController {
   })
   async unlikePost(@Req() req, @Param('slug') slug) {
     return this.postsService.unlikePost(slug, req.user);
+  }
+
+  @Delete(':slug')
+  @Role(IUserRole.ADMIN)
+  @ApiResponse({
+    status: 200,
+    description: 'The post has been deleted',
+  })
+  @ApiResponse({
+    status: 401,
+    description: 'Insuffisant permissions',
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'The post doesnt exist',
+  })
+  async deletePost(@Req() req, @Param('slug') slug) {
+    return this.postsService.deletePost(slug, req.user);
   }
 }

@@ -14,6 +14,7 @@ import { User } from '../users/entities/user.entity';
 import { GoogleService } from '../cloud/google.service';
 import { UploadTypes } from '../shared/types/upload.types';
 import { LikeOperation } from '../shared/types/post.types';
+import { HttpError, HttpErrorCode } from '../shared/error/HttpError';
 
 @Injectable()
 export class PostsService {
@@ -53,7 +54,9 @@ export class PostsService {
 
   private async updateLikeStatus(slug, user, operation: LikeOperation) {
     if (!(await this.postModel.findOne({ slug }))) {
-      throw new NotFoundException('Post not found');
+      throw new NotFoundException(
+        HttpError.getHttpError(HttpErrorCode.POST_NOT_FOUND),
+      );
     }
     await this.postModel.findOneAndUpdate(
       { slug },
@@ -61,6 +64,11 @@ export class PostsService {
     );
     const post = await this.findOne({ slug });
     return this.asDto(post, user).likes;
+  }
+
+  async deletePost(slug: string, user: User) {
+    await this.getPost(slug, user);
+    await this.postModel.findOneAndDelete({ slug });
   }
 
   async getPosts(user: User): Promise<PostDto[]> {
@@ -76,7 +84,9 @@ export class PostsService {
   async getPost(slug: string, user: User): Promise<PostDto> {
     const post = await this.findOne({ slug });
     if (!post) {
-      throw new NotFoundException();
+      throw new NotFoundException(
+        HttpError.getHttpError(HttpErrorCode.POST_NOT_FOUND),
+      );
     }
     return this.asDto(post, user);
   }

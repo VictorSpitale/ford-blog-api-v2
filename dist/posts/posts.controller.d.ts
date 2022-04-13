@@ -12,4 +12,5 @@ export declare class PostsController {
     getPost(req: any, slug: any): Promise<PostDto>;
     likePost(req: any, slug: any): Promise<number>;
     unlikePost(req: any, slug: any): Promise<number>;
+    deletePost(req: any, slug: any): Promise<void>;
 }
