@@ -287,6 +287,55 @@ describe('PostsController (e2e)', () => {
     });
   });
 
+  describe('delete a post', () => {
+    describe('failing delete post', () => {
+      it('should fail to delete a post while not logged in', async () => {
+        const post = PostStub();
+        await dbConnection.collection('posts').insertOne(post);
+        const response = await request.delete(`/posts/${post.slug}`);
+        expect(response.status).toBe(401);
+      });
+      it('should fail to delete a post while not an admin', async () => {
+        const post = PostStub();
+        const user = UserStub();
+        await dbConnection.collection('posts').insertOne(post);
+        await dbConnection.collection('users').insertOne(user);
+        const token = authService.signToken(user);
+        const response = await request
+          .delete(`/posts/${post.slug}`)
+          .set('Cookie', `access_token=${token};`);
+        expect(response.status).toBe(401);
+      });
+      it('should fail to delete a non-existent post', async () => {
+        const user = UserStub(IUserRole.ADMIN);
+        await dbConnection.collection('users').insertOne(user);
+        const token = authService.signToken(user);
+        const response = await request
+          .delete(`/posts/eee`)
+          .set('Cookie', `access_token=${token};`);
+        expect(response.status).toBe(404);
+      });
+    });
+    describe('delete a post', () => {
+      it('should delete a post', async () => {
+        const post = PostStub();
+        const user = UserStub(IUserRole.ADMIN);
+        await dbConnection.collection('posts').insertOne(post);
+        await dbConnection.collection('users').insertOne(user);
+        const token = authService.signToken(user);
+        const response = await request
+          .delete(`/posts/${post.slug}`)
+          .set('Cookie', `access_token=${token};`);
+        expect(response.status).toBe(200);
+      });
+    });
+
+    afterEach(async () => {
+      await clearDatabase(dbConnection, 'posts');
+      await clearDatabase(dbConnection, 'users');
+    });
+  });
+
   afterAll(async () => {
     await clearDatabase(dbConnection, 'categories');
     await clearDatabase(dbConnection, 'posts');
