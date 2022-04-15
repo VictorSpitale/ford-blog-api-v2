@@ -22,6 +22,7 @@ const roles_decorator_1 = require("../auth/decorators/roles.decorator");
 const users_role_interface_1 = require("../users/entities/users.role.interface");
 const allow_any_decorator_1 = require("../auth/decorators/allow-any.decorator");
 const platform_express_1 = require("@nestjs/platform-express");
+const update_post_dto_1 = require("./dto/update-post.dto");
 let PostsController = class PostsController {
     constructor(postsService) {
         this.postsService = postsService;
@@ -47,10 +48,15 @@ let PostsController = class PostsController {
     async unlikePost(req, slug) {
         return this.postsService.unlikePost(slug, req.user);
     }
+    async deletePost(req, slug) {
+        return this.postsService.deletePost(slug, req.user);
+    }
+    async updatePost(req, updatePostDto, slug) {
+        return this.postsService.updatePost(slug, updatePostDto, req.user);
+    }
 };
 __decorate([
     (0, common_1.Post)(),
-    (0, swagger_1.ApiBearerAuth)(),
     (0, swagger_1.ApiOperation)({ summary: 'Create a post' }),
     (0, swagger_1.ApiResponse)({
         status: 201,
@@ -164,6 +170,48 @@ __decorate([
     __metadata("design:paramtypes", [Object, Object]),
     __metadata("design:returntype", Promise)
 ], PostsController.prototype, "unlikePost", null);
+__decorate([
+    (0, common_1.Delete)(':slug'),
+    (0, roles_decorator_1.Role)(users_role_interface_1.IUserRole.ADMIN),
+    (0, swagger_1.ApiResponse)({
+        status: 200,
+        description: 'The post has been deleted',
+    }),
+    (0, swagger_1.ApiResponse)({
+        status: 401,
+        description: 'Insuffisant permissions',
+    }),
+    (0, swagger_1.ApiResponse)({
+        status: 404,
+        description: 'The post doesnt exist',
+    }),
+    __param(0, (0, common_1.Req)()),
+    __param(1, (0, common_1.Param)('slug')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, Object]),
+    __metadata("design:returntype", Promise)
+], PostsController.prototype, "deletePost", null);
+__decorate([
+    (0, common_1.Patch)(':slug'),
+    (0, roles_decorator_1.Role)(users_role_interface_1.IUserRole.ADMIN),
+    (0, swagger_1.ApiResponse)({
+        status: 201,
+        description: 'The post has been updated',
+        type: post_dto_1.PostDto,
+    }),
+    (0, swagger_1.ApiResponse)({ status: 400, description: 'Validations failed' }),
+    (0, swagger_1.ApiResponse)({ status: 401, description: 'Unauthorized access' }),
+    (0, swagger_1.ApiResponse)({
+        status: 404,
+        description: 'The post doesnt exist',
+    }),
+    __param(0, (0, common_1.Req)()),
+    __param(1, (0, common_1.Body)()),
+    __param(2, (0, common_1.Param)('slug')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, update_post_dto_1.UpdatePostDto, Object]),
+    __metadata("design:returntype", Promise)
+], PostsController.prototype, "updatePost", null);
 PostsController = __decorate([
     (0, common_1.Controller)('posts'),
     (0, swagger_1.ApiTags)('Posts'),

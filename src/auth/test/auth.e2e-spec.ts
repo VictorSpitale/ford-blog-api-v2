@@ -4,6 +4,7 @@ import { initE2eWithGuards } from '../../shared/test/init.e2e';
 import { clearDatabase } from '../../shared/test/utils';
 import { UserStub } from '../../users/test/stub/user.stub';
 import { UsersService } from '../../users/users.service';
+import { doArraysIntersect } from '../../shared/utils/tests.utils';
 
 describe('auth (e2e)', () => {
   let app: INestApplication;
@@ -60,15 +61,15 @@ describe('auth (e2e)', () => {
       const response = await request
         .get('/auth/jwt')
         .set('Cookie', `access_token=blabla;`);
-      expect(response.text).toBe('');
+      expect(response.status).toBe(404);
     });
-    it('should decode the jwt and send the user id', async () => {
+    it('should decode the jwt and send the user', async () => {
       const response = await request
         .get('/auth/jwt')
         .set('Cookie', `access_token=${token};`);
       expect(response).not.toBeNull();
       const user = await usersService.getUserByEmail(UserStub().email);
-      expect(response.text).toEqual(user._id.toString());
+      expect(doArraysIntersect(Object.keys(user), Object.keys(response.body)));
     });
     it('should cannot access protected route without Authorization', async () => {
       const response = await request.get('/posts');

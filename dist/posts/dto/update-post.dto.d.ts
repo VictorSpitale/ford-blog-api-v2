@@ -1,5 +1,8 @@
-import { CreatePostDto } from './create-post.dto';
-declare const UpdatePostDto_base: import("@nestjs/common").Type<Partial<CreatePostDto>>;
-export declare class UpdatePostDto extends UpdatePostDto_base {
+import * as Mongoose from 'mongoose';
+export declare class UpdatePostDto {
+    readonly title?: string;
+    readonly desc?: string;
+    readonly sourceName?: string;
+    readonly sourceLink?: string;
+    readonly categories?: Mongoose.Types.ObjectId[];
 }
-export {};

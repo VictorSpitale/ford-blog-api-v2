@@ -4,6 +4,7 @@ export enum HttpErrorCode {
   G_AUTH_FAILED,
   USER_ALREADY_EXIST,
   USER_NOT_FOUND,
+  POST_NOT_FOUND,
 }
 
 type HttpErrorObj = {
@@ -33,6 +34,10 @@ export class HttpError {
     [
       HttpErrorCode.USER_NOT_FOUND,
       { message: 'User not found', statusCode: 404, code: 4 },
+    ],
+    [
+      HttpErrorCode.POST_NOT_FOUND,
+      { message: 'Post not found', statusCode: 404, code: 5 },
     ],
   ]);
 

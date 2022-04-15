@@ -8,6 +8,7 @@ import { urlRegex } from '../../shared/utils/regex.validation';
 import { AuthService } from '../../auth/auth.service';
 import { UserStub } from '../../users/test/stub/user.stub';
 import { IUserRole } from '../../users/entities/users.role.interface';
+import { UpdatePostDto } from '../dto/update-post.dto';
 
 describe('PostsController (e2e)', () => {
   let app: INestApplication;
@@ -284,6 +285,135 @@ describe('PostsController (e2e)', () => {
         await clearDatabase(dbConnection, 'users');
         await clearDatabase(dbConnection, 'posts');
       });
+    });
+  });
+
+  describe('delete a post', () => {
+    describe('failing delete post', () => {
+      it('should fail to delete a post while not logged in', async () => {
+        const post = PostStub();
+        await dbConnection.collection('posts').insertOne(post);
+        const response = await request.delete(`/posts/${post.slug}`);
+        expect(response.status).toBe(401);
+      });
+      it('should fail to delete a post while not an admin', async () => {
+        const post = PostStub();
+        const user = UserStub();
+        await dbConnection.collection('posts').insertOne(post);
+        await dbConnection.collection('users').insertOne(user);
+        const token = authService.signToken(user);
+        const response = await request
+          .delete(`/posts/${post.slug}`)
+          .set('Cookie', `access_token=${token};`);
+        expect(response.status).toBe(401);
+      });
+      it('should fail to delete a non-existent post', async () => {
+        const user = UserStub(IUserRole.ADMIN);
+        await dbConnection.collection('users').insertOne(user);
+        const token = authService.signToken(user);
+        const response = await request
+          .delete(`/posts/eee`)
+          .set('Cookie', `access_token=${token};`);
+        expect(response.status).toBe(404);
+      });
+    });
+    describe('delete a post', () => {
+      it('should delete a post', async () => {
+        const post = PostStub();
+        const user = UserStub(IUserRole.ADMIN);
+        await dbConnection.collection('posts').insertOne(post);
+        await dbConnection.collection('users').insertOne(user);
+        const token = authService.signToken(user);
+        const response = await request
+          .delete(`/posts/${post.slug}`)
+          .set('Cookie', `access_token=${token};`);
+        expect(response.status).toBe(200);
+      });
+    });
+
+    afterEach(async () => {
+      await clearDatabase(dbConnection, 'posts');
+      await clearDatabase(dbConnection, 'users');
+    });
+  });
+
+  describe('update post', () => {
+    describe('failing update post', () => {
+      it('should not update a post while not logged in', async () => {
+        const post = PostStub();
+        const update: UpdatePostDto = { title: 'nouveau titre' };
+        await dbConnection.collection('posts').insertOne(post);
+        const response = await request
+          .patch(`/posts/${post.slug}`)
+          .send(update);
+        expect(response.status).toBe(401);
+      });
+      it('should not update a post while not been admin', async () => {
+        const post = PostStub();
+        const user = UserStub();
+        const update: UpdatePostDto = { title: 'nouveau titre' };
+        await dbConnection.collection('users').insertOne(user);
+        await dbConnection.collection('posts').insertOne(post);
+        const token = authService.signToken(user);
+        const response = await request
+          .patch(`/posts/${post.slug}`)
+          .send(update)
+          .set('Cookie', `access_token=${token};`);
+        expect(response.status).toBe(401);
+      });
+      it('should not update a non-existent post', async () => {
+        const post = PostStub();
+        const user = UserStub(IUserRole.ADMIN);
+        const update: UpdatePostDto = { title: 'nouveau titre' };
+        await dbConnection.collection('posts').insertOne(post);
+        await dbConnection.collection('users').insertOne(user);
+        const token = authService.signToken(user);
+        const response = await request
+          .patch(`/posts/eee`)
+          .send(update)
+          .set('Cookie', `access_token=${token};`);
+        expect(response.status).toBe(404);
+      });
+      it('should not update a post which does not respect the validation rules', async () => {
+        const post = PostStub();
+        const user = UserStub(IUserRole.ADMIN);
+        const update: UpdatePostDto = { title: '' };
+        await dbConnection.collection('posts').insertOne(post);
+        await dbConnection.collection('users').insertOne(user);
+        const token = authService.signToken(user);
+        const response = await request
+          .patch(`/posts/eee`)
+          .send(update)
+          .set('Cookie', `access_token=${token};`);
+        expect(response.status).toBe(400);
+      });
+    });
+
+    describe('update post', () => {
+      it('should update a post', async () => {
+        const post = PostStub();
+        const user = UserStub(IUserRole.ADMIN);
+        const update: UpdatePostDto = { title: 'nouveau titre' };
+        await dbConnection.collection('posts').insertOne(post);
+        await dbConnection.collection('users').insertOne(user);
+        const token = authService.signToken(user);
+        const response = await request
+          .patch(`/posts/${post.slug}`)
+          .send(update)
+          .set('Cookie', `access_token=${token};`);
+        expect(response.status).toBe(200);
+        expect(
+          doArraysIntersect(Object.keys(response.body), [
+            ...Object.keys(post),
+            'authUserLike',
+          ]),
+        ).toBe(true);
+      });
+    });
+
+    afterEach(async () => {
+      await clearDatabase(dbConnection, 'posts');
+      await clearDatabase(dbConnection, 'users');
     });
   });
 

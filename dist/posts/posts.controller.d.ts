@@ -2,6 +2,7 @@
 import { PostsService } from './posts.service';
 import { PostDto } from './dto/post.dto';
 import { CreatePostDto } from './dto/create-post.dto';
+import { UpdatePostDto } from './dto/update-post.dto';
 export declare class PostsController {
     private readonly postsService;
     constructor(postsService: PostsService);
@@ -12,4 +13,6 @@ export declare class PostsController {
     getPost(req: any, slug: any): Promise<PostDto>;
     likePost(req: any, slug: any): Promise<number>;
     unlikePost(req: any, slug: any): Promise<number>;
+    deletePost(req: any, slug: any): Promise<void>;
+    updatePost(req: any, updatePostDto: UpdatePostDto, slug: any): Promise<PostDto>;
 }
