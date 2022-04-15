@@ -13,6 +13,9 @@ import { CreatePostDto } from './dto/create-post.dto';
 import { User } from '../users/entities/user.entity';
 import { GoogleService } from '../cloud/google.service';
 import { UploadTypes } from '../shared/types/upload.types';
+import { LikeOperation } from '../shared/types/post.types';
+import { HttpError, HttpErrorCode } from '../shared/error/HttpError';
+import { UpdatePostDto } from './dto/update-post.dto';
 
 @Injectable()
 export class PostsService {
@@ -42,6 +45,41 @@ export class PostsService {
     return this.asDto(createdPost, null);
   }
 
+  async likePost(slug, user) {
+    return this.updateLikeStatus(slug, user, LikeOperation.LIKE);
+  }
+
+  async unlikePost(slug, user) {
+    return this.updateLikeStatus(slug, user, LikeOperation.UNLIKE);
+  }
+
+  private async updateLikeStatus(slug, user, operation: LikeOperation) {
+    if (!(await this.postModel.findOne({ slug }))) {
+      throw new NotFoundException(
+        HttpError.getHttpError(HttpErrorCode.POST_NOT_FOUND),
+      );
+    }
+    const updated = await this.postModel.findOneAndUpdate(
+      { slug },
+      { [operation]: { likers: user._id } },
+      { new: true },
+    );
+    return this.asDto(updated, user).likes;
+  }
+
+  async deletePost(slug: string, user: User) {
+    await this.getPost(slug, user);
+    await this.postModel.findOneAndDelete({ slug });
+  }
+
+  async updatePost(slug: string, updatePostDto: UpdatePostDto, user: User) {
+    await this.getPost(slug, user);
+    const updated = await this.postModel
+      .findOneAndUpdate({ slug }, { ...updatePostDto }, { new: true })
+      .populate('categories likers');
+    return this.asDto(updated, user);
+  }
+
   async getPosts(user: User): Promise<PostDto[]> {
     const posts = await this.find({});
     return posts.map((p) => this.asDto(p, user));
@@ -55,7 +93,9 @@ export class PostsService {
   async getPost(slug: string, user: User): Promise<PostDto> {
     const post = await this.findOne({ slug });
     if (!post) {
-      throw new NotFoundException();
+      throw new NotFoundException(
+        HttpError.getHttpError(HttpErrorCode.POST_NOT_FOUND),
+      );
     }
     return this.asDto(post, user);
   }
@@ -126,7 +166,7 @@ export class PostsService {
     return docs;
   }
 
-  async findOne(match: MatchType): Promise<Post | null> {
+  async findOne(match: MatchType) {
     const posts = await this.find(match);
     if (posts.length > 0) {
       return posts[0];

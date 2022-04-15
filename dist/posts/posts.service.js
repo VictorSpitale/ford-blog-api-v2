@@ -19,6 +19,8 @@ const post_entity_1 = require("./entities/post.entity");
 const mongoose_2 = require("mongoose");
 const google_service_1 = require("../cloud/google.service");
 const upload_types_1 = require("../shared/types/upload.types");
+const post_types_1 = require("../shared/types/post.types");
+const HttpError_1 = require("../shared/error/HttpError");
 let PostsService = class PostsService {
     constructor(postModel, googleService) {
         this.postModel = postModel;
@@ -37,6 +39,30 @@ let PostsService = class PostsService {
         await createdPost.populate('categories');
         return this.asDto(createdPost, null);
     }
+    async likePost(slug, user) {
+        return this.updateLikeStatus(slug, user, post_types_1.LikeOperation.LIKE);
+    }
+    async unlikePost(slug, user) {
+        return this.updateLikeStatus(slug, user, post_types_1.LikeOperation.UNLIKE);
+    }
+    async updateLikeStatus(slug, user, operation) {
+        if (!(await this.postModel.findOne({ slug }))) {
+            throw new common_1.NotFoundException(HttpError_1.HttpError.getHttpError(HttpError_1.HttpErrorCode.POST_NOT_FOUND));
+        }
+        const updated = await this.postModel.findOneAndUpdate({ slug }, { [operation]: { likers: user._id } }, { new: true });
+        return this.asDto(updated, user).likes;
+    }
+    async deletePost(slug, user) {
+        await this.getPost(slug, user);
+        await this.postModel.findOneAndDelete({ slug });
+    }
+    async updatePost(slug, updatePostDto, user) {
+        await this.getPost(slug, user);
+        const updated = await this.postModel
+            .findOneAndUpdate({ slug }, Object.assign({}, updatePostDto), { new: true })
+            .populate('categories likers');
+        return this.asDto(updated, user);
+    }
     async getPosts(user) {
         const posts = await this.find({});
         return posts.map((p) => this.asDto(p, user));
@@ -48,7 +74,7 @@ let PostsService = class PostsService {
     async getPost(slug, user) {
         const post = await this.findOne({ slug });
         if (!post) {
-            throw new common_1.NotFoundException();
+            throw new common_1.NotFoundException(HttpError_1.HttpError.getHttpError(HttpError_1.HttpErrorCode.POST_NOT_FOUND));
         }
         return this.asDto(post, user);
     }

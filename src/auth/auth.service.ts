@@ -1,4 +1,8 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { UsersService } from '../users/users.service';
 import { User } from '../users/entities/user.entity';
 import { UserDto } from '../users/dto/user.dto';
@@ -7,6 +11,7 @@ import { JwtAccessToken, JwtPayload } from './jwt/jwt-payload.interface';
 import { ConfigService } from '@nestjs/config';
 import { Response } from 'express';
 import { uuid } from '../shared/utils/password.utils';
+import { HttpError, HttpErrorCode } from '../shared/error/HttpError';
 
 @Injectable()
 export class AuthService {
@@ -18,11 +23,10 @@ export class AuthService {
 
   async validateUser(email, password): Promise<UserDto | null> {
     const user: User = await this.usersService.findOne({ email });
-    if (!user) {
-      throw new UnauthorizedException('No user with this email');
-    }
-    if (!(await user.checkPassword(password))) {
-      throw new UnauthorizedException('Wrong password');
+    if (!user || !(await user.checkPassword(password))) {
+      throw new UnauthorizedException(
+        HttpError.getHttpError(HttpErrorCode.UNAUTHORIZED_LOGIN),
+      );
     }
     return this.usersService.asDtoWithoutPassword(user);
   }
@@ -47,6 +51,26 @@ export class AuthService {
   async login(user: UserDto): Promise<JwtAccessToken> {
     const payload = { email: user.email, sub: user._id };
     return { access_token: this.jwtService.sign(payload) };
+  }
+
+  async setCookieFromGoogle(response: Response, token): Promise<Response> {
+    if (await this.decodePayload(token)) {
+      return this.setCookie(response, token);
+    }
+    throw new BadRequestException(
+      HttpError.getHttpError(HttpErrorCode.G_AUTH_FAILED),
+    );
+  }
+
+  setCookie(response: Response, value, body?): Response {
+    return response
+      .cookie('access_token', value, {
+        expires: new Date(Date.now() + 1000 * 60 * 60 * 24 * 2),
+        sameSite: 'none',
+        secure: true,
+        httpOnly: true,
+      })
+      .send(body);
   }
 
   async googleLogin(req, res: Response) {

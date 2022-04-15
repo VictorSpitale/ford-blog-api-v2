@@ -1,5 +1,4 @@
 import {
-  BadRequestException,
   Controller,
   Get,
   HttpCode,
@@ -18,11 +17,15 @@ import { UserDto } from '../users/dto/user.dto';
 import { AllowAny } from './decorators/allow-any.decorator';
 import { AuthGuard } from '@nestjs/passport';
 import { Request, Response } from 'express';
+import { UsersService } from '../users/users.service';
 
 @Controller('auth')
 @ApiTags('Auth')
 export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+  constructor(
+    private readonly authService: AuthService,
+    private readonly usersService: UsersService,
+  ) {}
 
   @UseGuards(LocalAuthGuard)
   @Post('login')
@@ -32,37 +35,21 @@ export class AuthController {
   @ApiOperation({ summary: 'Get an access token for a user' })
   async login(@AuthUser() user: UserDto, @Res() response: Response) {
     const { access_token } = await this.authService.login(user);
-    return response
-      .cookie('access_token', access_token, {
-        expires: new Date(Date.now() + 1000 * 60 * 60 * 24 * 2),
-        sameSite: 'none',
-        secure: true,
-        httpOnly: true,
-      })
-      .send({ access_token });
+    return this.authService.setCookie(response, access_token, { access_token });
   }
 
   @Get('/jwt')
   @AllowAny()
   async verifyToken(@Req() req: Request) {
-    return this.authService.decodePayload(req.cookies?.access_token);
+    const id = await this.authService.decodePayload(req.cookies?.access_token);
+    return this.usersService.getUserById(id);
   }
 
   @Get('/g-jwt/:token')
   @HttpCode(HttpStatus.OK)
   @AllowAny()
   async setCookieFromGoogle(@Res() res: Response, @Param('token') token) {
-    if (await this.authService.decodePayload(token)) {
-      return res
-        .cookie('access_token', token, {
-          httpOnly: true,
-          expires: new Date(Date.now() + 1000 * 60 * 60 * 24 * 2),
-          secure: true,
-          sameSite: 'none',
-        })
-        .send();
-    }
-    throw new BadRequestException();
+    return this.authService.setCookieFromGoogle(res, token);
   }
 
   @Get('/me')

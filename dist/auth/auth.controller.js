@@ -21,37 +21,23 @@ const user_decorator_1 = require("../users/user.decorator");
 const user_dto_1 = require("../users/dto/user.dto");
 const allow_any_decorator_1 = require("./decorators/allow-any.decorator");
 const passport_1 = require("@nestjs/passport");
+const users_service_1 = require("../users/users.service");
 let AuthController = class AuthController {
-    constructor(authService) {
+    constructor(authService, usersService) {
         this.authService = authService;
+        this.usersService = usersService;
     }
     async login(user, response) {
         const { access_token } = await this.authService.login(user);
-        return response
-            .cookie('access_token', access_token, {
-            expires: new Date(Date.now() + 1000 * 60 * 60 * 24 * 2),
-            sameSite: 'none',
-            secure: true,
-            httpOnly: true,
-        })
-            .send({ access_token });
+        return this.authService.setCookie(response, access_token, { access_token });
     }
     async verifyToken(req) {
         var _a;
-        return this.authService.decodePayload((_a = req.cookies) === null || _a === void 0 ? void 0 : _a.access_token);
+        const id = await this.authService.decodePayload((_a = req.cookies) === null || _a === void 0 ? void 0 : _a.access_token);
+        return this.usersService.getUserById(id);
     }
     async setCookieFromGoogle(res, token) {
-        if (await this.authService.decodePayload(token)) {
-            return res
-                .cookie('access_token', token, {
-                httpOnly: true,
-                expires: new Date(Date.now() + 1000 * 60 * 60 * 24 * 2),
-                secure: true,
-                sameSite: 'none',
-            })
-                .send();
-        }
-        throw new common_1.BadRequestException();
+        return this.authService.setCookieFromGoogle(res, token);
     }
     async getProfile(user) {
         return user;
@@ -120,7 +106,8 @@ __decorate([
 AuthController = __decorate([
     (0, common_1.Controller)('auth'),
     (0, swagger_1.ApiTags)('Auth'),
-    __metadata("design:paramtypes", [auth_service_1.AuthService])
+    __metadata("design:paramtypes", [auth_service_1.AuthService,
+        users_service_1.UsersService])
 ], AuthController);
 exports.AuthController = AuthController;
 //# sourceMappingURL=auth.controller.js.map

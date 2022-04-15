@@ -11,16 +11,21 @@ import { User, UserDocument } from './entities/user.entity';
 import { isValidObjectId, Model, Types } from 'mongoose';
 import { UserDto } from './dto/user.dto';
 import { MatchType } from '../shared/types/match.types';
+import { HttpError, HttpErrorCode } from '../shared/error/HttpError';
 
 @Injectable()
 export class UsersService {
   constructor(@InjectModel(User.name) private userModel: Model<UserDocument>) {}
   async create(createUserDto: CreateUserDto): Promise<UserDto> {
     if (await this.getUserByEmail(createUserDto.email)) {
-      throw new ConflictException('user already exist');
+      throw new ConflictException(
+        HttpError.getHttpError(HttpErrorCode.USER_ALREADY_EXIST),
+      );
     }
     if (await this.getUserByPseudo(createUserDto.pseudo)) {
-      throw new ConflictException('user already exist');
+      throw new ConflictException(
+        HttpError.getHttpError(HttpErrorCode.USER_ALREADY_EXIST),
+      );
     }
     const createdUser = await this.userModel.create(createUserDto);
     return this.asDtoWithoutPassword(createdUser);
@@ -38,7 +43,10 @@ export class UsersService {
 
   async getUserById(id: string): Promise<UserDto> {
     const user = await this.findOne({ _id: id });
-    if (!user) throw new NotFoundException();
+    if (!user)
+      throw new NotFoundException(
+        HttpError.getHttpError(HttpErrorCode.USER_NOT_FOUND),
+      );
     return this.asDtoWithoutPassword(user);
   }
 
