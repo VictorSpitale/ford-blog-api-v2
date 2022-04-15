@@ -12,19 +12,14 @@ import {
   UseInterceptors,
 } from '@nestjs/common';
 import { PostsService } from './posts.service';
-import {
-  ApiBearerAuth,
-  ApiOperation,
-  ApiQuery,
-  ApiResponse,
-  ApiTags,
-} from '@nestjs/swagger';
+import { ApiOperation, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { PostDto } from './dto/post.dto';
 import { CreatePostDto } from './dto/create-post.dto';
 import { Role } from '../auth/decorators/roles.decorator';
 import { IUserRole } from '../users/entities/users.role.interface';
 import { AllowAny } from '../auth/decorators/allow-any.decorator';
 import { FileInterceptor } from '@nestjs/platform-express';
+import { UpdatePostDto } from './dto/update-post.dto';
 
 @Controller('posts')
 @ApiTags('Posts')
@@ -32,7 +27,6 @@ export class PostsController {
   constructor(private readonly postsService: PostsService) {}
 
   @Post()
-  @ApiBearerAuth()
   @ApiOperation({ summary: 'Create a post' })
   @ApiResponse({
     status: 201,
@@ -149,5 +143,26 @@ export class PostsController {
   })
   async deletePost(@Req() req, @Param('slug') slug) {
     return this.postsService.deletePost(slug, req.user);
+  }
+
+  @Patch(':slug')
+  @Role(IUserRole.ADMIN)
+  @ApiResponse({
+    status: 201,
+    description: 'The post has been updated',
+    type: PostDto,
+  })
+  @ApiResponse({ status: 400, description: 'Validations failed' })
+  @ApiResponse({ status: 401, description: 'Unauthorized access' })
+  @ApiResponse({
+    status: 404,
+    description: 'The post doesnt exist',
+  })
+  async updatePost(
+    @Req() req,
+    @Body() updatePostDto: UpdatePostDto,
+    @Param('slug') slug,
+  ) {
+    return this.postsService.updatePost(slug, updatePostDto, req.user);
   }
 }
