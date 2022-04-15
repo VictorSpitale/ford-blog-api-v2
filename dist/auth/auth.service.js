@@ -15,6 +15,7 @@ const users_service_1 = require("../users/users.service");
 const jwt_1 = require("@nestjs/jwt");
 const config_1 = require("@nestjs/config");
 const password_utils_1 = require("../shared/utils/password.utils");
+const HttpError_1 = require("../shared/error/HttpError");
 let AuthService = class AuthService {
     constructor(usersService, jwtService, configService) {
         this.usersService = usersService;
@@ -23,11 +24,8 @@ let AuthService = class AuthService {
     }
     async validateUser(email, password) {
         const user = await this.usersService.findOne({ email });
-        if (!user) {
-            throw new common_1.UnauthorizedException('No user with this email');
-        }
-        if (!(await user.checkPassword(password))) {
-            throw new common_1.UnauthorizedException('Wrong password');
+        if (!user || !(await user.checkPassword(password))) {
+            throw new common_1.UnauthorizedException(HttpError_1.HttpError.getHttpError(HttpError_1.HttpErrorCode.UNAUTHORIZED_LOGIN));
         }
         return this.usersService.asDtoWithoutPassword(user);
     }
@@ -54,7 +52,7 @@ let AuthService = class AuthService {
         if (await this.decodePayload(token)) {
             return this.setCookie(response, token);
         }
-        throw new common_1.BadRequestException('Authentification impossible');
+        throw new common_1.BadRequestException(HttpError_1.HttpError.getHttpError(HttpError_1.HttpErrorCode.G_AUTH_FAILED));
     }
     setCookie(response, value, body) {
         return response

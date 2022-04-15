@@ -1,11 +1,13 @@
 import { AuthService } from './auth.service';
 import { UserDto } from '../users/dto/user.dto';
 import { Request, Response } from 'express';
+import { UsersService } from '../users/users.service';
 export declare class AuthController {
     private readonly authService;
-    constructor(authService: AuthService);
+    private readonly usersService;
+    constructor(authService: AuthService, usersService: UsersService);
     login(user: UserDto, response: Response): Promise<Response<any, Record<string, any>>>;
-    verifyToken(req: Request): Promise<any>;
+    verifyToken(req: Request): Promise<UserDto>;
     setCookieFromGoogle(res: Response, token: any): Promise<Response<any, Record<string, any>>>;
     getProfile(user: UserDto): Promise<UserDto>;
     googleAuth(req: any): Promise<void>;

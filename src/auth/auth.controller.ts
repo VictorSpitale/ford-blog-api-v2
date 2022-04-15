@@ -17,11 +17,15 @@ import { UserDto } from '../users/dto/user.dto';
 import { AllowAny } from './decorators/allow-any.decorator';
 import { AuthGuard } from '@nestjs/passport';
 import { Request, Response } from 'express';
+import { UsersService } from '../users/users.service';
 
 @Controller('auth')
 @ApiTags('Auth')
 export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+  constructor(
+    private readonly authService: AuthService,
+    private readonly usersService: UsersService,
+  ) {}
 
   @UseGuards(LocalAuthGuard)
   @Post('login')
@@ -37,7 +41,8 @@ export class AuthController {
   @Get('/jwt')
   @AllowAny()
   async verifyToken(@Req() req: Request) {
-    return this.authService.decodePayload(req.cookies?.access_token);
+    const id = await this.authService.decodePayload(req.cookies?.access_token);
+    return this.usersService.getUserById(id);
   }
 
   @Get('/g-jwt/:token')

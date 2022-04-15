@@ -11,6 +11,7 @@ import { JwtAccessToken, JwtPayload } from './jwt/jwt-payload.interface';
 import { ConfigService } from '@nestjs/config';
 import { Response } from 'express';
 import { uuid } from '../shared/utils/password.utils';
+import { HttpError, HttpErrorCode } from '../shared/error/HttpError';
 
 @Injectable()
 export class AuthService {
@@ -22,11 +23,10 @@ export class AuthService {
 
   async validateUser(email, password): Promise<UserDto | null> {
     const user: User = await this.usersService.findOne({ email });
-    if (!user) {
-      throw new UnauthorizedException('No user with this email');
-    }
-    if (!(await user.checkPassword(password))) {
-      throw new UnauthorizedException('Wrong password');
+    if (!user || !(await user.checkPassword(password))) {
+      throw new UnauthorizedException(
+        HttpError.getHttpError(HttpErrorCode.UNAUTHORIZED_LOGIN),
+      );
     }
     return this.usersService.asDtoWithoutPassword(user);
   }
@@ -57,7 +57,9 @@ export class AuthService {
     if (await this.decodePayload(token)) {
       return this.setCookie(response, token);
     }
-    throw new BadRequestException('Authentification impossible');
+    throw new BadRequestException(
+      HttpError.getHttpError(HttpErrorCode.G_AUTH_FAILED),
+    );
   }
 
   setCookie(response: Response, value, body?): Response {

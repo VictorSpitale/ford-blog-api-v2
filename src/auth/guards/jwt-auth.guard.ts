@@ -2,6 +2,7 @@ import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { Reflector } from '@nestjs/core';
 import { ALLOW_ANY_KEY } from '../decorators/allow-any.decorator';
+import { HttpError, HttpErrorCode } from '../../shared/error/HttpError';
 
 @Injectable()
 export class JwtAuthGuard extends AuthGuard('jwt') {
@@ -16,6 +17,8 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
     );
     if (user) return user;
     if (allowAny) return null;
-    throw new UnauthorizedException('Jwt failed');
+    throw new UnauthorizedException(
+      HttpError.getHttpError(HttpErrorCode.JWT_FAILED),
+    );
   }
 }
