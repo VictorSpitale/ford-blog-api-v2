@@ -393,7 +393,8 @@ describe('PostsController (e2e)', () => {
       it('should update a post', async () => {
         const post = PostStub();
         const user = UserStub(IUserRole.ADMIN);
-        const update: UpdatePostDto = { title: 'nouveau titre' };
+        const title = 'nouveau titre';
+        const update: UpdatePostDto = { title };
         await dbConnection.collection('posts').insertOne(post);
         await dbConnection.collection('users').insertOne(user);
         const token = authService.signToken(user);
@@ -408,6 +409,7 @@ describe('PostsController (e2e)', () => {
             'authUserLike',
           ]),
         ).toBe(true);
+        expect(response.body.title).toBe(title);
       });
     });
 
