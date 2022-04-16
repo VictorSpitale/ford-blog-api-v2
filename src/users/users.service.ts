@@ -60,6 +60,14 @@ export class UsersService {
   async update(id: string, updateUserDto: UpdateUserDto, user: User) {
     await this.getUserById(id);
     this.isSelfOrAdmin(id, user);
+    if (
+      updateUserDto.pseudo &&
+      (await this.getUserByPseudo(updateUserDto.pseudo))
+    ) {
+      throw new ConflictException(
+        HttpError.getHttpError(HttpErrorCode.DUPLICATE_PSEUDO),
+      );
+    }
     const updatedUser = await this.userModel.findOneAndUpdate(
       { _id: id },
       { ...updateUserDto },

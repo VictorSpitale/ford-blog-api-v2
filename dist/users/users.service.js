@@ -54,6 +54,10 @@ let UsersService = class UsersService {
     async update(id, updateUserDto, user) {
         await this.getUserById(id);
         this.isSelfOrAdmin(id, user);
+        if (updateUserDto.pseudo &&
+            (await this.getUserByPseudo(updateUserDto.pseudo))) {
+            throw new common_1.ConflictException(HttpError_1.HttpError.getHttpError(HttpError_1.HttpErrorCode.DUPLICATE_PSEUDO));
+        }
         const updatedUser = await this.userModel.findOneAndUpdate({ _id: id }, Object.assign({}, updateUserDto), {
             new: true,
         });
