@@ -27,9 +27,13 @@ let AuthController = class AuthController {
         this.authService = authService;
         this.usersService = usersService;
     }
-    async login(user, response) {
-        const { access_token } = await this.authService.login(user);
-        return this.authService.setCookie(response, access_token, { access_token });
+    async login(authUser, response) {
+        const { access_token } = await this.authService.login(authUser);
+        const user = await this.usersService.getUserById(authUser._id.toString());
+        return this.authService.setCookie(response, access_token, user);
+    }
+    async logout(response) {
+        return this.authService.logout(response);
     }
     async verifyToken(req) {
         var _a;
@@ -59,6 +63,13 @@ __decorate([
     __metadata("design:paramtypes", [user_dto_1.UserDto, Object]),
     __metadata("design:returntype", Promise)
 ], AuthController.prototype, "login", null);
+__decorate([
+    (0, common_1.Get)('logout'),
+    __param(0, (0, common_1.Res)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", Promise)
+], AuthController.prototype, "logout", null);
 __decorate([
     (0, common_1.Get)('/jwt'),
     (0, allow_any_decorator_1.AllowAny)(),
