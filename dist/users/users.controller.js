@@ -35,8 +35,8 @@ let UsersController = class UsersController {
     async getUserById(id) {
         return this.usersService.getUserById(id);
     }
-    update(id, updateUserDto) {
-        return this.usersService.update(+id, updateUserDto);
+    async updateUser(id, updateUserDto, req) {
+        return this.usersService.update(id, updateUserDto, req.user);
     }
     remove(id) {
         return this.usersService.remove(+id);
@@ -83,10 +83,11 @@ __decorate([
     (0, common_1.Patch)(':id'),
     __param(0, (0, common_1.Param)('id')),
     __param(1, (0, common_1.Body)()),
+    __param(2, (0, common_1.Req)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String, update_user_dto_1.UpdateUserDto]),
-    __metadata("design:returntype", void 0)
-], UsersController.prototype, "update", null);
+    __metadata("design:paramtypes", [String, update_user_dto_1.UpdateUserDto, Object]),
+    __metadata("design:returntype", Promise)
+], UsersController.prototype, "updateUser", null);
 __decorate([
     (0, common_1.Delete)(':id'),
     __param(0, (0, common_1.Param)('id')),

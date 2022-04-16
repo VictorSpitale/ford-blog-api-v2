@@ -8,6 +8,6 @@ export declare class UsersController {
     create(createUserDto: CreateUserDto): Promise<UserDto>;
     getUsers(): Promise<UserDto[]>;
     getUserById(id: string): Promise<UserDto>;
-    update(id: string, updateUserDto: UpdateUserDto): string;
+    updateUser(id: string, updateUserDto: UpdateUserDto, req: any): Promise<UserDto>;
     remove(id: string): string;
 }

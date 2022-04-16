@@ -12,7 +12,8 @@ export declare class UsersService {
     getUserByEmail(email: string): Promise<UserDto>;
     getUserById(id: string): Promise<UserDto>;
     private getUserByPseudo;
-    update(id: number, updateUserDto: UpdateUserDto): string;
+    update(id: string, updateUserDto: UpdateUserDto, user: User): Promise<UserDto>;
+    private isSelfOrAdmin;
     remove(id: number): string;
     save(user: UserDto): Promise<void>;
     private find;

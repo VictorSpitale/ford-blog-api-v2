@@ -3,6 +3,7 @@ import {
   ConflictException,
   Injectable,
   NotFoundException,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -12,6 +13,7 @@ import { isValidObjectId, Model, Types } from 'mongoose';
 import { UserDto } from './dto/user.dto';
 import { MatchType } from '../shared/types/match.types';
 import { HttpError, HttpErrorCode } from '../shared/error/HttpError';
+import { IUserRole } from './entities/users.role.interface';
 
 @Injectable()
 export class UsersService {
@@ -55,8 +57,23 @@ export class UsersService {
     return user ? this.asDtoWithoutPassword(user) : null;
   }
 
-  update(id: number, updateUserDto: UpdateUserDto) {
-    return `This action updates a #${id} user`;
+  async update(id: string, updateUserDto: UpdateUserDto, user: User) {
+    await this.getUserById(id);
+    this.isSelfOrAdmin(id, user);
+    const updatedUser = await this.userModel.findOneAndUpdate(
+      { _id: id },
+      { ...updateUserDto },
+      {
+        new: true,
+      },
+    );
+    return this.asDtoWithoutPassword(updatedUser);
+  }
+
+  private isSelfOrAdmin(id: string, user: User) {
+    if (!(id === user._id.toString() || user.role === IUserRole.ADMIN)) {
+      throw new UnauthorizedException();
+    }
   }
 
   remove(id: number) {

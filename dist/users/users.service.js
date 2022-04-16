@@ -18,6 +18,7 @@ const mongoose_1 = require("@nestjs/mongoose");
 const user_entity_1 = require("./entities/user.entity");
 const mongoose_2 = require("mongoose");
 const HttpError_1 = require("../shared/error/HttpError");
+const users_role_interface_1 = require("./entities/users.role.interface");
 let UsersService = class UsersService {
     constructor(userModel) {
         this.userModel = userModel;
@@ -50,8 +51,18 @@ let UsersService = class UsersService {
         const user = await this.findOne({ pseudo });
         return user ? this.asDtoWithoutPassword(user) : null;
     }
-    update(id, updateUserDto) {
-        return `This action updates a #${id} user`;
+    async update(id, updateUserDto, user) {
+        await this.getUserById(id);
+        this.isSelfOrAdmin(id, user);
+        const updatedUser = await this.userModel.findOneAndUpdate({ _id: id }, Object.assign({}, updateUserDto), {
+            new: true,
+        });
+        return this.asDtoWithoutPassword(updatedUser);
+    }
+    isSelfOrAdmin(id, user) {
+        if (!(id === user._id.toString() || user.role === users_role_interface_1.IUserRole.ADMIN)) {
+            throw new common_1.UnauthorizedException();
+        }
     }
     remove(id) {
         return `This action removes a #${id} user`;
