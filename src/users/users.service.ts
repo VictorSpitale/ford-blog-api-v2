@@ -83,6 +83,7 @@ export class UsersService {
       role: 1,
       createdAt: 1,
       updatedAt: 1,
+      picture: 1,
     });
   }
 
@@ -114,6 +115,7 @@ export class UsersService {
       role: user.role,
       updatedAt: user.updatedAt,
       createdAt: user.createdAt,
+      picture: user.picture,
     } as UserDto;
   }
 }

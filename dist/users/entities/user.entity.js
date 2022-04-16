@@ -13,6 +13,7 @@ exports.UserEntity = exports.User = void 0;
 const mongoose_1 = require("@nestjs/mongoose");
 const bcrypt = require("bcrypt");
 const users_role_interface_1 = require("./users.role.interface");
+const regex_validation_1 = require("../../shared/utils/regex.validation");
 let User = class User {
 };
 __decorate([
@@ -52,6 +53,14 @@ __decorate([
     }),
     __metadata("design:type", String)
 ], User.prototype, "role", void 0);
+__decorate([
+    (0, mongoose_1.Prop)({
+        type: String,
+        required: false,
+        match: [regex_validation_1.urlRegex, 'Please set a valid source url'],
+    }),
+    __metadata("design:type", String)
+], User.prototype, "picture", void 0);
 User = __decorate([
     (0, mongoose_1.Schema)({ timestamps: true })
 ], User);

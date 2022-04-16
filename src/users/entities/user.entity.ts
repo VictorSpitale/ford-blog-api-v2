@@ -3,6 +3,7 @@ import * as Mongoose from 'mongoose';
 import { Document } from 'mongoose';
 import * as bcrypt from 'bcrypt';
 import { IUserRole } from './users.role.interface';
+import { urlRegex } from '../../shared/utils/regex.validation';
 
 export type UserDocument = User & Document;
 
@@ -42,6 +43,13 @@ export class User {
     enum: IUserRole,
   })
   role: IUserRole;
+
+  @Prop({
+    type: String,
+    required: false,
+    match: [urlRegex, 'Please set a valid source url'],
+  })
+  picture: string;
 
   updatedAt: string;
   createdAt: string;

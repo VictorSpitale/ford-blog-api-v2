@@ -15,6 +15,7 @@ const create_user_dto_1 = require("./create-user.dto");
 const class_validator_1 = require("class-validator");
 const users_role_interface_1 = require("../entities/users.role.interface");
 const swagger_1 = require("@nestjs/swagger");
+const regex_validation_1 = require("../../shared/utils/regex.validation");
 class UserDto extends (0, swagger_1.PartialType)(create_user_dto_1.CreateUserDto) {
 }
 __decorate([
@@ -50,6 +51,17 @@ __decorate([
     }),
     __metadata("design:type", String)
 ], UserDto.prototype, "password", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({
+        description: 'Url to the picture',
+        example: 'https://storage.googleapis.com/name',
+        type: String,
+        pattern: regex_validation_1.urlPattern,
+    }),
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.Matches)(regex_validation_1.urlPattern),
+    __metadata("design:type", String)
+], UserDto.prototype, "picture", void 0);
 __decorate([
     (0, class_validator_1.IsDateString)(),
     (0, class_validator_1.IsNotEmpty)(),
