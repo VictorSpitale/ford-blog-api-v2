@@ -70,6 +70,7 @@ export class PostsService {
   async deletePost(slug: string, user: User) {
     await this.getPost(slug, user);
     await this.postModel.findOneAndDelete({ slug });
+    await this.googleService.deleteFile(slug, UploadTypes.POST);
   }
 
   async updatePost(slug: string, updatePostDto: UpdatePostDto, user: User) {

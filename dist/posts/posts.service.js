@@ -55,6 +55,7 @@ let PostsService = class PostsService {
     async deletePost(slug, user) {
         await this.getPost(slug, user);
         await this.postModel.findOneAndDelete({ slug });
+        await this.googleService.deleteFile(slug, upload_types_1.UploadTypes.POST);
     }
     async updatePost(slug, updatePostDto, user) {
         await this.getPost(slug, user);

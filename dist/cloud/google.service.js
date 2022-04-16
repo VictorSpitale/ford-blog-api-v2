@@ -33,18 +33,7 @@ let GoogleService = class GoogleService {
         }
         try {
             const bucket = this.storage.bucket(this.configService.get('bucket_name'));
-            let folder;
-            switch (type) {
-                case upload_types_1.UploadTypes.POST:
-                    folder = 'posts/';
-                    break;
-                case upload_types_1.UploadTypes.USER:
-                    folder = 'users/';
-                    break;
-                default:
-                    folder = '';
-                    break;
-            }
+            const folder = this.getFolder(type);
             const path = folder + slug + '.jpg';
             const fileCloud = this.storage
                 .bucket(this.configService.get('bucket_name'))
@@ -56,6 +45,26 @@ let GoogleService = class GoogleService {
         }
         catch (e) {
             throw new common_1.InternalServerErrorException('File upload failed');
+        }
+    }
+    async deleteFile(slug, type) {
+        try {
+            const bucket = this.storage.bucket(this.configService.get('bucket_name'));
+            const folder = this.getFolder(type);
+            const path = folder + slug + '.jpg';
+            const fileCloud = bucket.file(path);
+            await fileCloud.delete();
+        }
+        catch (e) { }
+    }
+    getFolder(type) {
+        switch (type) {
+            case upload_types_1.UploadTypes.POST:
+                return 'posts/';
+            case upload_types_1.UploadTypes.USER:
+                return 'users/';
+            default:
+                return '';
         }
     }
 };
