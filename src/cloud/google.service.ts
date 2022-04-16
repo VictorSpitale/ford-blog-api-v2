@@ -18,7 +18,7 @@ export class GoogleService {
 
   async uploadFile(
     file: Express.Multer.File,
-    slug: string,
+    name: string,
     type: UploadTypes,
   ): Promise<string> {
     if (file.size > 500000) {
@@ -34,14 +34,14 @@ export class GoogleService {
     try {
       const bucket = this.storage.bucket(this.configService.get('bucket_name'));
       const folder = this.getFolder(type);
-      const path = folder + slug + '.jpg';
+      const path = folder + name + '.jpg';
       const fileCloud = this.storage
         .bucket(this.configService.get('bucket_name'))
         .file(path);
       await fileCloud.save(file.buffer, {
         contentType: 'image/jpg',
       });
-      return `https://storage.googleapis.com/${bucket.name}/${folder}${path}`;
+      return `https://storage.googleapis.com/${bucket.name}/${path}`;
     } catch (e) {
       throw new InternalServerErrorException('File upload failed');
     }
