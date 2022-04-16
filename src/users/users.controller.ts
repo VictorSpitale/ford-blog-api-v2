@@ -7,6 +7,8 @@ import {
   Patch,
   Post,
   Req,
+  UploadedFile,
+  UseInterceptors,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
@@ -16,6 +18,7 @@ import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { AllowAny } from '../auth/decorators/allow-any.decorator';
 import { Role } from '../auth/decorators/roles.decorator';
 import { IUserRole } from './entities/users.role.interface';
+import { FileInterceptor } from '@nestjs/platform-express';
 
 @Controller('users')
 @ApiTags('Users')
@@ -61,6 +64,16 @@ export class UsersController {
     @Req() req,
   ) {
     return this.usersService.update(id, updateUserDto, req.user);
+  }
+
+  @Patch('/upload/:id')
+  @UseInterceptors(FileInterceptor('file'))
+  async uploadProfilePicture(
+    @UploadedFile() file: Express.Multer.File,
+    @Req() req,
+    @Param('id') id,
+  ) {
+    return this.usersService.uploadProfilePicture(id, file, req.user);
   }
 
   @Delete(':id')

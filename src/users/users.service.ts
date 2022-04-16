@@ -14,10 +14,15 @@ import { UserDto } from './dto/user.dto';
 import { MatchType } from '../shared/types/match.types';
 import { HttpError, HttpErrorCode } from '../shared/error/HttpError';
 import { IUserRole } from './entities/users.role.interface';
+import { GoogleService } from '../cloud/google.service';
+import { UploadTypes } from '../shared/types/upload.types';
 
 @Injectable()
 export class UsersService {
-  constructor(@InjectModel(User.name) private userModel: Model<UserDocument>) {}
+  constructor(
+    @InjectModel(User.name) private userModel: Model<UserDocument>,
+    private readonly googleService: GoogleService,
+  ) {}
   async create(createUserDto: CreateUserDto): Promise<UserDto> {
     if (await this.getUserByEmail(createUserDto.email)) {
       throw new ConflictException(
@@ -76,6 +81,23 @@ export class UsersService {
       },
     );
     return this.asDtoWithoutPassword(updatedUser);
+  }
+
+  async uploadProfilePicture(
+    id: string,
+    file: Express.Multer.File,
+    user: User,
+  ): Promise<{ picture: string }> {
+    await this.getUserById(id);
+    this.isSelfOrAdmin(id, user);
+    const url = await this.googleService.uploadFile(file, id, UploadTypes.USER);
+    await this.userModel.findOneAndUpdate(
+      { _id: id },
+      {
+        picture: url,
+      },
+    );
+    return { picture: url };
   }
 
   private isSelfOrAdmin(id: string, user: User) {

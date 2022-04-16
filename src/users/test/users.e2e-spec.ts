@@ -1,4 +1,4 @@
-import { INestApplication } from '@nestjs/common';
+import { INestApplication, NotImplementedException } from '@nestjs/common';
 import * as Mongoose from 'mongoose';
 import { Connection } from 'mongoose';
 
@@ -43,6 +43,7 @@ describe('UsersController (e2e)', () => {
       expect(response.status).toBe(401);
     });
   });
+
   describe('getUsers logged in', () => {
     afterEach(async () => {
       await clearDatabase(dbConnection, 'users');
@@ -188,6 +189,31 @@ describe('UsersController (e2e)', () => {
           .get(`/users/${mockObjectId}`)
           .set('Cookie', `access_token=${token};`);
         expect(response.status).toBe(404);
+      });
+    });
+  });
+
+  describe('update user', () => {
+    describe('failing update user', () => {
+      it('should not update a user while not logged in', () => {
+        throw new NotImplementedException();
+      });
+      it('should not update a non-existent user', () => {
+        throw new NotImplementedException();
+      });
+      it('should not update a user who is not self while not been admin', () => {
+        throw new NotImplementedException();
+      });
+      it('should not update a user which does not respect the validation rules', () => {
+        throw new NotImplementedException();
+      });
+      it('should not update a user with a pseudo already used', () => {
+        throw new NotImplementedException();
+      });
+    });
+    describe('update user', () => {
+      it('should update a user and return the new user', () => {
+        throw new NotImplementedException();
       });
     });
   });

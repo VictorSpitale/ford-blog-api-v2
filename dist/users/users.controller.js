@@ -22,6 +22,7 @@ const swagger_1 = require("@nestjs/swagger");
 const allow_any_decorator_1 = require("../auth/decorators/allow-any.decorator");
 const roles_decorator_1 = require("../auth/decorators/roles.decorator");
 const users_role_interface_1 = require("./entities/users.role.interface");
+const platform_express_1 = require("@nestjs/platform-express");
 let UsersController = class UsersController {
     constructor(usersService) {
         this.usersService = usersService;
@@ -37,6 +38,9 @@ let UsersController = class UsersController {
     }
     async updateUser(id, updateUserDto, req) {
         return this.usersService.update(id, updateUserDto, req.user);
+    }
+    async uploadProfilePicture(file, req, id) {
+        return this.usersService.uploadProfilePicture(id, file, req.user);
     }
     remove(id) {
         return this.usersService.remove(+id);
@@ -88,6 +92,16 @@ __decorate([
     __metadata("design:paramtypes", [String, update_user_dto_1.UpdateUserDto, Object]),
     __metadata("design:returntype", Promise)
 ], UsersController.prototype, "updateUser", null);
+__decorate([
+    (0, common_1.Patch)('/upload/:id'),
+    (0, common_1.UseInterceptors)((0, platform_express_1.FileInterceptor)('file')),
+    __param(0, (0, common_1.UploadedFile)()),
+    __param(1, (0, common_1.Req)()),
+    __param(2, (0, common_1.Param)('id')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, Object, Object]),
+    __metadata("design:returntype", Promise)
+], UsersController.prototype, "uploadProfilePicture", null);
 __decorate([
     (0, common_1.Delete)(':id'),
     __param(0, (0, common_1.Param)('id')),

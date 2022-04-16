@@ -19,9 +19,12 @@ const user_entity_1 = require("./entities/user.entity");
 const mongoose_2 = require("mongoose");
 const HttpError_1 = require("../shared/error/HttpError");
 const users_role_interface_1 = require("./entities/users.role.interface");
+const google_service_1 = require("../cloud/google.service");
+const upload_types_1 = require("../shared/types/upload.types");
 let UsersService = class UsersService {
-    constructor(userModel) {
+    constructor(userModel, googleService) {
         this.userModel = userModel;
+        this.googleService = googleService;
     }
     async create(createUserDto) {
         if (await this.getUserByEmail(createUserDto.email)) {
@@ -62,6 +65,15 @@ let UsersService = class UsersService {
             new: true,
         });
         return this.asDtoWithoutPassword(updatedUser);
+    }
+    async uploadProfilePicture(id, file, user) {
+        await this.getUserById(id);
+        this.isSelfOrAdmin(id, user);
+        const url = await this.googleService.uploadFile(file, id, upload_types_1.UploadTypes.USER);
+        await this.userModel.findOneAndUpdate({ _id: id }, {
+            picture: url,
+        });
+        return { picture: url };
     }
     isSelfOrAdmin(id, user) {
         if (!(id === user._id.toString() || user.role === users_role_interface_1.IUserRole.ADMIN)) {
@@ -129,7 +141,8 @@ let UsersService = class UsersService {
 UsersService = __decorate([
     (0, common_1.Injectable)(),
     __param(0, (0, mongoose_1.InjectModel)(user_entity_1.User.name)),
-    __metadata("design:paramtypes", [mongoose_2.Model])
+    __metadata("design:paramtypes", [mongoose_2.Model,
+        google_service_1.GoogleService])
 ], UsersService);
 exports.UsersService = UsersService;
 //# sourceMappingURL=users.service.js.map
