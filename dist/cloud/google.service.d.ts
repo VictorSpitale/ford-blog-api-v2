@@ -7,4 +7,6 @@ export declare class GoogleService {
     constructor(configService: ConfigService);
     storage: Storage;
     uploadFile(file: Express.Multer.File, slug: string, type: UploadTypes): Promise<string>;
+    deleteFile(slug: string, type: UploadTypes): Promise<void>;
+    private getFolder;
 }
