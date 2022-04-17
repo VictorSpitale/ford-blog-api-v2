@@ -82,7 +82,7 @@ export class UsersController {
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.usersService.remove(+id);
+  async deleteUser(@Req() req, @Param('id') id: string) {
+    return this.usersService.deleteUser(id, req.user);
   }
 }

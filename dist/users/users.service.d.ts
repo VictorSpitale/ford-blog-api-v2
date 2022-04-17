@@ -21,7 +21,7 @@ export declare class UsersService {
     }>;
     removeProfilePicture(id: string, user: User): Promise<void>;
     private isSelfOrAdmin;
-    remove(id: number): string;
+    deleteUser(id: string, user: User): Promise<void>;
     save(user: UserDto): Promise<void>;
     private find;
     findOne(match: MatchType): Promise<User | null>;

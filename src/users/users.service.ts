@@ -120,8 +120,10 @@ export class UsersService {
     }
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} user`;
+  async deleteUser(id: string, user: User) {
+    await this.getUserById(id);
+    this.isSelfOrAdmin(id, user);
+    await this.userModel.findOneAndDelete({ _id: id });
   }
 
   async save(user: UserDto) {

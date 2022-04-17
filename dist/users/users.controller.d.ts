@@ -14,5 +14,5 @@ export declare class UsersController {
         picture: string;
     }>;
     removeProfilePicture(req: any, id: any): Promise<void>;
-    remove(id: string): string;
+    deleteUser(req: any, id: string): Promise<void>;
 }

@@ -45,8 +45,8 @@ let UsersController = class UsersController {
     async removeProfilePicture(req, id) {
         return this.usersService.removeProfilePicture(id, req.user);
     }
-    remove(id) {
-        return this.usersService.remove(+id);
+    async deleteUser(req, id) {
+        return this.usersService.deleteUser(id, req.user);
     }
 };
 __decorate([
@@ -115,11 +115,12 @@ __decorate([
 ], UsersController.prototype, "removeProfilePicture", null);
 __decorate([
     (0, common_1.Delete)(':id'),
-    __param(0, (0, common_1.Param)('id')),
+    __param(0, (0, common_1.Req)()),
+    __param(1, (0, common_1.Param)('id')),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String]),
-    __metadata("design:returntype", void 0)
-], UsersController.prototype, "remove", null);
+    __metadata("design:paramtypes", [Object, String]),
+    __metadata("design:returntype", Promise)
+], UsersController.prototype, "deleteUser", null);
 UsersController = __decorate([
     (0, common_1.Controller)('users'),
     (0, swagger_1.ApiTags)('Users'),

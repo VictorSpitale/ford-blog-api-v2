@@ -90,8 +90,10 @@ let UsersService = class UsersService {
             throw new common_1.UnauthorizedException();
         }
     }
-    remove(id) {
-        return `This action removes a #${id} user`;
+    async deleteUser(id, user) {
+        await this.getUserById(id);
+        this.isSelfOrAdmin(id, user);
+        await this.userModel.findOneAndDelete({ _id: id });
     }
     async save(user) {
         await this.userModel.replaceOne({ _id: user._id }, user, { upsert: true });
