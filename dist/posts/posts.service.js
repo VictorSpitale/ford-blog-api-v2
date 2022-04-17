@@ -49,7 +49,9 @@ let PostsService = class PostsService {
         if (!(await this.postModel.findOne({ slug }))) {
             throw new common_1.NotFoundException(HttpError_1.HttpError.getHttpError(HttpError_1.HttpErrorCode.POST_NOT_FOUND));
         }
-        const updated = await this.postModel.findOneAndUpdate({ slug }, { [operation]: { likers: user._id } }, { new: true });
+        const updated = await this.postModel
+            .findOneAndUpdate({ slug }, { [operation]: { likers: user._id } }, { new: true })
+            .populate('likers');
         return this.asDto(updated, user).likes;
     }
     async deletePost(slug, user) {

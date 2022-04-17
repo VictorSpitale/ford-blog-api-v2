@@ -59,11 +59,13 @@ export class PostsService {
         HttpError.getHttpError(HttpErrorCode.POST_NOT_FOUND),
       );
     }
-    const updated = await this.postModel.findOneAndUpdate(
-      { slug },
-      { [operation]: { likers: user._id } },
-      { new: true },
-    );
+    const updated = await this.postModel
+      .findOneAndUpdate(
+        { slug },
+        { [operation]: { likers: user._id } },
+        { new: true },
+      )
+      .populate('likers');
     return this.asDto(updated, user).likes;
   }
 
