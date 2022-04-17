@@ -5,6 +5,7 @@ export enum HttpErrorCode {
   USER_ALREADY_EXIST,
   USER_NOT_FOUND,
   POST_NOT_FOUND,
+  DUPLICATE_PSEUDO,
 }
 
 type HttpErrorObj = {
@@ -38,6 +39,10 @@ export class HttpError {
     [
       HttpErrorCode.POST_NOT_FOUND,
       { message: 'Post not found', statusCode: 404, code: 5 },
+    ],
+    [
+      HttpErrorCode.DUPLICATE_PSEUDO,
+      { message: 'Pseudo already used', statusCode: 409, code: 6 },
     ],
   ]);
 

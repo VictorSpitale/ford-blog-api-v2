@@ -6,7 +6,8 @@ export declare class AuthController {
     private readonly authService;
     private readonly usersService;
     constructor(authService: AuthService, usersService: UsersService);
-    login(user: UserDto, response: Response): Promise<Response<any, Record<string, any>>>;
+    login(authUser: UserDto, response: Response): Promise<Response<any, Record<string, any>>>;
+    logout(response: Response): Promise<Response<any, Record<string, any>>>;
     verifyToken(req: Request): Promise<UserDto>;
     setCookieFromGoogle(res: Response, token: any): Promise<Response<any, Record<string, any>>>;
     getProfile(user: UserDto): Promise<UserDto>;

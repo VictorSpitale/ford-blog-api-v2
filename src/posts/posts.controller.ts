@@ -84,6 +84,11 @@ export class PostsController {
     return this.postsService.getQueriedPosts(search);
   }
 
+  @Get('liked/:id')
+  async getLikedPost(@Req() req, @Param('id') id) {
+    return this.postsService.getLikedPosts(id, req.user);
+  }
+
   @Get(':slug')
   @AllowAny()
   @ApiResponse({

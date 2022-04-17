@@ -8,6 +8,7 @@ export declare class User {
     email: string;
     password: string;
     role: IUserRole;
+    picture: string;
     updatedAt: string;
     createdAt: string;
     checkPassword: (plainPassword: string) => Promise<boolean>;

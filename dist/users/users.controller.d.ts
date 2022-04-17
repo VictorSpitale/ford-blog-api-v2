@@ -1,3 +1,4 @@
+/// <reference types="multer" />
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -8,6 +9,10 @@ export declare class UsersController {
     create(createUserDto: CreateUserDto): Promise<UserDto>;
     getUsers(): Promise<UserDto[]>;
     getUserById(id: string): Promise<UserDto>;
-    update(id: string, updateUserDto: UpdateUserDto): string;
-    remove(id: string): string;
+    updateUser(id: string, updateUserDto: UpdateUserDto, req: any): Promise<UserDto>;
+    uploadProfilePicture(file: Express.Multer.File, req: any, id: any): Promise<{
+        picture: string;
+    }>;
+    removeProfilePicture(req: any, id: any): Promise<void>;
+    deleteUser(req: any, id: string): Promise<void>;
 }
