@@ -67,6 +67,18 @@ UserEntity.pre<User>('save', async function (next) {
   next();
 });
 
+//@TODO: Résoudre les pbs avec ts
+UserEntity.pre('findOneAndUpdate', async function () {
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-ignore
+  if (this._update.password) {
+    const salt = await bcrypt.genSalt();
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    this._update.password = await bcrypt.hash(this._update.password, salt);
+  }
+});
+
 UserEntity.methods.checkPassword = async function (
   plainPassword: string,
 ): Promise<boolean> {

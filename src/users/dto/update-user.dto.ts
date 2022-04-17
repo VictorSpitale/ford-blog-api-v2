@@ -22,4 +22,17 @@ export class UpdateUserDto {
   @MaxLength(18)
   @IsOptional()
   readonly pseudo?: string;
+
+  @ApiProperty({
+    description: "User's password",
+    example: 'password',
+    minLength: 6,
+    required: false,
+    type: String,
+  })
+  @IsString()
+  @IsNotEmpty()
+  @MinLength(6)
+  @IsOptional()
+  readonly password?: string;
 }

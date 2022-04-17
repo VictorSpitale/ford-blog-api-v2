@@ -73,6 +73,12 @@ exports.UserEntity.pre('save', async function (next) {
     this.password = await bcrypt.hash(this.password, salt);
     next();
 });
+exports.UserEntity.pre('findOneAndUpdate', async function () {
+    if (this._update.password) {
+        const salt = await bcrypt.genSalt();
+        this._update.password = await bcrypt.hash(this._update.password, salt);
+    }
+});
 exports.UserEntity.methods.checkPassword = async function (plainPassword) {
     const user = this;
     return await bcrypt.compare(plainPassword, user.password);
