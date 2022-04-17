@@ -1,4 +1,4 @@
-import { INestApplication, NotImplementedException } from '@nestjs/common';
+import { INestApplication } from '@nestjs/common';
 import * as Mongoose from 'mongoose';
 import { Connection } from 'mongoose';
 
@@ -195,26 +195,120 @@ describe('UsersController (e2e)', () => {
 
   describe('update user', () => {
     describe('failing update user', () => {
-      it('should not update a user while not logged in', () => {
-        throw new NotImplementedException();
+      it('should not update a user while not logged in', async () => {
+        const user = UserStub();
+        await dbConnection.collection('users').insertOne(user);
+        const response = await request.patch(`/users/${user._id}`);
+        expect(response.status).toBe(401);
       });
-      it('should not update a non-existent user', () => {
-        throw new NotImplementedException();
+      it('should not update a non-existent user', async () => {
+        const user = UserStub();
+        const token = authService.signToken(user);
+        const fakeId = new Mongoose.Types.ObjectId();
+        await dbConnection.collection('users').insertOne(user);
+        const response = await request
+          .patch(`/users/${fakeId}`)
+          .set('Cookie', `access_token=${token}`);
+        expect(response.status).toBe(404);
       });
-      it('should not update a user who is not self while not been admin', () => {
-        throw new NotImplementedException();
+      it('should not update a user who is not self while not been admin', async () => {
+        const user = UserStub();
+        const userToUpdate = adminStub();
+        const token = authService.signToken(user);
+        await dbConnection.collection('users').insertOne(user);
+        await dbConnection.collection('users').insertOne(userToUpdate);
+        const response = await request
+          .patch(`/users/${userToUpdate._id}`)
+          .set('Cookie', `access_token=${token}`);
+        expect(response.status).toBe(401);
       });
-      it('should not update a user which does not respect the validation rules', () => {
-        throw new NotImplementedException();
+      it('should not update a user which does not respect the validation rules', async () => {
+        const user = UserStub();
+        const token = authService.signToken(user);
+        await dbConnection.collection('users').insertOne(user);
+        const response = await request
+          .patch(`/users/${user._id}`)
+          .send({ pseudo: 'e' })
+          .set('Cookie', `access_token=${token}`);
+        expect(response.status).toBe(400);
       });
-      it('should not update a user with a pseudo already used', () => {
-        throw new NotImplementedException();
+      it('should not update a user with a pseudo already used', async () => {
+        const user = UserStub();
+        const userToUpdate = adminStub();
+        const token = authService.signToken(user);
+        await dbConnection.collection('users').insertOne(user);
+        await dbConnection.collection('users').insertOne(userToUpdate);
+        const response = await request
+          .patch(`/users/${user._id}`)
+          .send({ pseudo: userToUpdate.pseudo })
+          .set('Cookie', `access_token=${token}`);
+        expect(response.status).toBe(409);
       });
     });
     describe('update user', () => {
-      it('should update a user and return the new user', () => {
-        throw new NotImplementedException();
+      it('should update a user and return the new user', async () => {
+        const user = UserStub();
+        await dbConnection.collection('users').insertOne(user);
+        const token = authService.signToken(user);
+        const response = await request
+          .patch(`/users/${user._id}`)
+          .set('Cookie', `access_token=${token}`)
+          .send({ pseudo: 'nouveau pseudo' });
+        expect(response.status).toBe(200);
+        expect(response.body.pseudo).toBe('nouveau pseudo');
       });
+    });
+    afterEach(async () => {
+      await clearDatabase(dbConnection, 'users');
+    });
+  });
+  describe('delete user', () => {
+    describe('failing delete user', () => {
+      it('should not delete a user while not logged in', async () => {
+        const user = UserStub();
+        await dbConnection.collection('users').insertOne(user);
+        const response = await request.delete(`/users/${user._id}`);
+        expect(response.status).toBe(401);
+      });
+      it('should not delete a non-existent user', async () => {
+        const user = UserStub();
+        const fakeId = new Mongoose.Types.ObjectId();
+        await dbConnection.collection('users').insertOne(user);
+        const token = authService.signToken(user);
+        const response = await request
+          .delete(`/users/${fakeId}`)
+          .set('Cookie', `access_token=${token}`);
+        expect(response.status).toBe(404);
+      });
+      it('should not delete a user who is not self while not been admin', async () => {
+        const user = UserStub();
+        const userToDelete = adminStub();
+        await dbConnection.collection('users').insertOne(user);
+        await dbConnection.collection('users').insertOne(userToDelete);
+        const token = authService.signToken(user);
+        const response = await request
+          .delete(`/users/${userToDelete._id}`)
+          .set('Cookie', `access_token=${token}`);
+        expect(response.status).toBe(401);
+      });
+    });
+    describe('delete user', () => {
+      it('should delete a user', async () => {
+        const user = UserStub();
+        await dbConnection.collection('users').insertOne(user);
+        const token = authService.signToken(user);
+        const response = await request
+          .delete(`/users/${user._id}`)
+          .set('Cookie', `access_token=${token}`);
+        expect(response.status).toBe(200);
+        const founded = await dbConnection
+          .collection('users')
+          .findOne({ _id: user._id });
+        expect(founded).toBeNull();
+      });
+    });
+    afterEach(async () => {
+      await clearDatabase(dbConnection, 'users');
     });
   });
 
