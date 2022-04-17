@@ -82,7 +82,6 @@ describe('auth (e2e)', () => {
     });
 
     it('should request a protected route successfully', async () => {
-      console.log(token);
       const response = await request
         .get('/posts')
         .set('Cookie', `access_token=${token};`);
