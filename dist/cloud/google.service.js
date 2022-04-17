@@ -22,7 +22,7 @@ let GoogleService = class GoogleService {
             keyFilename: './fordblog-bfc482c198ea.json',
         });
     }
-    async uploadFile(file, slug, type) {
+    async uploadFile(file, name, type) {
         if (file.size > 500000) {
             throw new common_1.BadRequestException('File is to big');
         }
@@ -33,29 +33,38 @@ let GoogleService = class GoogleService {
         }
         try {
             const bucket = this.storage.bucket(this.configService.get('bucket_name'));
-            let folder;
-            switch (type) {
-                case upload_types_1.UploadTypes.POST:
-                    folder = 'posts/';
-                    break;
-                case upload_types_1.UploadTypes.USER:
-                    folder = 'users/';
-                    break;
-                default:
-                    folder = '';
-                    break;
-            }
-            const path = folder + slug + '.jpg';
+            const folder = this.getFolder(type);
+            const path = folder + name + '.jpg';
             const fileCloud = this.storage
                 .bucket(this.configService.get('bucket_name'))
                 .file(path);
             await fileCloud.save(file.buffer, {
                 contentType: 'image/jpg',
             });
-            return `https://storage.googleapis.com/${bucket.name}/${folder}${path}`;
+            return `https://storage.googleapis.com/${bucket.name}/${path}`;
         }
         catch (e) {
             throw new common_1.InternalServerErrorException('File upload failed');
+        }
+    }
+    async deleteFile(name, type) {
+        try {
+            const bucket = this.storage.bucket(this.configService.get('bucket_name'));
+            const folder = this.getFolder(type);
+            const path = folder + name + '.jpg';
+            const fileCloud = bucket.file(path);
+            await fileCloud.delete();
+        }
+        catch (e) { }
+    }
+    getFolder(type) {
+        switch (type) {
+            case upload_types_1.UploadTypes.POST:
+                return 'posts/';
+            case upload_types_1.UploadTypes.USER:
+                return 'users/';
+            default:
+                return '';
         }
     }
 };

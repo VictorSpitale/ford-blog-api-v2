@@ -54,8 +54,10 @@ describe('auth (e2e)', () => {
         password: UserStub().password,
       });
       expect(response.status).toBe(200);
-      expect(Object.keys(response.body)).toContain('access_token');
-      token = response.body.access_token;
+      expect(
+        doArraysIntersect(Object.keys(response.body), Object.keys(UserStub())),
+      ).toBe(true);
+      token = response.headers['set-cookie'][0].replace('access_token=', '');
     });
     it('should not give the user id if the jwt is not correct', async () => {
       const response = await request
@@ -67,9 +69,12 @@ describe('auth (e2e)', () => {
       const response = await request
         .get('/auth/jwt')
         .set('Cookie', `access_token=${token};`);
+      expect(response.status).toBe(200);
       expect(response).not.toBeNull();
       const user = await usersService.getUserByEmail(UserStub().email);
-      expect(doArraysIntersect(Object.keys(user), Object.keys(response.body)));
+      expect(
+        doArraysIntersect(Object.keys(user), Object.keys(response.body)),
+      ).toBe(true);
     });
     it('should cannot access protected route without Authorization', async () => {
       const response = await request.get('/posts');

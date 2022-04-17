@@ -3,6 +3,7 @@ import {
   ConflictException,
   Injectable,
   NotFoundException,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -12,10 +13,16 @@ import { isValidObjectId, Model, Types } from 'mongoose';
 import { UserDto } from './dto/user.dto';
 import { MatchType } from '../shared/types/match.types';
 import { HttpError, HttpErrorCode } from '../shared/error/HttpError';
+import { IUserRole } from './entities/users.role.interface';
+import { GoogleService } from '../cloud/google.service';
+import { UploadTypes } from '../shared/types/upload.types';
 
 @Injectable()
 export class UsersService {
-  constructor(@InjectModel(User.name) private userModel: Model<UserDocument>) {}
+  constructor(
+    @InjectModel(User.name) private userModel: Model<UserDocument>,
+    private readonly googleService: GoogleService,
+  ) {}
   async create(createUserDto: CreateUserDto): Promise<UserDto> {
     if (await this.getUserByEmail(createUserDto.email)) {
       throw new ConflictException(
@@ -55,12 +62,68 @@ export class UsersService {
     return user ? this.asDtoWithoutPassword(user) : null;
   }
 
-  update(id: number, updateUserDto: UpdateUserDto) {
-    return `This action updates a #${id} user`;
+  async update(id: string, updateUserDto: UpdateUserDto, user: User) {
+    await this.getUserById(id);
+    this.isSelfOrAdmin(id, user);
+    if (
+      updateUserDto.pseudo &&
+      (await this.getUserByPseudo(updateUserDto.pseudo))
+    ) {
+      throw new ConflictException(
+        HttpError.getHttpError(HttpErrorCode.DUPLICATE_PSEUDO),
+      );
+    }
+    const updatedUser = await this.userModel.findOneAndUpdate(
+      { _id: id },
+      { ...updateUserDto },
+      {
+        new: true,
+      },
+    );
+    return this.asDtoWithoutPassword(updatedUser);
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} user`;
+  async uploadProfilePicture(
+    id: string,
+    file: Express.Multer.File,
+    user: User,
+  ): Promise<{ picture: string }> {
+    await this.getUserById(id);
+    this.isSelfOrAdmin(id, user);
+    const url = await this.googleService.uploadFile(file, id, UploadTypes.USER);
+    await this.userModel.findOneAndUpdate(
+      { _id: id },
+      {
+        picture: url,
+      },
+    );
+    return { picture: url };
+  }
+
+  async removeProfilePicture(id: string, user: User) {
+    await this.getUserById(id);
+    this.isSelfOrAdmin(id, user);
+    await this.googleService.deleteFile(id, UploadTypes.USER);
+    await this.userModel.findOneAndUpdate(
+      { _id: id },
+      {
+        $unset: {
+          picture: 1,
+        },
+      },
+    );
+  }
+
+  isSelfOrAdmin(id: string, user: User) {
+    if (!(id === user._id.toString() || user.role === IUserRole.ADMIN)) {
+      throw new UnauthorizedException();
+    }
+  }
+
+  async deleteUser(id: string, user: User) {
+    await this.getUserById(id);
+    this.isSelfOrAdmin(id, user);
+    await this.userModel.findOneAndDelete({ _id: id });
   }
 
   async save(user: UserDto) {
@@ -83,6 +146,7 @@ export class UsersService {
       role: 1,
       createdAt: 1,
       updatedAt: 1,
+      picture: 1,
     });
   }
 
@@ -114,6 +178,7 @@ export class UsersService {
       role: user.role,
       updatedAt: user.updatedAt,
       createdAt: user.createdAt,
+      picture: user.picture,
     } as UserDto;
   }
 }

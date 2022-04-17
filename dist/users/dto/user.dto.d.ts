@@ -6,6 +6,7 @@ export declare class UserDto extends UserDto_base {
     readonly _id: Mongoose.Types.ObjectId;
     readonly role: IUserRole;
     readonly password?: string;
+    readonly picture?: string;
     readonly createdAt: string;
     readonly updatedAt: string;
 }

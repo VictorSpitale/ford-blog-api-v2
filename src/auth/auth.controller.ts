@@ -33,9 +33,15 @@ export class AuthController {
   // @UseInterceptors(TokenInterceptor)
   @AllowAny()
   @ApiOperation({ summary: 'Get an access token for a user' })
-  async login(@AuthUser() user: UserDto, @Res() response: Response) {
-    const { access_token } = await this.authService.login(user);
-    return this.authService.setCookie(response, access_token, { access_token });
+  async login(@AuthUser() authUser: UserDto, @Res() response: Response) {
+    const { access_token } = await this.authService.login(authUser);
+    const user = await this.usersService.getUserById(authUser._id.toString());
+    return this.authService.setCookie(response, access_token, user);
+  }
+
+  @Get('logout')
+  async logout(@Res() response: Response) {
+    return this.authService.logout(response);
   }
 
   @Get('/jwt')

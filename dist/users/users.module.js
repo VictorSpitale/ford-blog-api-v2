@@ -12,6 +12,7 @@ const users_service_1 = require("./users.service");
 const users_controller_1 = require("./users.controller");
 const mongoose_1 = require("@nestjs/mongoose");
 const user_entity_1 = require("./entities/user.entity");
+const google_service_1 = require("../cloud/google.service");
 let UsersModule = class UsersModule {
 };
 UsersModule = __decorate([
@@ -20,7 +21,7 @@ UsersModule = __decorate([
             mongoose_1.MongooseModule.forFeature([{ name: user_entity_1.User.name, schema: user_entity_1.UserEntity }]),
         ],
         controllers: [users_controller_1.UsersController],
-        providers: [users_service_1.UsersService],
+        providers: [users_service_1.UsersService, google_service_1.GoogleService],
         exports: [users_service_1.UsersService],
     })
 ], UsersModule);

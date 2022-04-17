@@ -9,6 +9,7 @@ var HttpErrorCode;
     HttpErrorCode[HttpErrorCode["USER_ALREADY_EXIST"] = 3] = "USER_ALREADY_EXIST";
     HttpErrorCode[HttpErrorCode["USER_NOT_FOUND"] = 4] = "USER_NOT_FOUND";
     HttpErrorCode[HttpErrorCode["POST_NOT_FOUND"] = 5] = "POST_NOT_FOUND";
+    HttpErrorCode[HttpErrorCode["DUPLICATE_PSEUDO"] = 6] = "DUPLICATE_PSEUDO";
 })(HttpErrorCode = exports.HttpErrorCode || (exports.HttpErrorCode = {}));
 class HttpError {
     static getHttpError(code) {
@@ -40,6 +41,10 @@ HttpError.errors = new Map([
     [
         HttpErrorCode.POST_NOT_FOUND,
         { message: 'Post not found', statusCode: 404, code: 5 },
+    ],
+    [
+        HttpErrorCode.DUPLICATE_PSEUDO,
+        { message: 'Pseudo already used', statusCode: 409, code: 6 },
     ],
 ]);
 //# sourceMappingURL=HttpError.js.map

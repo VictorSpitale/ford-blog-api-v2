@@ -48,16 +48,19 @@ let AuthService = class AuthService {
         const payload = { email: user.email, sub: user._id };
         return { access_token: this.jwtService.sign(payload) };
     }
+    async logout(response) {
+        return this.setCookie(response, '', null, 1);
+    }
     async setCookieFromGoogle(response, token) {
         if (await this.decodePayload(token)) {
             return this.setCookie(response, token);
         }
         throw new common_1.BadRequestException(HttpError_1.HttpError.getHttpError(HttpError_1.HttpErrorCode.G_AUTH_FAILED));
     }
-    setCookie(response, value, body) {
+    setCookie(response, value, body, time = 1000 * 60 * 60 * 24 * 2) {
         return response
             .cookie('access_token', value, {
-            expires: new Date(Date.now() + 1000 * 60 * 60 * 24 * 2),
+            expires: new Date(Date.now() + time),
             sameSite: 'none',
             secure: true,
             httpOnly: true,

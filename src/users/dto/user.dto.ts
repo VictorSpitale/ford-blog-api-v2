@@ -6,12 +6,14 @@ import {
   IsIn,
   IsMongoId,
   IsNotEmpty,
+  IsOptional,
   IsString,
   Matches,
   MinLength,
 } from 'class-validator';
 import { IUserRole } from '../entities/users.role.interface';
 import { ApiProperty, PartialType } from '@nestjs/swagger';
+import { urlPattern } from '../../shared/utils/regex.validation';
 
 export class UserDto extends PartialType(CreateUserDto) {
   @IsNotEmpty()
@@ -43,6 +45,16 @@ export class UserDto extends PartialType(CreateUserDto) {
     type: String,
   })
   readonly password?: string;
+
+  @ApiProperty({
+    description: 'Url to the picture',
+    example: 'https://storage.googleapis.com/name',
+    type: String,
+    pattern: urlPattern,
+  })
+  @IsOptional()
+  @Matches(urlPattern)
+  readonly picture?: string;
 
   @IsDateString()
   @IsNotEmpty()

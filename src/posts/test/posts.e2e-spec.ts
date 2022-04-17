@@ -1,4 +1,5 @@
 import { INestApplication } from '@nestjs/common';
+import * as Mongoose from 'mongoose';
 import { Connection } from 'mongoose';
 import { initE2eWithGuards } from '../../shared/test/init.e2e';
 import { clearDatabase } from '../../shared/test/utils';
@@ -6,7 +7,7 @@ import { PostStub } from './stub/post.stub';
 import { doArraysIntersect } from '../../shared/utils/tests.utils';
 import { urlRegex } from '../../shared/utils/regex.validation';
 import { AuthService } from '../../auth/auth.service';
-import { UserStub } from '../../users/test/stub/user.stub';
+import { adminStub, UserStub } from '../../users/test/stub/user.stub';
 import { IUserRole } from '../../users/entities/users.role.interface';
 import { UpdatePostDto } from '../dto/update-post.dto';
 
@@ -393,7 +394,8 @@ describe('PostsController (e2e)', () => {
       it('should update a post', async () => {
         const post = PostStub();
         const user = UserStub(IUserRole.ADMIN);
-        const update: UpdatePostDto = { title: 'nouveau titre' };
+        const title = 'nouveau titre';
+        const update: UpdatePostDto = { title };
         await dbConnection.collection('posts').insertOne(post);
         await dbConnection.collection('users').insertOne(user);
         const token = authService.signToken(user);
@@ -408,6 +410,66 @@ describe('PostsController (e2e)', () => {
             'authUserLike',
           ]),
         ).toBe(true);
+        expect(response.body.title).toBe(title);
+      });
+    });
+
+    afterEach(async () => {
+      await clearDatabase(dbConnection, 'posts');
+      await clearDatabase(dbConnection, 'users');
+    });
+  });
+
+  describe('get liked posts', () => {
+    describe('failing get liked posts', () => {
+      it('should not get liked posts while not logged in', async () => {
+        const user = UserStub();
+        await dbConnection.collection('users').insertOne(user);
+        const response = await request.get(`/posts/liked/${user._id}`);
+        expect(response.status).toBe(401);
+      });
+      it('should not get liked posts of other user while not been admin', async () => {
+        const user = UserStub();
+        const userToQuery = adminStub();
+        await dbConnection.collection('users').insertOne(user);
+        await dbConnection.collection('users').insertOne(userToQuery);
+        const token = authService.signToken(user);
+        const response = await request
+          .get(`/posts/liked/${userToQuery._id}`)
+          .set('Cookie', `access_token=${token};`);
+        expect(response.status).toBe(401);
+      });
+      it('should not get liked posts of a non-existent user', async () => {
+        const user = UserStub(IUserRole.ADMIN);
+        await dbConnection.collection('users').insertOne(user);
+        const token = authService.signToken(user);
+        const fakeId = new Mongoose.Types.ObjectId();
+        const response = await request
+          .get(`/posts/liked/${fakeId}`)
+          .set('Cookie', `access_token=${token};`);
+        expect(response.status).toBe(404);
+      });
+    });
+
+    describe('get liked posts', () => {
+      it('should get liked posts', async () => {
+        const post = PostStub();
+        const user = UserStub(IUserRole.ADMIN);
+        await dbConnection
+          .collection('posts')
+          .insertOne({ ...post, likers: [user._id] });
+        await dbConnection.collection('users').insertOne(user);
+        const token = authService.signToken(user);
+        const response = await request
+          .get(`/posts/liked/${user._id}`)
+          .set('Cookie', `access_token=${token};`);
+        expect(response.status).toBe(200);
+        expect(response.body).toBeInstanceOf(Array);
+        expect(response.body[0]).toMatchObject({
+          title: post.title,
+          desc: post.desc,
+          slug: post.slug,
+        });
       });
     });
 

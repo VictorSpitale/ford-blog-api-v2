@@ -53,6 +53,10 @@ export class AuthService {
     return { access_token: this.jwtService.sign(payload) };
   }
 
+  async logout(response: Response) {
+    return this.setCookie(response, '', null, 1);
+  }
+
   async setCookieFromGoogle(response: Response, token): Promise<Response> {
     if (await this.decodePayload(token)) {
       return this.setCookie(response, token);
@@ -62,10 +66,15 @@ export class AuthService {
     );
   }
 
-  setCookie(response: Response, value, body?): Response {
+  setCookie(
+    response: Response,
+    value,
+    body?,
+    time = 1000 * 60 * 60 * 24 * 2,
+  ): Response {
     return response
       .cookie('access_token', value, {
-        expires: new Date(Date.now() + 1000 * 60 * 60 * 24 * 2),
+        expires: new Date(Date.now() + time),
         sameSite: 'none',
         secure: true,
         httpOnly: true,

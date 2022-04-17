@@ -1,3 +1,4 @@
+/// <reference types="mongoose" />
 import { TestingModule } from '@nestjs/testing';
 export declare function initE2eWithoutGuards(): Promise<{
     app: import("@nestjs/common").INestApplication;

@@ -18,9 +18,13 @@ const mongoose_1 = require("@nestjs/mongoose");
 const user_entity_1 = require("./entities/user.entity");
 const mongoose_2 = require("mongoose");
 const HttpError_1 = require("../shared/error/HttpError");
+const users_role_interface_1 = require("./entities/users.role.interface");
+const google_service_1 = require("../cloud/google.service");
+const upload_types_1 = require("../shared/types/upload.types");
 let UsersService = class UsersService {
-    constructor(userModel) {
+    constructor(userModel, googleService) {
         this.userModel = userModel;
+        this.googleService = googleService;
     }
     async create(createUserDto) {
         if (await this.getUserByEmail(createUserDto.email)) {
@@ -50,11 +54,46 @@ let UsersService = class UsersService {
         const user = await this.findOne({ pseudo });
         return user ? this.asDtoWithoutPassword(user) : null;
     }
-    update(id, updateUserDto) {
-        return `This action updates a #${id} user`;
+    async update(id, updateUserDto, user) {
+        await this.getUserById(id);
+        this.isSelfOrAdmin(id, user);
+        if (updateUserDto.pseudo &&
+            (await this.getUserByPseudo(updateUserDto.pseudo))) {
+            throw new common_1.ConflictException(HttpError_1.HttpError.getHttpError(HttpError_1.HttpErrorCode.DUPLICATE_PSEUDO));
+        }
+        const updatedUser = await this.userModel.findOneAndUpdate({ _id: id }, Object.assign({}, updateUserDto), {
+            new: true,
+        });
+        return this.asDtoWithoutPassword(updatedUser);
     }
-    remove(id) {
-        return `This action removes a #${id} user`;
+    async uploadProfilePicture(id, file, user) {
+        await this.getUserById(id);
+        this.isSelfOrAdmin(id, user);
+        const url = await this.googleService.uploadFile(file, id, upload_types_1.UploadTypes.USER);
+        await this.userModel.findOneAndUpdate({ _id: id }, {
+            picture: url,
+        });
+        return { picture: url };
+    }
+    async removeProfilePicture(id, user) {
+        await this.getUserById(id);
+        this.isSelfOrAdmin(id, user);
+        await this.googleService.deleteFile(id, upload_types_1.UploadTypes.USER);
+        await this.userModel.findOneAndUpdate({ _id: id }, {
+            $unset: {
+                picture: 1,
+            },
+        });
+    }
+    isSelfOrAdmin(id, user) {
+        if (!(id === user._id.toString() || user.role === users_role_interface_1.IUserRole.ADMIN)) {
+            throw new common_1.UnauthorizedException();
+        }
+    }
+    async deleteUser(id, user) {
+        await this.getUserById(id);
+        this.isSelfOrAdmin(id, user);
+        await this.userModel.findOneAndDelete({ _id: id });
     }
     async save(user) {
         await this.userModel.replaceOne({ _id: user._id }, user, { upsert: true });
@@ -76,6 +115,7 @@ let UsersService = class UsersService {
             role: 1,
             createdAt: 1,
             updatedAt: 1,
+            picture: 1,
         });
     }
     async findOne(match) {
@@ -106,13 +146,15 @@ let UsersService = class UsersService {
             role: user.role,
             updatedAt: user.updatedAt,
             createdAt: user.createdAt,
+            picture: user.picture,
         };
     }
 };
 UsersService = __decorate([
     (0, common_1.Injectable)(),
     __param(0, (0, mongoose_1.InjectModel)(user_entity_1.User.name)),
-    __metadata("design:paramtypes", [mongoose_2.Model])
+    __metadata("design:paramtypes", [mongoose_2.Model,
+        google_service_1.GoogleService])
 ], UsersService);
 exports.UsersService = UsersService;
 //# sourceMappingURL=users.service.js.map
