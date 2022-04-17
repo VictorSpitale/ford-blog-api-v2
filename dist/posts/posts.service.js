@@ -21,10 +21,12 @@ const google_service_1 = require("../cloud/google.service");
 const upload_types_1 = require("../shared/types/upload.types");
 const post_types_1 = require("../shared/types/post.types");
 const HttpError_1 = require("../shared/error/HttpError");
+const users_service_1 = require("../users/users.service");
 let PostsService = class PostsService {
-    constructor(postModel, googleService) {
+    constructor(postModel, googleService, usersService) {
         this.postModel = postModel;
         this.googleService = googleService;
+        this.usersService = usersService;
     }
     async create(createPostDto, file) {
         if (await this.checkIfPostIsDuplicatedBySlug(createPostDto.slug)) {
@@ -80,6 +82,12 @@ let PostsService = class PostsService {
             throw new common_1.NotFoundException(HttpError_1.HttpError.getHttpError(HttpError_1.HttpErrorCode.POST_NOT_FOUND));
         }
         return this.asDto(post, user);
+    }
+    async getLikedPosts(userId, authUser) {
+        await this.usersService.getUserById(userId);
+        this.usersService.isSelfOrAdmin(userId, authUser);
+        const posts = await this.postModel.find({ likers: userId });
+        return posts.map((p) => this.asBasicDto(p));
     }
     async getQueriedPosts(search) {
         if (!search || (search && search.length < 3)) {
@@ -150,6 +158,13 @@ let PostsService = class PostsService {
             return null;
         }
     }
+    asBasicDto(post) {
+        return {
+            slug: post.slug,
+            title: post.title,
+            desc: post.desc,
+        };
+    }
     asDto(post, authUser) {
         let likeStatus = false;
         if (authUser) {
@@ -176,7 +191,8 @@ PostsService = __decorate([
     (0, common_1.Injectable)(),
     __param(0, (0, mongoose_1.InjectModel)(post_entity_1.Post.name)),
     __metadata("design:paramtypes", [mongoose_2.Model,
-        google_service_1.GoogleService])
+        google_service_1.GoogleService,
+        users_service_1.UsersService])
 ], PostsService);
 exports.PostsService = PostsService;
 //# sourceMappingURL=posts.service.js.map

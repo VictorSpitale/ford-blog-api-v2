@@ -20,7 +20,7 @@ export declare class UsersService {
         picture: string;
     }>;
     removeProfilePicture(id: string, user: User): Promise<void>;
-    private isSelfOrAdmin;
+    isSelfOrAdmin(id: string, user: User): void;
     deleteUser(id: string, user: User): Promise<void>;
     save(user: UserDto): Promise<void>;
     private find;

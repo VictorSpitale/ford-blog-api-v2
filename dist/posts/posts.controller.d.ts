@@ -10,6 +10,11 @@ export declare class PostsController {
     getPosts(req: any): Promise<PostDto[]>;
     getLastPosts(req: any): Promise<PostDto[]>;
     getQueriedPosts(search: any): Promise<PostDto[]>;
+    getLikedPost(req: any, id: any): Promise<{
+        slug: string;
+        title: string;
+        desc: string;
+    }[]>;
     getPost(req: any, slug: any): Promise<PostDto>;
     likePost(req: any, slug: any): Promise<number>;
     unlikePost(req: any, slug: any): Promise<number>;

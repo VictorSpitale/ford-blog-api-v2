@@ -16,12 +16,14 @@ import { UploadTypes } from '../shared/types/upload.types';
 import { LikeOperation } from '../shared/types/post.types';
 import { HttpError, HttpErrorCode } from '../shared/error/HttpError';
 import { UpdatePostDto } from './dto/update-post.dto';
+import { UsersService } from '../users/users.service';
 
 @Injectable()
 export class PostsService {
   constructor(
     @InjectModel(Post.name) private readonly postModel: Model<PostDocument>,
     private readonly googleService: GoogleService,
+    private readonly usersService: UsersService,
   ) {}
 
   async create(
@@ -103,6 +105,13 @@ export class PostsService {
     return this.asDto(post, user);
   }
 
+  async getLikedPosts(userId: string, authUser: User) {
+    await this.usersService.getUserById(userId);
+    this.usersService.isSelfOrAdmin(userId, authUser);
+    const posts = await this.postModel.find({ likers: userId });
+    return posts.map((p) => this.asBasicDto(p));
+  }
+
   async getQueriedPosts(search: string) {
     if (!search || (search && search.length < 3)) {
       throw new BadRequestException(
@@ -176,6 +185,14 @@ export class PostsService {
     } else {
       return null;
     }
+  }
+
+  asBasicDto(post: Post) {
+    return {
+      slug: post.slug,
+      title: post.title,
+      desc: post.desc,
+    };
   }
 
   asDto(post: Post, authUser?: User): PostDto {
