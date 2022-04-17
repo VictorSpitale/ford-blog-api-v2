@@ -47,11 +47,11 @@ let GoogleService = class GoogleService {
             throw new common_1.InternalServerErrorException('File upload failed');
         }
     }
-    async deleteFile(slug, type) {
+    async deleteFile(name, type) {
         try {
             const bucket = this.storage.bucket(this.configService.get('bucket_name'));
             const folder = this.getFolder(type);
-            const path = folder + slug + '.jpg';
+            const path = folder + name + '.jpg';
             const fileCloud = bucket.file(path);
             await fileCloud.delete();
         }

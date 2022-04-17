@@ -19,6 +19,7 @@ export declare class UsersService {
     uploadProfilePicture(id: string, file: Express.Multer.File, user: User): Promise<{
         picture: string;
     }>;
+    removeProfilePicture(id: string, user: User): Promise<void>;
     private isSelfOrAdmin;
     remove(id: number): string;
     save(user: UserDto): Promise<void>;

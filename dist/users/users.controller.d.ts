@@ -13,5 +13,6 @@ export declare class UsersController {
     uploadProfilePicture(file: Express.Multer.File, req: any, id: any): Promise<{
         picture: string;
     }>;
+    removeProfilePicture(req: any, id: any): Promise<void>;
     remove(id: string): string;
 }

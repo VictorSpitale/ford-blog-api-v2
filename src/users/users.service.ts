@@ -100,6 +100,20 @@ export class UsersService {
     return { picture: url };
   }
 
+  async removeProfilePicture(id: string, user: User) {
+    await this.getUserById(id);
+    this.isSelfOrAdmin(id, user);
+    await this.googleService.deleteFile(id, UploadTypes.USER);
+    await this.userModel.findOneAndUpdate(
+      { _id: id },
+      {
+        $unset: {
+          picture: 1,
+        },
+      },
+    );
+  }
+
   private isSelfOrAdmin(id: string, user: User) {
     if (!(id === user._id.toString() || user.role === IUserRole.ADMIN)) {
       throw new UnauthorizedException();

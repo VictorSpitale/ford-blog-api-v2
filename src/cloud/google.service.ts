@@ -47,11 +47,11 @@ export class GoogleService {
     }
   }
 
-  async deleteFile(slug: string, type: UploadTypes) {
+  async deleteFile(name: string, type: UploadTypes) {
     try {
       const bucket = this.storage.bucket(this.configService.get('bucket_name'));
       const folder = this.getFolder(type);
-      const path = folder + slug + '.jpg';
+      const path = folder + name + '.jpg';
       const fileCloud = bucket.file(path);
       await fileCloud.delete();
     } catch (e) {}

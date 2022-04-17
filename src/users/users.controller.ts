@@ -76,6 +76,11 @@ export class UsersController {
     return this.usersService.uploadProfilePicture(id, file, req.user);
   }
 
+  @Delete('/upload/:id')
+  async removeProfilePicture(@Req() req, @Param('id') id) {
+    return this.usersService.removeProfilePicture(id, req.user);
+  }
+
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.usersService.remove(+id);

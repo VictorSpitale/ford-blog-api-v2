@@ -75,6 +75,16 @@ let UsersService = class UsersService {
         });
         return { picture: url };
     }
+    async removeProfilePicture(id, user) {
+        await this.getUserById(id);
+        this.isSelfOrAdmin(id, user);
+        await this.googleService.deleteFile(id, upload_types_1.UploadTypes.USER);
+        await this.userModel.findOneAndUpdate({ _id: id }, {
+            $unset: {
+                picture: 1,
+            },
+        });
+    }
     isSelfOrAdmin(id, user) {
         if (!(id === user._id.toString() || user.role === users_role_interface_1.IUserRole.ADMIN)) {
             throw new common_1.UnauthorizedException();

@@ -42,6 +42,9 @@ let UsersController = class UsersController {
     async uploadProfilePicture(file, req, id) {
         return this.usersService.uploadProfilePicture(id, file, req.user);
     }
+    async removeProfilePicture(req, id) {
+        return this.usersService.removeProfilePicture(id, req.user);
+    }
     remove(id) {
         return this.usersService.remove(+id);
     }
@@ -102,6 +105,14 @@ __decorate([
     __metadata("design:paramtypes", [Object, Object, Object]),
     __metadata("design:returntype", Promise)
 ], UsersController.prototype, "uploadProfilePicture", null);
+__decorate([
+    (0, common_1.Delete)('/upload/:id'),
+    __param(0, (0, common_1.Req)()),
+    __param(1, (0, common_1.Param)('id')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, Object]),
+    __metadata("design:returntype", Promise)
+], UsersController.prototype, "removeProfilePicture", null);
 __decorate([
     (0, common_1.Delete)(':id'),
     __param(0, (0, common_1.Param)('id')),
