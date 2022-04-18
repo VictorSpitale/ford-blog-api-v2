@@ -17,6 +17,8 @@ import { IUserRole } from './entities/users.role.interface';
 import { GoogleService } from '../cloud/google.service';
 import { UploadTypes } from '../shared/types/upload.types';
 import { MailService } from '../mail/mail.service';
+import { uuid } from '../shared/utils/password.utils';
+import { LocalesTypes } from '../shared/types/locales.types';
 
 @Injectable()
 export class UsersService {
@@ -130,6 +132,23 @@ export class UsersService {
     await this.getUserById(id);
     this.isSelfOrAdmin(id, user);
     await this.userModel.findOneAndDelete({ _id: id });
+  }
+
+  async sendPasswordRecovery(email: string, locale: LocalesTypes) {
+    if (!(await this.getUserByEmail(email))) return;
+    const token = uuid();
+    const user = await this.userModel.findOneAndUpdate(
+      { email },
+      {
+        recoveryToken: token,
+      },
+    );
+    await this.mailService.addPasswordRecoveryEmailToQueue({
+      mailTo: user.email,
+      pseudo: user.pseudo,
+      token,
+      locale,
+    });
   }
 
   async save(user: UserDto) {

@@ -22,6 +22,7 @@ const users_role_interface_1 = require("./entities/users.role.interface");
 const google_service_1 = require("../cloud/google.service");
 const upload_types_1 = require("../shared/types/upload.types");
 const mail_service_1 = require("../mail/mail.service");
+const password_utils_1 = require("../shared/utils/password.utils");
 let UsersService = class UsersService {
     constructor(userModel, googleService, mailService) {
         this.userModel = userModel;
@@ -100,6 +101,20 @@ let UsersService = class UsersService {
         await this.getUserById(id);
         this.isSelfOrAdmin(id, user);
         await this.userModel.findOneAndDelete({ _id: id });
+    }
+    async sendPasswordRecovery(email, locale) {
+        if (!(await this.getUserByEmail(email)))
+            return;
+        const token = (0, password_utils_1.uuid)();
+        const user = await this.userModel.findOneAndUpdate({ email }, {
+            recoveryToken: token,
+        });
+        await this.mailService.addPasswordRecoveryEmailToQueue({
+            mailTo: user.email,
+            pseudo: user.pseudo,
+            token,
+            locale,
+        });
     }
     async save(user) {
         await this.userModel.replaceOne({ _id: user._id }, user, { upsert: true });
