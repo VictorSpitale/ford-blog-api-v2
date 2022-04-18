@@ -4,6 +4,10 @@ import { InjectQueue } from '@nestjs/bull';
 import { Queue } from 'bull';
 import { ConfigService } from '@nestjs/config';
 import { WelcomeEmailInfos, WelcomeEmailType } from './types/welcome.type';
+import {
+  PasswordRecoveryInfos,
+  PasswordRecoveryType,
+} from './types/password-recovery.type';
 
 @Injectable()
 export class MailService {
@@ -19,5 +23,15 @@ export class MailService {
       mailTo: welcomeMailInfos.mailTo,
       clientUrl: this.configService.get('client_url'),
     } as WelcomeEmailType);
+  }
+
+  async addPasswordRecoveryEmailToQueue(recoveryInfos: PasswordRecoveryInfos) {
+    await this.mailingQueue.add('recovery', {
+      pseudo: recoveryInfos.pseudo,
+      mailTo: recoveryInfos.mailTo,
+      token: recoveryInfos.token,
+      clientUrl: this.configService.get('client_url'),
+      locale: recoveryInfos.locale,
+    } as PasswordRecoveryType);
   }
 }

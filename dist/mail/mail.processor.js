@@ -16,7 +16,7 @@ let MailProcessor = class MailProcessor {
     constructor(mailerService) {
         this.mailerService = mailerService;
     }
-    handleMailing(job) {
+    handleWelcome(job) {
         try {
             this.mailerService
                 .sendMail({
@@ -34,13 +34,40 @@ let MailProcessor = class MailProcessor {
         }
         catch (e) { }
     }
+    handleRecovery(job) {
+        try {
+            const subject = job.data.locale === 'fr'
+                ? 'Réinitialisation de mot de passe'
+                : 'Password recovery';
+            this.mailerService
+                .sendMail({
+                to: job.data.mailTo,
+                from: '"Ford Universe Team" <no-reply@forduniverse.com>',
+                subject,
+                template: `passwordRecovery-${job.data.locale}`,
+                context: {
+                    name: job.data.pseudo,
+                    link: `${job.data.clientUrl}/recovery/${job.data.token}`,
+                },
+            })
+                .then(() => null)
+                .catch(() => null);
+        }
+        catch (e) { }
+    }
 };
 __decorate([
     (0, bull_1.Process)('welcome'),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Object]),
     __metadata("design:returntype", void 0)
-], MailProcessor.prototype, "handleMailing", null);
+], MailProcessor.prototype, "handleWelcome", null);
+__decorate([
+    (0, bull_1.Process)('recovery'),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", void 0)
+], MailProcessor.prototype, "handleRecovery", null);
 MailProcessor = __decorate([
     (0, bull_1.Processor)('mailing'),
     __metadata("design:paramtypes", [mailer_1.MailerService])

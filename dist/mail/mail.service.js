@@ -30,6 +30,15 @@ let MailService = class MailService {
             clientUrl: this.configService.get('client_url'),
         });
     }
+    async addPasswordRecoveryEmailToQueue(recoveryInfos) {
+        await this.mailingQueue.add('recovery', {
+            pseudo: recoveryInfos.pseudo,
+            mailTo: recoveryInfos.mailTo,
+            token: recoveryInfos.token,
+            clientUrl: this.configService.get('client_url'),
+            locale: recoveryInfos.locale,
+        });
+    }
 };
 MailService = __decorate([
     (0, common_1.Injectable)(),
