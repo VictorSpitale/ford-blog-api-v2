@@ -1,28 +1,12 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { AppModule } from '../../app.module';
-import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
-import { AuthGuardMock } from './mocks/auth.guard.mock';
 import { ValidationPipe } from '@nestjs/common';
 import { DatabaseService } from '../../database/database.service';
 import { getRequest } from './superagent';
 import * as request from 'supertest';
-import { RolesGuard } from '../../auth/guards/roles.guard';
 import * as cookieParser from 'cookie-parser';
-
-export async function initE2eWithoutGuards() {
-  const moduleFixture: TestingModule = await Test.createTestingModule({
-    imports: [AppModule],
-  })
-    .overrideProvider(RolesGuard)
-    .useClass(AuthGuardMock)
-    .overrideProvider(JwtAuthGuard)
-    .useClass(AuthGuardMock)
-    .compile();
-
-  return {
-    ...(await getInitConst(moduleFixture)),
-  };
-}
+import { MailService } from '../../mail/mail.service';
+import { MailServiceMock } from './mocks/mail.service.mock';
 
 async function getInitConst(moduleFixture: TestingModule) {
   const app = moduleFixture.createNestApplication();
@@ -45,7 +29,10 @@ async function getInitConst(moduleFixture: TestingModule) {
 export async function initE2eWithGuards() {
   const moduleFixture: TestingModule = await Test.createTestingModule({
     imports: [AppModule],
-  }).compile();
+  })
+    .overrideProvider(MailService)
+    .useClass(MailServiceMock)
+    .compile();
 
   return {
     ...(await getInitConst(moduleFixture)),
