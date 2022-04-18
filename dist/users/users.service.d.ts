@@ -6,10 +6,12 @@ import { Model } from 'mongoose';
 import { UserDto } from './dto/user.dto';
 import { MatchType } from '../shared/types/match.types';
 import { GoogleService } from '../cloud/google.service';
+import { MailService } from '../mail/mail.service';
 export declare class UsersService {
     private userModel;
     private readonly googleService;
-    constructor(userModel: Model<UserDocument>, googleService: GoogleService);
+    private readonly mailService;
+    constructor(userModel: Model<UserDocument>, googleService: GoogleService, mailService: MailService);
     create(createUserDto: CreateUserDto): Promise<UserDto>;
     getUsers(): Promise<UserDto[]>;
     getUserByEmail(email: string): Promise<UserDto>;

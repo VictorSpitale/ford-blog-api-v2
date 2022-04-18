@@ -17,10 +17,26 @@ let MailProcessor = class MailProcessor {
         this.mailerService = mailerService;
     }
     handleMailing(job) {
+        try {
+            this.mailerService
+                .sendMail({
+                to: job.data.mailTo,
+                from: '"Ford Universe Team" <no-reply@forduniverse.com>',
+                subject: 'Welcome on Ford Universe !',
+                template: 'welcome',
+                context: {
+                    name: job.data.pseudo,
+                    url: job.data.clientUrl,
+                },
+            })
+                .then(() => null)
+                .catch(() => null);
+        }
+        catch (e) { }
     }
 };
 __decorate([
-    (0, bull_1.Process)(),
+    (0, bull_1.Process)('welcome'),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Object]),
     __metadata("design:returntype", void 0)

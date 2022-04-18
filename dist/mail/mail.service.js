@@ -16,18 +16,26 @@ exports.MailService = void 0;
 const common_1 = require("@nestjs/common");
 const mailer_1 = require("@nestjs-modules/mailer");
 const bull_1 = require("@nestjs/bull");
+const config_1 = require("@nestjs/config");
 let MailService = class MailService {
-    constructor(mailerService, mailingQueue) {
+    constructor(mailerService, configService, mailingQueue) {
         this.mailerService = mailerService;
+        this.configService = configService;
         this.mailingQueue = mailingQueue;
     }
-    async addWelcomeMailToQueue() {
+    async addWelcomeMailToQueue(welcomeMailInfos) {
+        await this.mailingQueue.add('welcome', {
+            pseudo: welcomeMailInfos.pseudo,
+            mailTo: welcomeMailInfos.mailTo,
+            clientUrl: this.configService.get('client_url'),
+        });
     }
 };
 MailService = __decorate([
     (0, common_1.Injectable)(),
-    __param(1, (0, bull_1.InjectQueue)('mailing')),
-    __metadata("design:paramtypes", [mailer_1.MailerService, Object])
+    __param(2, (0, bull_1.InjectQueue)('mailing')),
+    __metadata("design:paramtypes", [mailer_1.MailerService,
+        config_1.ConfigService, Object])
 ], MailService);
 exports.MailService = MailService;
 //# sourceMappingURL=mail.service.js.map

@@ -1,13 +1,88 @@
 <style>
-  .header{
-    color:red;
-    font-size: 36px;
+  @import url('https://fonts.googleapis.com/css2?family=Josefin+Sans&family=Varela+Round&display=swap');
+
+  * {
+    margin: 0;
+    padding: 0;
+    font-family: "Varela Round", sans-serif;
+    font-weight: 400;
+  }
+
+  .bg {
+    background-color: #dee6f0;
+    width: 100%;
+    height: 100%;
+    border-radius: 25px;
+    padding-top: 25px;
+  }
+
+  .logo {
+    display: block;
+    margin: auto;
+  }
+
+  h1 {
+
+    font-family: "Josefin Sans", sans-serif;
+  }
+
+  .header {
+    padding: 50px 50px 25px;
+    display: block;
+    width: 250px;
+    margin: 0 auto 0;
+    background-color: #335d93;
+    border-radius: 25px;
+  }
+
+  .welcome {
+    text-align: center;
+    margin-top: 25px;
+    color: white;
+  }
+
+  .content {
+    width: 400px;
+    margin: 0 auto;
+    padding: 25px;
+  }
+
+  .content>* {
+    margin-block: 5px;
+  }
+
+  .btn {
+    display: block;
+    border: none;
+    outline: none;
+    width: max-content;
+    background-color: #335d93;
+    border-radius: 10px;
+    color: white;
+    padding: 5px 10px;
+    cursor: pointer;
+    margin: 10px 0;
+  }
+  .ignore {
+    color: gray;
+    font-size: 8px;
+    font-style: italic;
+    margin-top: 15px;
   }
 </style>
-<p class="header">Hey {{ name }},</p>
-<p>Please click below to confirm your email</p>
-<p>
-  <a href="{{ url }}">Confirm</a>
-</p>
 
-<p>If you did not request this email you can safely ignore it.</p>
+<div class="bg">
+  <div class="header">
+    <img src="https://storage.googleapis.com/fordblog.appspot.com/email/forduniverse.png" class="logo" alt="ford universe logo">
+    <h1 class="welcome">Welcome</h1>
+  </div>
+  <div class="content">
+    <p>Hello {{name}} !</p>
+    <p>You can now consult articles on the Ford Motor Company!</p>
+    <p>Do not hesitate to give your opinion on the articles by leaving a like or a comment.</p>
+    <a class="btn" href="{{url}}/login">Log in now</a>
+    <p>See you soon.</p>
+    <p>The Ford Universe Team</p>
+    <p class="ignore">If you have not registered on the Ford Universe blog, you can safely ignore this email.</p>
+  </div>
+</div>

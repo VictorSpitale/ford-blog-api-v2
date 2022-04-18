@@ -16,12 +16,14 @@ import { HttpError, HttpErrorCode } from '../shared/error/HttpError';
 import { IUserRole } from './entities/users.role.interface';
 import { GoogleService } from '../cloud/google.service';
 import { UploadTypes } from '../shared/types/upload.types';
+import { MailService } from '../mail/mail.service';
 
 @Injectable()
 export class UsersService {
   constructor(
     @InjectModel(User.name) private userModel: Model<UserDocument>,
     private readonly googleService: GoogleService,
+    private readonly mailService: MailService,
   ) {}
   async create(createUserDto: CreateUserDto): Promise<UserDto> {
     if (await this.getUserByEmail(createUserDto.email)) {
@@ -35,6 +37,10 @@ export class UsersService {
       );
     }
     const createdUser = await this.userModel.create(createUserDto);
+    await this.mailService.addWelcomeMailToQueue({
+      mailTo: createdUser.email,
+      pseudo: createdUser.pseudo,
+    });
     return this.asDtoWithoutPassword(createdUser);
   }
 
