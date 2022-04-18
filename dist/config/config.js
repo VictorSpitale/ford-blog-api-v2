@@ -21,5 +21,16 @@ exports.default = () => ({
         callback: process.env.GOOGLE_CALLBACK_URL,
         client_url: process.env.CLIENT_URL,
     },
+    email: {
+        username: process.env.MAIL_USERNAME,
+        password: process.env.MAIL_PASSWORD,
+        to: process.env.MAIL_TO,
+    },
+    redis: {
+        host: process.env.REDIS_HOST,
+        port: process.env.REDIS_PORT,
+        username: process.env.REDIS_USERNAME,
+        password: process.env.REDIS_PASSWORD,
+    },
 });
 //# sourceMappingURL=config.js.map

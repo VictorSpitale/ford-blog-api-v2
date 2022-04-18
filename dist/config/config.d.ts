@@ -19,5 +19,16 @@ declare const _default: () => {
         callback: string;
         client_url: string;
     };
+    email: {
+        username: string;
+        password: string;
+        to: string;
+    };
+    redis: {
+        host: string;
+        port: string;
+        username: string;
+        password: string;
+    };
 };
 export default _default;
