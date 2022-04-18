@@ -1,7 +1,5 @@
-export interface WelcomeEmailInfos {
-    mailTo: string;
-    pseudo: string;
-}
+import { BasicEmailType } from './basic.type';
+export declare type WelcomeEmailInfos = BasicEmailType;
 export interface WelcomeEmailType extends WelcomeEmailInfos {
     clientUrl: string;
 }
