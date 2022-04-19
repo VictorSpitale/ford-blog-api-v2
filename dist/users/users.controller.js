@@ -52,6 +52,9 @@ let UsersController = class UsersController {
     async sendPasswordRecovery(body) {
         return this.usersService.sendPasswordRecovery(body.email, body.locale);
     }
+    async recoverPassword(body, token) {
+        return this.usersService.recoverPassword(token, body);
+    }
 };
 __decorate([
     (0, common_1.Post)(),
@@ -131,9 +134,19 @@ __decorate([
     (0, allow_any_decorator_1.AllowAny)(),
     __param(0, (0, common_1.Body)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [password_recovery_dto_1.PasswordRecoveryDto]),
+    __metadata("design:paramtypes", [password_recovery_dto_1.PasswordPreRecoveryDto]),
     __metadata("design:returntype", Promise)
 ], UsersController.prototype, "sendPasswordRecovery", null);
+__decorate([
+    (0, common_1.Post)('/password/:token'),
+    (0, common_1.HttpCode)(common_1.HttpStatus.OK),
+    (0, allow_any_decorator_1.AllowAny)(),
+    __param(0, (0, common_1.Body)()),
+    __param(1, (0, common_1.Param)('token')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [password_recovery_dto_1.PasswordRecoveryDto, Object]),
+    __metadata("design:returntype", Promise)
+], UsersController.prototype, "recoverPassword", null);
 UsersController = __decorate([
     (0, common_1.Controller)('users'),
     (0, swagger_1.ApiTags)('Users'),

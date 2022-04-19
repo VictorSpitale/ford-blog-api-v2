@@ -9,24 +9,13 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.PasswordRecoveryDto = void 0;
+exports.PasswordRecoveryDto = exports.PasswordPreRecoveryDto = void 0;
 const swagger_1 = require("@nestjs/swagger");
 const class_validator_1 = require("class-validator");
-class PasswordRecoveryDto {
+const user_dto_1 = require("./user.dto");
+const create_user_dto_1 = require("./create-user.dto");
+class PasswordPreRecoveryDto extends (0, swagger_1.PickType)(user_dto_1.UserDto, ['email']) {
 }
-__decorate([
-    (0, swagger_1.ApiProperty)({
-        description: "User's email",
-        example: 'John@Doe.fr',
-        required: true,
-        pattern: `/^\\w+([\\.-]?\\w+)*@\\w+([\\.-]?\\w+)*(\\.\\w{2,3})+$/`,
-        type: String,
-    }),
-    (0, class_validator_1.IsString)(),
-    (0, class_validator_1.IsEmail)(),
-    (0, class_validator_1.IsNotEmpty)(),
-    __metadata("design:type", String)
-], PasswordRecoveryDto.prototype, "email", void 0);
 __decorate([
     (0, class_validator_1.IsNotEmpty)(),
     (0, class_validator_1.IsString)(),
@@ -36,6 +25,11 @@ __decorate([
         examples: ['fr', 'en'],
     }),
     __metadata("design:type", String)
-], PasswordRecoveryDto.prototype, "locale", void 0);
+], PasswordPreRecoveryDto.prototype, "locale", void 0);
+exports.PasswordPreRecoveryDto = PasswordPreRecoveryDto;
+class PasswordRecoveryDto extends (0, swagger_1.PickType)(create_user_dto_1.CreateUserDto, [
+    'password',
+]) {
+}
 exports.PasswordRecoveryDto = PasswordRecoveryDto;
 //# sourceMappingURL=password-recovery.dto.js.map

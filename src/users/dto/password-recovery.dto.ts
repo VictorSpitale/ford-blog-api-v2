@@ -1,20 +1,10 @@
-import { ApiProperty } from '@nestjs/swagger';
-import { IsEmail, IsIn, IsNotEmpty, IsString } from 'class-validator';
+import { ApiProperty, PickType } from '@nestjs/swagger';
+import { IsIn, IsNotEmpty, IsString } from 'class-validator';
 import { LocalesTypes } from '../../shared/types/locales.types';
+import { UserDto } from './user.dto';
+import { CreateUserDto } from './create-user.dto';
 
-export class PasswordRecoveryDto {
-  @ApiProperty({
-    description: "User's email",
-    example: 'John@Doe.fr',
-    required: true,
-    pattern: `/^\\w+([\\.-]?\\w+)*@\\w+([\\.-]?\\w+)*(\\.\\w{2,3})+$/`,
-    type: String,
-  })
-  @IsString()
-  @IsEmail()
-  @IsNotEmpty()
-  readonly email: string;
-
+export class PasswordPreRecoveryDto extends PickType(UserDto, ['email']) {
   @IsNotEmpty()
   @IsString()
   @IsIn(['fr', 'en'])
@@ -24,3 +14,7 @@ export class PasswordRecoveryDto {
   })
   readonly locale: LocalesTypes;
 }
+
+export class PasswordRecoveryDto extends PickType(CreateUserDto, [
+  'password',
+]) {}

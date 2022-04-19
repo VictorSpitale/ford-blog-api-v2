@@ -116,6 +116,15 @@ let UsersService = class UsersService {
             locale,
         });
     }
+    async recoverPassword(token, body) {
+        if (!(await this.findOne({ recoveryToken: token }))) {
+            throw new common_1.NotFoundException();
+        }
+        await this.userModel.findOneAndUpdate({ recoveryToken: token }, {
+            password: body.password,
+            $unset: { recoveryToken: 1 },
+        });
+    }
     async save(user) {
         await this.userModel.replaceOne({ _id: user._id }, user, { upsert: true });
     }

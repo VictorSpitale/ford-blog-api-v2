@@ -21,7 +21,10 @@ import { AllowAny } from '../auth/decorators/allow-any.decorator';
 import { Role } from '../auth/decorators/roles.decorator';
 import { IUserRole } from './entities/users.role.interface';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { PasswordRecoveryDto } from './dto/password-recovery.dto';
+import {
+  PasswordPreRecoveryDto,
+  PasswordRecoveryDto,
+} from './dto/password-recovery.dto';
 
 @Controller('users')
 @ApiTags('Users')
@@ -92,7 +95,17 @@ export class UsersController {
   @Post('password')
   @HttpCode(HttpStatus.OK)
   @AllowAny()
-  async sendPasswordRecovery(@Body() body: PasswordRecoveryDto) {
+  async sendPasswordRecovery(@Body() body: PasswordPreRecoveryDto) {
     return this.usersService.sendPasswordRecovery(body.email, body.locale);
+  }
+
+  @Post('/password/:token')
+  @HttpCode(HttpStatus.OK)
+  @AllowAny()
+  async recoverPassword(
+    @Body() body: PasswordRecoveryDto,
+    @Param('token') token,
+  ) {
+    return this.usersService.recoverPassword(token, body);
   }
 }

@@ -8,6 +8,7 @@ import { MatchType } from '../shared/types/match.types';
 import { GoogleService } from '../cloud/google.service';
 import { MailService } from '../mail/mail.service';
 import { LocalesTypes } from '../shared/types/locales.types';
+import { PasswordRecoveryDto } from './dto/password-recovery.dto';
 export declare class UsersService {
     private userModel;
     private readonly googleService;
@@ -26,6 +27,7 @@ export declare class UsersService {
     isSelfOrAdmin(id: string, user: User): void;
     deleteUser(id: string, user: User): Promise<void>;
     sendPasswordRecovery(email: string, locale: LocalesTypes): Promise<void>;
+    recoverPassword(token: string, body: PasswordRecoveryDto): Promise<void>;
     save(user: UserDto): Promise<void>;
     private find;
     findOne(match: MatchType): Promise<User | null>;

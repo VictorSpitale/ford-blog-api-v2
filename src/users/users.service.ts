@@ -19,6 +19,7 @@ import { UploadTypes } from '../shared/types/upload.types';
 import { MailService } from '../mail/mail.service';
 import { uuid } from '../shared/utils/password.utils';
 import { LocalesTypes } from '../shared/types/locales.types';
+import { PasswordRecoveryDto } from './dto/password-recovery.dto';
 
 @Injectable()
 export class UsersService {
@@ -149,6 +150,19 @@ export class UsersService {
       token,
       locale,
     });
+  }
+
+  async recoverPassword(token: string, body: PasswordRecoveryDto) {
+    if (!(await this.findOne({ recoveryToken: token }))) {
+      throw new NotFoundException();
+    }
+    await this.userModel.findOneAndUpdate(
+      { recoveryToken: token },
+      {
+        password: body.password,
+        $unset: { recoveryToken: 1 },
+      },
+    );
   }
 
   async save(user: UserDto) {
