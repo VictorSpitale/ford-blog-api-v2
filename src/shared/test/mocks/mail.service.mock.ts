@@ -5,4 +5,8 @@ export class MailServiceMock {
   async addWelcomeMailToQueue() {
     return;
   }
+
+  async addPasswordRecoveryEmailToQueue() {
+    return;
+  }
 }

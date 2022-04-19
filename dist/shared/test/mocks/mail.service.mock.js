@@ -12,6 +12,9 @@ let MailServiceMock = class MailServiceMock {
     async addWelcomeMailToQueue() {
         return;
     }
+    async addPasswordRecoveryEmailToQueue() {
+        return;
+    }
 };
 MailServiceMock = __decorate([
     (0, common_1.Injectable)()
