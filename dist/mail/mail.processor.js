@@ -47,7 +47,7 @@ let MailProcessor = class MailProcessor {
                 template: `passwordRecovery-${job.data.locale}`,
                 context: {
                     name: job.data.pseudo,
-                    link: `${job.data.clientUrl}/recovery/${job.data.token}`,
+                    link: `${job.data.clientUrl}/recovery/${job.data.locale}/${job.data.token}`,
                 },
             })
                 .then(() => null)
