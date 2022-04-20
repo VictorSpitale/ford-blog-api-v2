@@ -334,6 +334,12 @@ describe('UsersController (e2e)', () => {
         .send({ password: 'newpassword' });
       expect(response.status).toBe(404);
     });
+    it('should not change password with a too short one', async () => {
+      const response = await request
+        .post('/users/password/zeraer')
+        .send({ password: 'ee' });
+      expect(response.status).toBe(400);
+    });
 
     it("should change the user's password", async () => {
       const password = 'newpassword';
