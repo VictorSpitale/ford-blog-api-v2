@@ -13,11 +13,23 @@ declare const _default: () => {
     jwt: {
         secret: string;
     };
+    client_url: string;
     google: {
         client_id: string;
         secret: string;
         callback: string;
         client_url: string;
+    };
+    email: {
+        username: string;
+        password: string;
+        to: string;
+    };
+    redis: {
+        host: string;
+        port: string;
+        username: string;
+        password: string;
     };
 };
 export default _default;

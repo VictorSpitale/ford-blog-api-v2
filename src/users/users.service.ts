@@ -16,12 +16,17 @@ import { HttpError, HttpErrorCode } from '../shared/error/HttpError';
 import { IUserRole } from './entities/users.role.interface';
 import { GoogleService } from '../cloud/google.service';
 import { UploadTypes } from '../shared/types/upload.types';
+import { MailService } from '../mail/mail.service';
+import { uuid } from '../shared/utils/password.utils';
+import { LocalesTypes } from '../shared/types/locales.types';
+import { PasswordRecoveryDto } from './dto/password-recovery.dto';
 
 @Injectable()
 export class UsersService {
   constructor(
     @InjectModel(User.name) private userModel: Model<UserDocument>,
     private readonly googleService: GoogleService,
+    private readonly mailService: MailService,
   ) {}
   async create(createUserDto: CreateUserDto): Promise<UserDto> {
     if (await this.getUserByEmail(createUserDto.email)) {
@@ -35,6 +40,10 @@ export class UsersService {
       );
     }
     const createdUser = await this.userModel.create(createUserDto);
+    await this.mailService.addWelcomeMailToQueue({
+      mailTo: createdUser.email,
+      pseudo: createdUser.pseudo,
+    });
     return this.asDtoWithoutPassword(createdUser);
   }
 
@@ -124,6 +133,36 @@ export class UsersService {
     await this.getUserById(id);
     this.isSelfOrAdmin(id, user);
     await this.userModel.findOneAndDelete({ _id: id });
+  }
+
+  async sendPasswordRecovery(email: string, locale: LocalesTypes) {
+    if (!(await this.getUserByEmail(email))) return;
+    const token = uuid();
+    const user = await this.userModel.findOneAndUpdate(
+      { email },
+      {
+        recoveryToken: token,
+      },
+    );
+    await this.mailService.addPasswordRecoveryEmailToQueue({
+      mailTo: user.email,
+      pseudo: user.pseudo,
+      token,
+      locale,
+    });
+  }
+
+  async recoverPassword(token: string, body: PasswordRecoveryDto) {
+    if (!(await this.findOne({ recoveryToken: token }))) {
+      throw new NotFoundException();
+    }
+    await this.userModel.findOneAndUpdate(
+      { recoveryToken: token },
+      {
+        password: body.password,
+        $unset: { recoveryToken: 1 },
+      },
+    );
   }
 
   async save(user: UserDto) {

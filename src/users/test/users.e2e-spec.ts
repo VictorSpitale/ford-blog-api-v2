@@ -1,7 +1,7 @@
 import { INestApplication } from '@nestjs/common';
 import * as Mongoose from 'mongoose';
 import { Connection } from 'mongoose';
-
+import * as bcrypt from 'bcrypt';
 import {
   adminStub,
   mockDate,
@@ -308,6 +308,55 @@ describe('UsersController (e2e)', () => {
       });
     });
     afterEach(async () => {
+      await clearDatabase(dbConnection, 'users');
+    });
+  });
+
+  describe('recovery password system', () => {
+    let token;
+    it('should set a recovery token to the user', async () => {
+      const user = UserStub();
+      await dbConnection.collection('users').insertOne(user);
+      const response = await request
+        .post('/users/password')
+        .send({ email: user.email, locale: 'fr' });
+      expect(response.status).toBe(200);
+      const insertedUser = await dbConnection
+        .collection('users')
+        .findOne({ email: user.email });
+      token = insertedUser.recoveryToken;
+      expect(token).toMatch(new RegExp(/[\w]{8}(-[\w]{4}){3}-[\w]{12}/gm));
+    });
+
+    it("should not change a non-existent user's password", async () => {
+      const response = await request
+        .post('/users/password/zeraer')
+        .send({ password: 'newpassword' });
+      expect(response.status).toBe(404);
+    });
+    it('should not change password with a too short one', async () => {
+      const response = await request
+        .post('/users/password/zeraer')
+        .send({ password: 'ee' });
+      expect(response.status).toBe(400);
+    });
+
+    it("should change the user's password", async () => {
+      const password = 'newpassword';
+      const beforeUser = await dbConnection
+        .collection('users')
+        .findOne({ recoveryToken: token });
+      const response = await request
+        .post(`/users/password/${token}`)
+        .send({ password });
+
+      const afterUser = await dbConnection
+        .collection('users')
+        .findOne({ email: beforeUser.email });
+      expect(response.status).toBe(200);
+      expect(await bcrypt.compare(password, afterUser.password)).toBe(true);
+    });
+    afterAll(async () => {
       await clearDatabase(dbConnection, 'users');
     });
   });
