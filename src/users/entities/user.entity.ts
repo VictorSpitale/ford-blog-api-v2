@@ -51,6 +51,12 @@ export class User {
   })
   picture: string;
 
+  @Prop({
+    type: String,
+    required: false,
+  })
+  recoveryToken: string;
+
   updatedAt: string;
   createdAt: string;
 
