@@ -163,6 +163,7 @@ let PostsService = class PostsService {
             slug: post.slug,
             title: post.title,
             desc: post.desc,
+            picture: post.picture,
         };
     }
     asDto(post, authUser) {
