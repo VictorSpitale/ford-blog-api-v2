@@ -6,14 +6,10 @@ import { Model } from 'mongoose';
 import { UserDto } from './dto/user.dto';
 import { MatchType } from '../shared/types/match.types';
 import { GoogleService } from '../cloud/google.service';
-import { MailService } from '../mail/mail.service';
-import { LocalesTypes } from '../shared/types/locales.types';
-import { PasswordRecoveryDto } from './dto/password-recovery.dto';
 export declare class UsersService {
     private userModel;
     private readonly googleService;
-    private readonly mailService;
-    constructor(userModel: Model<UserDocument>, googleService: GoogleService, mailService: MailService);
+    constructor(userModel: Model<UserDocument>, googleService: GoogleService);
     create(createUserDto: CreateUserDto): Promise<UserDto>;
     getUsers(): Promise<UserDto[]>;
     getUserByEmail(email: string): Promise<UserDto>;
@@ -26,8 +22,6 @@ export declare class UsersService {
     removeProfilePicture(id: string, user: User): Promise<void>;
     isSelfOrAdmin(id: string, user: User): void;
     deleteUser(id: string, user: User): Promise<void>;
-    sendPasswordRecovery(email: string, locale: LocalesTypes): Promise<void>;
-    recoverPassword(token: string, body: PasswordRecoveryDto): Promise<void>;
     save(user: UserDto): Promise<void>;
     private find;
     findOne(match: MatchType): Promise<User | null>;

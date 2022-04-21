@@ -18,8 +18,6 @@ const categories_module_1 = require("./categories/categories.module");
 const core_1 = require("@nestjs/core");
 const jwt_auth_guard_1 = require("./auth/guards/jwt-auth.guard");
 const roles_guard_1 = require("./auth/guards/roles.guard");
-const mail_module_1 = require("./mail/mail.module");
-const bull_1 = require("@nestjs/bull");
 let AppModule = class AppModule {
 };
 AppModule = __decorate([
@@ -30,26 +28,11 @@ AppModule = __decorate([
                 load: [config_2.default],
                 isGlobal: true,
             }),
-            bull_1.BullModule.forRootAsync({
-                imports: [config_1.ConfigModule],
-                useFactory: (configService) => {
-                    return {
-                        redis: {
-                            host: configService.get('redis.host'),
-                            port: configService.get('redis.port'),
-                            username: configService.get('redis.username'),
-                            password: configService.get('redis.password'),
-                        },
-                    };
-                },
-                inject: [config_1.ConfigService],
-            }),
             database_module_1.DatabaseModule.forRoot(),
             auth_module_1.AuthModule,
             users_module_1.UsersModule,
             posts_module_1.PostsModule,
             categories_module_1.CategoriesModule,
-            mail_module_1.MailModule,
         ],
         providers: [
             {

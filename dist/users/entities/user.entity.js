@@ -61,13 +61,6 @@ __decorate([
     }),
     __metadata("design:type", String)
 ], User.prototype, "picture", void 0);
-__decorate([
-    (0, mongoose_1.Prop)({
-        type: String,
-        required: false,
-    }),
-    __metadata("design:type", String)
-], User.prototype, "recoveryToken", void 0);
 User = __decorate([
     (0, mongoose_1.Schema)({ timestamps: true })
 ], User);
