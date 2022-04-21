@@ -9,7 +9,6 @@ export declare class User {
     password: string;
     role: IUserRole;
     picture: string;
-    recoveryToken: string;
     updatedAt: string;
     createdAt: string;
     checkPassword: (plainPassword: string) => Promise<boolean>;
