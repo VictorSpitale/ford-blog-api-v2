@@ -14,6 +14,7 @@ export declare class PostsController {
         slug: string;
         title: string;
         desc: string;
+        picture: string;
     }[]>;
     getPost(req: any, slug: any): Promise<PostDto>;
     likePost(req: any, slug: any): Promise<number>;

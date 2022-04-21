@@ -192,6 +192,7 @@ export class PostsService {
       slug: post.slug,
       title: post.title,
       desc: post.desc,
+      picture: post.picture,
     };
   }
 

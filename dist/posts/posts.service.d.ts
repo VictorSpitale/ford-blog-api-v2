@@ -26,6 +26,7 @@ export declare class PostsService {
         slug: string;
         title: string;
         desc: string;
+        picture: string;
     }[]>;
     getQueriedPosts(search: string): Promise<PostDto[]>;
     private checkIfPostIsDuplicatedBySlug;
@@ -37,6 +38,7 @@ export declare class PostsService {
         slug: string;
         title: string;
         desc: string;
+        picture: string;
     };
     asDto(post: Post, authUser?: User): PostDto;
 }
