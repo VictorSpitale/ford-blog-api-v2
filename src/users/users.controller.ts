@@ -3,6 +3,8 @@ import {
   Controller,
   Delete,
   Get,
+  HttpCode,
+  HttpStatus,
   Param,
   Patch,
   Post,
@@ -19,6 +21,10 @@ import { AllowAny } from '../auth/decorators/allow-any.decorator';
 import { Role } from '../auth/decorators/roles.decorator';
 import { IUserRole } from './entities/users.role.interface';
 import { FileInterceptor } from '@nestjs/platform-express';
+import {
+  PasswordPreRecoveryDto,
+  PasswordRecoveryDto,
+} from './dto/password-recovery.dto';
 
 @Controller('users')
 @ApiTags('Users')
@@ -84,5 +90,22 @@ export class UsersController {
   @Delete(':id')
   async deleteUser(@Req() req, @Param('id') id: string) {
     return this.usersService.deleteUser(id, req.user);
+  }
+
+  @Post('password')
+  @HttpCode(HttpStatus.OK)
+  @AllowAny()
+  async sendPasswordRecovery(@Body() body: PasswordPreRecoveryDto) {
+    return this.usersService.sendPasswordRecovery(body.email, body.locale);
+  }
+
+  @Post('/password/:token')
+  @HttpCode(HttpStatus.OK)
+  @AllowAny()
+  async recoverPassword(
+    @Body() body: PasswordRecoveryDto,
+    @Param('token') token,
+  ) {
+    return this.usersService.recoverPassword(token, body);
   }
 }

@@ -21,10 +21,13 @@ const HttpError_1 = require("../shared/error/HttpError");
 const users_role_interface_1 = require("./entities/users.role.interface");
 const google_service_1 = require("../cloud/google.service");
 const upload_types_1 = require("../shared/types/upload.types");
+const mail_service_1 = require("../mail/mail.service");
+const password_utils_1 = require("../shared/utils/password.utils");
 let UsersService = class UsersService {
-    constructor(userModel, googleService) {
+    constructor(userModel, googleService, mailService) {
         this.userModel = userModel;
         this.googleService = googleService;
+        this.mailService = mailService;
     }
     async create(createUserDto) {
         if (await this.getUserByEmail(createUserDto.email)) {
@@ -34,6 +37,10 @@ let UsersService = class UsersService {
             throw new common_1.ConflictException(HttpError_1.HttpError.getHttpError(HttpError_1.HttpErrorCode.USER_ALREADY_EXIST));
         }
         const createdUser = await this.userModel.create(createUserDto);
+        await this.mailService.addWelcomeMailToQueue({
+            mailTo: createdUser.email,
+            pseudo: createdUser.pseudo,
+        });
         return this.asDtoWithoutPassword(createdUser);
     }
     async getUsers() {
@@ -95,6 +102,29 @@ let UsersService = class UsersService {
         this.isSelfOrAdmin(id, user);
         await this.userModel.findOneAndDelete({ _id: id });
     }
+    async sendPasswordRecovery(email, locale) {
+        if (!(await this.getUserByEmail(email)))
+            return;
+        const token = (0, password_utils_1.uuid)();
+        const user = await this.userModel.findOneAndUpdate({ email }, {
+            recoveryToken: token,
+        });
+        await this.mailService.addPasswordRecoveryEmailToQueue({
+            mailTo: user.email,
+            pseudo: user.pseudo,
+            token,
+            locale,
+        });
+    }
+    async recoverPassword(token, body) {
+        if (!(await this.findOne({ recoveryToken: token }))) {
+            throw new common_1.NotFoundException();
+        }
+        await this.userModel.findOneAndUpdate({ recoveryToken: token }, {
+            password: body.password,
+            $unset: { recoveryToken: 1 },
+        });
+    }
     async save(user) {
         await this.userModel.replaceOne({ _id: user._id }, user, { upsert: true });
     }
@@ -154,7 +184,8 @@ UsersService = __decorate([
     (0, common_1.Injectable)(),
     __param(0, (0, mongoose_1.InjectModel)(user_entity_1.User.name)),
     __metadata("design:paramtypes", [mongoose_2.Model,
-        google_service_1.GoogleService])
+        google_service_1.GoogleService,
+        mail_service_1.MailService])
 ], UsersService);
 exports.UsersService = UsersService;
 //# sourceMappingURL=users.service.js.map
