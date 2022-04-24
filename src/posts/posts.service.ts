@@ -31,7 +31,9 @@ export class PostsService {
     file: Express.Multer.File,
   ): Promise<PostDto | any> {
     if (await this.checkIfPostIsDuplicatedBySlug(createPostDto.slug)) {
-      throw new ConflictException('post with this slug already exist');
+      throw new ConflictException(
+        HttpError.getHttpError(HttpErrorCode.DUPLICATE_SLUG),
+      );
     }
     let data = { ...createPostDto } as any;
     if (file) {

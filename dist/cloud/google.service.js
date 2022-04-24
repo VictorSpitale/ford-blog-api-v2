@@ -14,6 +14,7 @@ const common_1 = require("@nestjs/common");
 const storage_1 = require("@google-cloud/storage");
 const config_1 = require("@nestjs/config");
 const upload_types_1 = require("../shared/types/upload.types");
+const HttpError_1 = require("../shared/error/HttpError");
 let GoogleService = class GoogleService {
     constructor(configService) {
         this.configService = configService;
@@ -24,12 +25,12 @@ let GoogleService = class GoogleService {
     }
     async uploadFile(file, name, type) {
         if (file.size > 500000) {
-            throw new common_1.BadRequestException('File is to big');
+            throw new common_1.BadRequestException(HttpError_1.HttpError.getHttpError(HttpError_1.HttpErrorCode.FILE_TOO_BIG));
         }
         if (file.mimetype !== 'image/jpeg' &&
             file.mimetype !== 'image/jpeg' &&
             file.mimetype !== 'image/png') {
-            throw new common_1.BadRequestException('File format not supported');
+            throw new common_1.BadRequestException(HttpError_1.HttpError.getHttpError(HttpError_1.HttpErrorCode.FILE_FORMAT));
         }
         try {
             const bucket = this.storage.bucket(this.configService.get('bucket_name'));
@@ -44,7 +45,7 @@ let GoogleService = class GoogleService {
             return `https://storage.googleapis.com/${bucket.name}/${path}`;
         }
         catch (e) {
-            throw new common_1.InternalServerErrorException('File upload failed');
+            throw new common_1.InternalServerErrorException(HttpError_1.HttpError.getHttpError(HttpError_1.HttpErrorCode.FAIL_UPLOAD));
         }
     }
     async deleteFile(name, type) {
