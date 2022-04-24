@@ -1,1 +1,1 @@
-{"version":3,"file":"regex.validation.js","sourceRoot":"","sources":["../../../src/shared/utils/regex.validation.ts"],"names":[],"mappings":";;;AAAa,QAAA,UAAU,GACrB,6GAA6G,CAAC;AAEnG,QAAA,QAAQ,GAAG,IAAI,MAAM,CAAC,kBAAU,CAAC,CAAC"}
+{"version":3,"file":"regex.validation.js","sourceRoot":"","sources":["../../../src/shared/utils/regex.validation.ts"],"names":[],"mappings":";;;AAAa,QAAA,UAAU,GACrB,oHAAoH,CAAC;AAE1G,QAAA,QAAQ,GAAG,IAAI,MAAM,CAAC,kBAAU,CAAC,CAAC"}
