@@ -10,6 +10,10 @@ var HttpErrorCode;
     HttpErrorCode[HttpErrorCode["USER_NOT_FOUND"] = 4] = "USER_NOT_FOUND";
     HttpErrorCode[HttpErrorCode["POST_NOT_FOUND"] = 5] = "POST_NOT_FOUND";
     HttpErrorCode[HttpErrorCode["DUPLICATE_PSEUDO"] = 6] = "DUPLICATE_PSEUDO";
+    HttpErrorCode[HttpErrorCode["DUPLICATE_SLUG"] = 7] = "DUPLICATE_SLUG";
+    HttpErrorCode[HttpErrorCode["FILE_TOO_BIG"] = 8] = "FILE_TOO_BIG";
+    HttpErrorCode[HttpErrorCode["FILE_FORMAT"] = 9] = "FILE_FORMAT";
+    HttpErrorCode[HttpErrorCode["FAIL_UPLOAD"] = 10] = "FAIL_UPLOAD";
 })(HttpErrorCode = exports.HttpErrorCode || (exports.HttpErrorCode = {}));
 class HttpError {
     static getHttpError(code) {
@@ -45,6 +49,38 @@ HttpError.errors = new Map([
     [
         HttpErrorCode.DUPLICATE_PSEUDO,
         { message: 'Pseudo already used', statusCode: 409, code: 6 },
+    ],
+    [
+        HttpErrorCode.DUPLICATE_SLUG,
+        {
+            message: 'Post with this slug already exist',
+            statusCode: 409,
+            code: 7,
+        },
+    ],
+    [
+        HttpErrorCode.FILE_TOO_BIG,
+        {
+            message: 'File is too big',
+            statusCode: 400,
+            code: 8,
+        },
+    ],
+    [
+        HttpErrorCode.FILE_FORMAT,
+        {
+            message: 'File format not supported',
+            statusCode: 400,
+            code: 9,
+        },
+    ],
+    [
+        HttpErrorCode.FAIL_UPLOAD,
+        {
+            message: 'File upload failed',
+            statusCode: 500,
+            code: 10,
+        },
     ],
 ]);
 //# sourceMappingURL=HttpError.js.map

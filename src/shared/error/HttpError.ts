@@ -6,6 +6,10 @@ export enum HttpErrorCode {
   USER_NOT_FOUND,
   POST_NOT_FOUND,
   DUPLICATE_PSEUDO,
+  DUPLICATE_SLUG,
+  FILE_TOO_BIG,
+  FILE_FORMAT,
+  FAIL_UPLOAD,
 }
 
 type HttpErrorObj = {
@@ -43,6 +47,38 @@ export class HttpError {
     [
       HttpErrorCode.DUPLICATE_PSEUDO,
       { message: 'Pseudo already used', statusCode: 409, code: 6 },
+    ],
+    [
+      HttpErrorCode.DUPLICATE_SLUG,
+      {
+        message: 'Post with this slug already exist',
+        statusCode: 409,
+        code: 7,
+      },
+    ],
+    [
+      HttpErrorCode.FILE_TOO_BIG,
+      {
+        message: 'File is too big',
+        statusCode: 400,
+        code: 8,
+      },
+    ],
+    [
+      HttpErrorCode.FILE_FORMAT,
+      {
+        message: 'File format not supported',
+        statusCode: 400,
+        code: 9,
+      },
+    ],
+    [
+      HttpErrorCode.FAIL_UPLOAD,
+      {
+        message: 'File upload failed',
+        statusCode: 500,
+        code: 10,
+      },
     ],
   ]);
 

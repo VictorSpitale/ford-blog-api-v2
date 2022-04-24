@@ -5,7 +5,11 @@ export declare enum HttpErrorCode {
     USER_ALREADY_EXIST = 3,
     USER_NOT_FOUND = 4,
     POST_NOT_FOUND = 5,
-    DUPLICATE_PSEUDO = 6
+    DUPLICATE_PSEUDO = 6,
+    DUPLICATE_SLUG = 7,
+    FILE_TOO_BIG = 8,
+    FILE_FORMAT = 9,
+    FAIL_UPLOAD = 10
 }
 declare type HttpErrorObj = {
     statusCode: number;
