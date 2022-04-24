@@ -30,7 +30,7 @@ let PostsService = class PostsService {
     }
     async create(createPostDto, file) {
         if (await this.checkIfPostIsDuplicatedBySlug(createPostDto.slug)) {
-            throw new common_1.ConflictException('post with this slug already exist');
+            throw new common_1.ConflictException(HttpError_1.HttpError.getHttpError(HttpError_1.HttpErrorCode.DUPLICATE_SLUG));
         }
         let data = Object.assign({}, createPostDto);
         if (file) {

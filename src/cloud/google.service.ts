@@ -6,6 +6,7 @@ import {
 import { Storage } from '@google-cloud/storage';
 import { ConfigService } from '@nestjs/config';
 import { UploadTypes } from '../shared/types/upload.types';
+import { HttpError, HttpErrorCode } from '../shared/error/HttpError';
 
 @Injectable()
 export class GoogleService {
@@ -22,14 +23,18 @@ export class GoogleService {
     type: UploadTypes,
   ): Promise<string> {
     if (file.size > 500000) {
-      throw new BadRequestException('File is to big');
+      throw new BadRequestException(
+        HttpError.getHttpError(HttpErrorCode.FILE_TOO_BIG),
+      );
     }
     if (
       file.mimetype !== 'image/jpeg' &&
       file.mimetype !== 'image/jpeg' &&
       file.mimetype !== 'image/png'
     ) {
-      throw new BadRequestException('File format not supported');
+      throw new BadRequestException(
+        HttpError.getHttpError(HttpErrorCode.FILE_FORMAT),
+      );
     }
     try {
       const bucket = this.storage.bucket(this.configService.get('bucket_name'));
@@ -43,7 +48,9 @@ export class GoogleService {
       });
       return `https://storage.googleapis.com/${bucket.name}/${path}`;
     } catch (e) {
-      throw new InternalServerErrorException('File upload failed');
+      throw new InternalServerErrorException(
+        HttpError.getHttpError(HttpErrorCode.FAIL_UPLOAD),
+      );
     }
   }
 
