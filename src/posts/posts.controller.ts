@@ -20,6 +20,7 @@ import { IUserRole } from '../users/entities/users.role.interface';
 import { AllowAny } from '../auth/decorators/allow-any.decorator';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { UpdatePostDto } from './dto/update-post.dto';
+import { PaginatedPostDto } from './dto/paginated-post.dto';
 
 @Controller('posts')
 @ApiTags('Posts')
@@ -50,9 +51,13 @@ export class PostsController {
 
   @Get()
   @ApiOperation({ summary: 'Get all posts' })
-  @ApiResponse({ status: 200, description: 'List all posts', type: [PostDto] })
-  async getPosts(@Req() req): Promise<PostDto[]> {
-    return this.postsService.getPosts(req.user);
+  @ApiResponse({
+    status: 200,
+    description: 'List all posts',
+    type: PaginatedPostDto,
+  })
+  async getPosts(@Req() req, @Query('page') page) {
+    return this.postsService.getPosts(req.user, page);
   }
 
   @Get('last')
