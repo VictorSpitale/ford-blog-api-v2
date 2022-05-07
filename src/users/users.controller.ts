@@ -25,6 +25,7 @@ import {
   PasswordPreRecoveryDto,
   PasswordRecoveryDto,
 } from './dto/password-recovery.dto';
+import { HttpErrorDto, HttpValidationError } from '../shared/error/HttpError';
 
 @Controller('users')
 @ApiTags('Users')
@@ -39,8 +40,16 @@ export class UsersController {
     description: 'The user has been created',
     type: UserDto,
   })
-  @ApiResponse({ status: 400, description: 'Validations failed' })
-  @ApiResponse({ status: 409, description: 'The user already exist' })
+  @ApiResponse({
+    status: 400,
+    description: 'Validations failed',
+    type: HttpValidationError,
+  })
+  @ApiResponse({
+    status: 409,
+    description: 'The user already exist',
+    type: HttpErrorDto,
+  })
   create(@Body() createUserDto: CreateUserDto): Promise<UserDto> {
     return this.usersService.create(createUserDto);
   }
