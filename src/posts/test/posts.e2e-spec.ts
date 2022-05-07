@@ -133,12 +133,14 @@ describe('PostsController (e2e)', () => {
           .get('/posts')
           .set('Cookie', `access_token=${token};`);
         expect(response.status).toBe(200);
-        expect(response.body).toBeInstanceOf(Array);
-        expect(response.body.length).toBe(1);
+        expect(response.body.hasMore).toBe(false);
+        expect(response.body.posts).toBeInstanceOf(Array);
+        expect(response.body.page).toBe(1);
+        expect(response.body.posts.length).toBe(1);
         expect(
           doArraysIntersect(
             [...Object.keys(post), 'authUserLiked'],
-            [...Object.keys(response.body[0])],
+            [...Object.keys(response.body.posts[0])],
           ),
         ).toBe(true);
       });

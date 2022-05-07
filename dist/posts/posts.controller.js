@@ -23,6 +23,7 @@ const users_role_interface_1 = require("../users/entities/users.role.interface")
 const allow_any_decorator_1 = require("../auth/decorators/allow-any.decorator");
 const platform_express_1 = require("@nestjs/platform-express");
 const update_post_dto_1 = require("./dto/update-post.dto");
+const paginated_post_dto_1 = require("./dto/paginated-post.dto");
 let PostsController = class PostsController {
     constructor(postsService) {
         this.postsService = postsService;
@@ -30,8 +31,8 @@ let PostsController = class PostsController {
     create(createPostDto, file) {
         return this.postsService.create(createPostDto, file);
     }
-    async getPosts(req) {
-        return this.postsService.getPosts(req.user);
+    async getPosts(req, page) {
+        return this.postsService.getPosts(req.user, page);
     }
     async getLastPosts(req) {
         return this.postsService.getLastPosts(req.user);
@@ -83,10 +84,15 @@ __decorate([
 __decorate([
     (0, common_1.Get)(),
     (0, swagger_1.ApiOperation)({ summary: 'Get all posts' }),
-    (0, swagger_1.ApiResponse)({ status: 200, description: 'List all posts', type: [post_dto_1.PostDto] }),
+    (0, swagger_1.ApiResponse)({
+        status: 200,
+        description: 'List all posts',
+        type: paginated_post_dto_1.PaginatedPostDto,
+    }),
     __param(0, (0, common_1.Req)()),
+    __param(1, (0, common_1.Query)('page')),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Object]),
+    __metadata("design:paramtypes", [Object, Object]),
     __metadata("design:returntype", Promise)
 ], PostsController.prototype, "getPosts", null);
 __decorate([

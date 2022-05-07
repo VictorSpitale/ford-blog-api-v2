@@ -68,9 +68,28 @@ let PostsService = class PostsService {
             .populate('categories likers');
         return this.asDto(updated, user);
     }
-    async getPosts(user) {
-        const posts = await this.find({});
-        return posts.map((p) => this.asDto(p, user));
+    async getPosts(user, page) {
+        let posts;
+        let hasMore = false;
+        if (!page)
+            posts = await this.find({});
+        else {
+            posts = await this.postModel
+                .find({})
+                .sort({ createdAt: -1 })
+                .limit(4)
+                .populate('categories')
+                .skip(3 * (page - 1));
+            if (posts.length > 3) {
+                hasMore = true;
+            }
+            posts = posts.slice(0, 3);
+        }
+        return {
+            hasMore,
+            posts: posts.map((p) => this.asDto(p, user)),
+            page: page || 1,
+        };
     }
     async getLastPosts(user) {
         const posts = await this.find({}, 6);
@@ -144,7 +163,8 @@ let PostsService = class PostsService {
             updatedAt: 1,
         })
             .sort({ createdAt: -1 })
-            .populate('categories likers');
+            .populate('categories likers')
+            .sort({ createdAt: -1 });
         if (limit)
             docs.limit(limit);
         return docs;
