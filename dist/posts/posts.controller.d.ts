@@ -7,7 +7,11 @@ export declare class PostsController {
     private readonly postsService;
     constructor(postsService: PostsService);
     create(createPostDto: CreatePostDto, file: Express.Multer.File): Promise<PostDto>;
-    getPosts(req: any): Promise<PostDto[]>;
+    getPosts(req: any, page: any): Promise<{
+        hasMore: boolean;
+        posts: PostDto[];
+        page: number;
+    }>;
     getLastPosts(req: any): Promise<PostDto[]>;
     getQueriedPosts(search: any): Promise<PostDto[]>;
     getLikedPost(req: any, id: any): Promise<{
