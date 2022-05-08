@@ -24,6 +24,7 @@ var HttpErrorCode;
     HttpErrorCode[HttpErrorCode["FILE_TOO_BIG"] = 8] = "FILE_TOO_BIG";
     HttpErrorCode[HttpErrorCode["FILE_FORMAT"] = 9] = "FILE_FORMAT";
     HttpErrorCode[HttpErrorCode["FAIL_UPLOAD"] = 10] = "FAIL_UPLOAD";
+    HttpErrorCode[HttpErrorCode["ROLE_UNAUTHORIZED"] = 11] = "ROLE_UNAUTHORIZED";
 })(HttpErrorCode = exports.HttpErrorCode || (exports.HttpErrorCode = {}));
 class HttpValidationError {
 }
@@ -150,6 +151,14 @@ HttpError.errors = new Map([
             message: 'File upload failed',
             statusCode: 500,
             code: 10,
+        },
+    ],
+    [
+        HttpErrorCode.ROLE_UNAUTHORIZED,
+        {
+            message: 'Insufficient permissions',
+            statusCode: 401,
+            code: 11,
         },
     ],
 ]);

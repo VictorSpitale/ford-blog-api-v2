@@ -12,6 +12,7 @@ export enum HttpErrorCode {
   FILE_TOO_BIG,
   FILE_FORMAT,
   FAIL_UPLOAD,
+  ROLE_UNAUTHORIZED,
 }
 export class HttpValidationError {
   @ApiProperty({
@@ -125,6 +126,14 @@ export class HttpError {
         message: 'File upload failed',
         statusCode: 500,
         code: 10,
+      },
+    ],
+    [
+      HttpErrorCode.ROLE_UNAUTHORIZED,
+      {
+        message: 'Insufficient permissions',
+        statusCode: 401,
+        code: 11,
       },
     ],
   ]);

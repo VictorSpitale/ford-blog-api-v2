@@ -13,6 +13,7 @@ exports.RolesGuard = void 0;
 const common_1 = require("@nestjs/common");
 const core_1 = require("@nestjs/core");
 const roles_decorator_1 = require("../decorators/roles.decorator");
+const HttpError_1 = require("../../shared/error/HttpError");
 let RolesGuard = class RolesGuard {
     constructor(reflector) {
         this.reflector = reflector;
@@ -28,7 +29,7 @@ let RolesGuard = class RolesGuard {
         const { user } = context.switchToHttp().getRequest();
         if (user.role >= requiredRole)
             return true;
-        throw new common_1.UnauthorizedException('Insufficient permissions');
+        throw new common_1.UnauthorizedException(HttpError_1.HttpError.getHttpError(HttpError_1.HttpErrorCode.ROLE_UNAUTHORIZED));
     }
 };
 RolesGuard = __decorate([

@@ -9,7 +9,8 @@ export declare enum HttpErrorCode {
     DUPLICATE_SLUG = 7,
     FILE_TOO_BIG = 8,
     FILE_FORMAT = 9,
-    FAIL_UPLOAD = 10
+    FAIL_UPLOAD = 10,
+    ROLE_UNAUTHORIZED = 11
 }
 export declare class HttpValidationError {
     statusCode: number;
