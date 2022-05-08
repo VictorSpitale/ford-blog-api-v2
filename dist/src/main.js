@@ -5,7 +5,7 @@ const common_1 = require("@nestjs/common");
 const swagger_1 = require("@nestjs/swagger");
 const cookieParser = require("cookie-parser");
 const app_module_1 = require("./app.module");
-const whitelist = ['http://localhost:3000'];
+const whitelist = ['http://localhost:3000', 'http://localhost:5000'];
 async function bootstrap() {
     const app = await core_1.NestFactory.create(app_module_1.AppModule);
     app.useGlobalPipes(new common_1.ValidationPipe());
@@ -15,7 +15,7 @@ async function bootstrap() {
         .setTitle('Ford Blog API v2')
         .setDescription('The Ford Blog API')
         .setVersion('2.0.1')
-        .addBearerAuth()
+        .addCookieAuth('access_token')
         .build();
     const document = swagger_1.SwaggerModule.createDocument(app, config);
     swagger_1.SwaggerModule.setup('docs', app, document);

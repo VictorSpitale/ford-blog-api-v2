@@ -4,7 +4,7 @@ import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import * as cookieParser from 'cookie-parser';
 import { AppModule } from './app.module';
 
-const whitelist = ['http://localhost:3000'];
+const whitelist = ['http://localhost:3000', 'http://localhost:5000'];
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -16,7 +16,7 @@ async function bootstrap() {
     .setTitle('Ford Blog API v2')
     .setDescription('The Ford Blog API')
     .setVersion('2.0.1')
-    .addBearerAuth()
+    .addCookieAuth('access_token')
     .build();
   const document = SwaggerModule.createDocument(app, config);
   // fs.writeFile('schema.json', JSON.stringify(document), (err) =>

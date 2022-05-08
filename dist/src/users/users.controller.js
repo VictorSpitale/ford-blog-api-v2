@@ -85,17 +85,37 @@ __decorate([
     (0, common_1.Get)(),
     (0, swagger_1.ApiOperation)({ summary: 'Get all users' }),
     (0, swagger_1.ApiResponse)({ status: 200, description: 'List all users', type: [user_dto_1.UserDto] }),
+    (0, swagger_1.ApiResponse)({
+        status: 401,
+        description: 'Jwt failed | Insufficient permissions',
+        type: HttpError_1.HttpErrorDto,
+    }),
     (0, roles_decorator_1.Role)(users_role_interface_1.IUserRole.ADMIN),
+    (0, swagger_1.ApiCookieAuth)(),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", []),
     __metadata("design:returntype", Promise)
 ], UsersController.prototype, "getUsers", null);
 __decorate([
     (0, common_1.Get)(':id'),
+    (0, swagger_1.ApiParam)({
+        description: 'User id',
+        type: String,
+        name: 'id',
+    }),
     (0, swagger_1.ApiOperation)({ summary: 'Get user by id' }),
-    (0, swagger_1.ApiResponse)({ status: 200, description: 'User founded', type: user_dto_1.UserDto }),
-    (0, swagger_1.ApiResponse)({ status: 400, description: 'Id is not a valid id' }),
-    (0, swagger_1.ApiResponse)({ status: 404, description: 'User not found' }),
+    (0, swagger_1.ApiResponse)({ status: 200, description: 'User found', type: user_dto_1.UserDto }),
+    (0, swagger_1.ApiResponse)({
+        status: 400,
+        description: 'Id is not a valid id',
+        type: HttpError_1.HttpErrorDto,
+    }),
+    (0, swagger_1.ApiResponse)({
+        status: 404,
+        description: 'User not found',
+        type: HttpError_1.HttpErrorDto,
+    }),
+    (0, swagger_1.ApiCookieAuth)(),
     (0, roles_decorator_1.Role)(users_role_interface_1.IUserRole.ADMIN),
     __param(0, (0, common_1.Param)('id')),
     __metadata("design:type", Function),
@@ -104,6 +124,28 @@ __decorate([
 ], UsersController.prototype, "getUserById", null);
 __decorate([
     (0, common_1.Patch)(':id'),
+    (0, swagger_1.ApiOperation)({ summary: 'Update a user' }),
+    (0, swagger_1.ApiParam)({
+        description: 'User id',
+        type: String,
+        name: 'id',
+    }),
+    (0, swagger_1.ApiResponse)({
+        status: 200,
+        description: 'The updated user',
+        type: user_dto_1.UserDto,
+    }),
+    (0, swagger_1.ApiResponse)({
+        status: 400,
+        description: 'Validations failed',
+        type: HttpError_1.HttpValidationError,
+    }),
+    (0, swagger_1.ApiResponse)({
+        status: 401,
+        description: 'Jwt failed | Insufficient permissions',
+        type: HttpError_1.HttpErrorDto,
+    }),
+    (0, swagger_1.ApiCookieAuth)(),
     __param(0, (0, common_1.Param)('id')),
     __param(1, (0, common_1.Body)()),
     __param(2, (0, common_1.Req)()),
@@ -113,6 +155,57 @@ __decorate([
 ], UsersController.prototype, "updateUser", null);
 __decorate([
     (0, common_1.Patch)('/upload/:id'),
+    (0, swagger_1.ApiConsumes)('multipart/form-data'),
+    (0, swagger_1.ApiOperation)({ summary: 'Upload a profile picture' }),
+    (0, swagger_1.ApiParam)({
+        description: 'User id',
+        type: String,
+        name: 'id',
+    }),
+    (0, swagger_1.ApiBody)({
+        schema: {
+            type: 'object',
+            required: ['file'],
+            properties: {
+                file: {
+                    type: 'string',
+                    format: 'binary',
+                    maxItems: 1,
+                    nullable: false,
+                },
+            },
+        },
+    }),
+    (0, swagger_1.ApiResponse)({
+        description: 'The profile picture url',
+        status: 200,
+        schema: {
+            type: 'object',
+            properties: {
+                picture: {
+                    type: 'string',
+                    description: 'url to the profile picture',
+                    example: 'https://storage.googleapis.com/path',
+                },
+            },
+        },
+    }),
+    (0, swagger_1.ApiResponse)({
+        description: 'Bad file format',
+        status: 400,
+        type: HttpError_1.HttpErrorDto,
+    }),
+    (0, swagger_1.ApiResponse)({
+        status: 401,
+        description: 'Jwt failed | Insufficient permissions',
+        type: HttpError_1.HttpErrorDto,
+    }),
+    (0, swagger_1.ApiResponse)({
+        description: 'Upload failed',
+        status: 500,
+        type: HttpError_1.HttpErrorDto,
+    }),
+    (0, swagger_1.ApiCookieAuth)(),
     (0, common_1.UseInterceptors)((0, platform_express_1.FileInterceptor)('file')),
     __param(0, (0, common_1.UploadedFile)()),
     __param(1, (0, common_1.Req)()),
@@ -123,6 +216,22 @@ __decorate([
 ], UsersController.prototype, "uploadProfilePicture", null);
 __decorate([
     (0, common_1.Delete)('/upload/:id'),
+    (0, swagger_1.ApiOperation)({ summary: 'Delete profile picture' }),
+    (0, swagger_1.ApiParam)({
+        description: 'User id',
+        type: String,
+        name: 'id',
+    }),
+    (0, swagger_1.ApiResponse)({
+        status: 200,
+        description: 'Profile picture deleted',
+    }),
+    (0, swagger_1.ApiResponse)({
+        status: 401,
+        description: 'Jwt failed | Insufficient permissions',
+        type: HttpError_1.HttpErrorDto,
+    }),
+    (0, swagger_1.ApiCookieAuth)(),
     __param(0, (0, common_1.Req)()),
     __param(1, (0, common_1.Param)('id')),
     __metadata("design:type", Function),
@@ -131,6 +240,22 @@ __decorate([
 ], UsersController.prototype, "removeProfilePicture", null);
 __decorate([
     (0, common_1.Delete)(':id'),
+    (0, swagger_1.ApiOperation)({ summary: 'Delete user account' }),
+    (0, swagger_1.ApiParam)({
+        description: 'User id',
+        type: String,
+        name: 'id',
+    }),
+    (0, swagger_1.ApiResponse)({
+        status: 200,
+        description: 'User account deleted',
+    }),
+    (0, swagger_1.ApiResponse)({
+        status: 401,
+        description: 'Jwt failed | Insufficient permissions',
+        type: HttpError_1.HttpErrorDto,
+    }),
+    (0, swagger_1.ApiCookieAuth)(),
     __param(0, (0, common_1.Req)()),
     __param(1, (0, common_1.Param)('id')),
     __metadata("design:type", Function),
@@ -141,6 +266,11 @@ __decorate([
     (0, common_1.Post)('password'),
     (0, common_1.HttpCode)(common_1.HttpStatus.OK),
     (0, allow_any_decorator_1.AllowAny)(),
+    (0, swagger_1.ApiOperation)({ summary: 'Send password recovery email' }),
+    (0, swagger_1.ApiResponse)({
+        status: 200,
+        description: 'Email sent',
+    }),
     __param(0, (0, common_1.Body)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [password_recovery_dto_1.PasswordPreRecoveryDto]),
@@ -149,6 +279,16 @@ __decorate([
 __decorate([
     (0, common_1.Post)('/password/:token'),
     (0, common_1.HttpCode)(common_1.HttpStatus.OK),
+    (0, swagger_1.ApiOperation)({ summary: 'Change user password after recovery' }),
+    (0, swagger_1.ApiParam)({
+        description: 'Recovery token',
+        type: String,
+        name: 'token',
+    }),
+    (0, swagger_1.ApiResponse)({
+        status: 200,
+        description: 'Password changed',
+    }),
     (0, allow_any_decorator_1.AllowAny)(),
     __param(0, (0, common_1.Body)()),
     __param(1, (0, common_1.Param)('token')),

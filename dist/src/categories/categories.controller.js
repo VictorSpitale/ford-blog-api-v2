@@ -84,7 +84,7 @@ __decorate([
     (0, swagger_1.ApiOperation)({ summary: 'Get category by id' }),
     (0, swagger_1.ApiResponse)({
         status: 200,
-        description: 'Category founded',
+        description: 'Category found',
         type: category_dto_1.CategoryDto,
     }),
     (0, swagger_1.ApiResponse)({

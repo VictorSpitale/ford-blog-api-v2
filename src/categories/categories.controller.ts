@@ -62,7 +62,7 @@ export class CategoriesController {
   @ApiOperation({ summary: 'Get category by id' })
   @ApiResponse({
     status: 200,
-    description: 'Category founded',
+    description: 'Category found',
     type: CategoryDto,
   })
   @ApiResponse({
