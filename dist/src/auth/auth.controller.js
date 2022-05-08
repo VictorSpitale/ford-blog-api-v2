@@ -22,6 +22,8 @@ const user_dto_1 = require("../users/dto/user.dto");
 const allow_any_decorator_1 = require("./decorators/allow-any.decorator");
 const passport_1 = require("@nestjs/passport");
 const users_service_1 = require("../users/users.service");
+const login_user_dto_1 = require("../users/dto/login-user.dto");
+const HttpError_1 = require("../shared/error/HttpError");
 let AuthController = class AuthController {
     constructor(authService, usersService) {
         this.authService = authService;
@@ -43,9 +45,6 @@ let AuthController = class AuthController {
     async setCookieFromGoogle(res, token) {
         return this.authService.setCookieFromGoogle(res, token);
     }
-    async getProfile(user) {
-        return user;
-    }
     async googleAuth(req) { }
     googleAuthRedirect(req, res) {
         return this.authService.googleLogin(req, res);
@@ -57,6 +56,20 @@ __decorate([
     (0, common_1.HttpCode)(common_1.HttpStatus.OK),
     (0, allow_any_decorator_1.AllowAny)(),
     (0, swagger_1.ApiOperation)({ summary: 'Get an access token for a user' }),
+    (0, swagger_1.ApiBody)({
+        description: "User's credentials",
+        required: true,
+        type: login_user_dto_1.LoginUserDto,
+    }),
+    (0, swagger_1.ApiResponse)({
+        status: 200,
+        description: 'Setting jwt cookie',
+    }),
+    (0, swagger_1.ApiResponse)({
+        description: 'Bad credentials',
+        status: 401,
+        type: HttpError_1.HttpErrorDto,
+    }),
     __param(0, (0, user_decorator_1.AuthUser)()),
     __param(1, (0, common_1.Res)()),
     __metadata("design:type", Function),
@@ -65,6 +78,16 @@ __decorate([
 ], AuthController.prototype, "login", null);
 __decorate([
     (0, common_1.Get)('logout'),
+    (0, swagger_1.ApiOperation)({ summary: 'Logout a user' }),
+    (0, swagger_1.ApiResponse)({
+        description: 'Removing the jwt cookie',
+        status: 200,
+    }),
+    (0, swagger_1.ApiResponse)({
+        description: 'Jwt failed',
+        status: 401,
+        type: HttpError_1.HttpErrorDto,
+    }),
     __param(0, (0, common_1.Res)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Object]),
@@ -72,7 +95,22 @@ __decorate([
 ], AuthController.prototype, "logout", null);
 __decorate([
     (0, common_1.Get)('/jwt'),
-    (0, allow_any_decorator_1.AllowAny)(),
+    (0, swagger_1.ApiOperation)({ summary: 'Get user information by its jwt cookie' }),
+    (0, swagger_1.ApiResponse)({
+        description: 'User information',
+        status: 200,
+        type: user_dto_1.UserDto,
+    }),
+    (0, swagger_1.ApiResponse)({
+        description: 'Jwt failed',
+        status: 401,
+        type: HttpError_1.HttpErrorDto,
+    }),
+    (0, swagger_1.ApiResponse)({
+        description: 'User not found',
+        status: 404,
+        type: HttpError_1.HttpErrorDto,
+    }),
     __param(0, (0, common_1.Req)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Object]),
@@ -82,6 +120,22 @@ __decorate([
     (0, common_1.Get)('/g-jwt/:token'),
     (0, common_1.HttpCode)(common_1.HttpStatus.OK),
     (0, allow_any_decorator_1.AllowAny)(),
+    (0, swagger_1.ApiOperation)({ summary: 'Set jwt cookie on Google Auth' }),
+    (0, swagger_1.ApiParam)({
+        description: 'Jwt token',
+        required: true,
+        type: String,
+        name: 'token',
+    }),
+    (0, swagger_1.ApiResponse)({
+        description: 'Setting jwt on Google Auth',
+        status: 200,
+    }),
+    (0, swagger_1.ApiResponse)({
+        description: 'Google Auth failed',
+        status: 400,
+        type: HttpError_1.HttpErrorDto,
+    }),
     __param(0, (0, common_1.Res)()),
     __param(1, (0, common_1.Param)('token')),
     __metadata("design:type", Function),
@@ -89,16 +143,10 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], AuthController.prototype, "setCookieFromGoogle", null);
 __decorate([
-    (0, common_1.Get)('/me'),
-    __param(0, (0, user_decorator_1.AuthUser)()),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", [user_dto_1.UserDto]),
-    __metadata("design:returntype", Promise)
-], AuthController.prototype, "getProfile", null);
-__decorate([
     (0, common_1.Get)('/google'),
     (0, allow_any_decorator_1.AllowAny)(),
     (0, common_1.UseGuards)((0, passport_1.AuthGuard)('google')),
+    (0, swagger_1.ApiOperation)({ summary: 'Redirect to Google Auth' }),
     __param(0, (0, common_1.Req)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Object]),
@@ -108,6 +156,9 @@ __decorate([
     (0, common_1.Get)('/google/redirect'),
     (0, allow_any_decorator_1.AllowAny)(),
     (0, common_1.UseGuards)((0, passport_1.AuthGuard)('google')),
+    (0, swagger_1.ApiOperation)({
+        summary: 'Redirect to the front-end application after Google Auth',
+    }),
     __param(0, (0, common_1.Req)()),
     __param(1, (0, common_1.Res)()),
     __metadata("design:type", Function),
