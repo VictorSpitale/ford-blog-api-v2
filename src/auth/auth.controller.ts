@@ -12,6 +12,7 @@ import {
 import { LocalAuthGuard } from './guards/local-auth.guard';
 import {
   ApiBody,
+  ApiCookieAuth,
   ApiOperation,
   ApiParam,
   ApiResponse,
@@ -72,6 +73,7 @@ export class AuthController {
     status: 401,
     type: HttpErrorDto,
   })
+  @ApiCookieAuth()
   async logout(@Res() response: Response) {
     return this.authService.logout(response);
   }
@@ -93,6 +95,7 @@ export class AuthController {
     status: 404,
     type: HttpErrorDto,
   })
+  @ApiCookieAuth()
   async verifyToken(@Req() req: Request) {
     const id = await this.authService.decodePayload(req.cookies?.access_token);
     return this.usersService.getUserById(id);
