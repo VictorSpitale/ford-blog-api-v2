@@ -21,6 +21,7 @@ const create_category_dto_1 = require("./dto/create-category.dto");
 const roles_decorator_1 = require("../auth/decorators/roles.decorator");
 const users_role_interface_1 = require("../users/entities/users.role.interface");
 const allow_any_decorator_1 = require("../auth/decorators/allow-any.decorator");
+const HttpError_1 = require("../shared/error/HttpError");
 let CategoriesController = class CategoriesController {
     constructor(categoriesService) {
         this.categoriesService = categoriesService;
@@ -43,8 +44,21 @@ __decorate([
         description: 'The category has been created',
         type: category_dto_1.CategoryDto,
     }),
-    (0, swagger_1.ApiResponse)({ status: 400, description: 'Validations failed' }),
-    (0, swagger_1.ApiResponse)({ status: 409, description: 'The category already exist' }),
+    (0, swagger_1.ApiResponse)({
+        status: 400,
+        description: 'Validations failed',
+        type: HttpError_1.HttpValidationError,
+    }),
+    (0, swagger_1.ApiResponse)({
+        status: 401,
+        description: 'Jwt failed | Insufficient permissions',
+        type: HttpError_1.HttpErrorDto,
+    }),
+    (0, swagger_1.ApiResponse)({
+        status: 409,
+        description: 'The category already exist',
+        type: HttpError_1.HttpErrorDto,
+    }),
     (0, roles_decorator_1.Role)(users_role_interface_1.IUserRole.ADMIN),
     __param(0, (0, common_1.Body)()),
     __metadata("design:type", Function),
@@ -72,8 +86,16 @@ __decorate([
         description: 'Category founded',
         type: category_dto_1.CategoryDto,
     }),
-    (0, swagger_1.ApiResponse)({ status: 400, description: 'Id is not a valid id' }),
-    (0, swagger_1.ApiResponse)({ status: 404, description: 'Category not found' }),
+    (0, swagger_1.ApiResponse)({
+        status: 400,
+        description: 'Id is not a valid id',
+        type: HttpError_1.HttpErrorDto,
+    }),
+    (0, swagger_1.ApiResponse)({
+        status: 404,
+        description: 'Category not found',
+        type: HttpError_1.HttpErrorDto,
+    }),
     (0, allow_any_decorator_1.AllowAny)(),
     __param(0, (0, common_1.Param)('id')),
     __metadata("design:type", Function),

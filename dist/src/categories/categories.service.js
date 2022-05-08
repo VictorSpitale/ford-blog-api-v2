@@ -17,13 +17,14 @@ const common_1 = require("@nestjs/common");
 const mongoose_1 = require("@nestjs/mongoose");
 const category_entity_1 = require("./entities/category.entity");
 const mongoose_2 = require("mongoose");
+const HttpError_1 = require("../shared/error/HttpError");
 let CategoriesService = class CategoriesService {
     constructor(categoryModel) {
         this.categoryModel = categoryModel;
     }
     async create(createCategoryDto) {
         if (await this.getCategoryByName(createCategoryDto.name)) {
-            throw new common_1.ConflictException('category already exist');
+            throw new common_1.ConflictException(HttpError_1.HttpError.getHttpError(HttpError_1.HttpErrorCode.DUPLICATE_CATEGORY));
         }
         const createdCategory = await this.categoryModel.create(createCategoryDto);
         return this.asDto(createdCategory);
@@ -45,7 +46,7 @@ let CategoriesService = class CategoriesService {
     async find(match = {}) {
         if (match._id) {
             if (!(0, mongoose_2.isValidObjectId)(match._id)) {
-                throw new common_1.BadRequestException();
+                throw new common_1.BadRequestException(HttpError_1.HttpError.getHttpError(HttpError_1.HttpErrorCode.INVALID_ID));
             }
             else {
                 match._id = new mongoose_2.Types.ObjectId(match._id);

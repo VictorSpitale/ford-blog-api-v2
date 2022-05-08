@@ -13,6 +13,8 @@ export enum HttpErrorCode {
   FILE_FORMAT,
   FAIL_UPLOAD,
   ROLE_UNAUTHORIZED,
+  DUPLICATE_CATEGORY,
+  INVALID_ID,
 }
 export class HttpValidationError {
   @ApiProperty({
@@ -135,6 +137,14 @@ export class HttpError {
         statusCode: 401,
         code: 11,
       },
+    ],
+    [
+      HttpErrorCode.DUPLICATE_CATEGORY,
+      { message: 'Category already exist', statusCode: 409, code: 12 },
+    ],
+    [
+      HttpErrorCode.INVALID_ID,
+      { message: 'Invalid object id', statusCode: 400, code: 13 },
     ],
   ]);
 

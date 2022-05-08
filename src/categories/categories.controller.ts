@@ -6,6 +6,7 @@ import { CreateCategoryDto } from './dto/create-category.dto';
 import { Role } from '../auth/decorators/roles.decorator';
 import { IUserRole } from '../users/entities/users.role.interface';
 import { AllowAny } from '../auth/decorators/allow-any.decorator';
+import { HttpErrorDto, HttpValidationError } from '../shared/error/HttpError';
 
 @Controller('categories')
 @ApiTags('Categories')
@@ -19,8 +20,21 @@ export class CategoriesController {
     description: 'The category has been created',
     type: CategoryDto,
   })
-  @ApiResponse({ status: 400, description: 'Validations failed' })
-  @ApiResponse({ status: 409, description: 'The category already exist' })
+  @ApiResponse({
+    status: 400,
+    description: 'Validations failed',
+    type: HttpValidationError,
+  })
+  @ApiResponse({
+    status: 401,
+    description: 'Jwt failed | Insufficient permissions',
+    type: HttpErrorDto,
+  })
+  @ApiResponse({
+    status: 409,
+    description: 'The category already exist',
+    type: HttpErrorDto,
+  })
   @Role(IUserRole.ADMIN)
   create(@Body() createCategoryDto: CreateCategoryDto): Promise<CategoryDto> {
     return this.categoriesService.create(createCategoryDto);
@@ -45,8 +59,16 @@ export class CategoriesController {
     description: 'Category founded',
     type: CategoryDto,
   })
-  @ApiResponse({ status: 400, description: 'Id is not a valid id' })
-  @ApiResponse({ status: 404, description: 'Category not found' })
+  @ApiResponse({
+    status: 400,
+    description: 'Id is not a valid id',
+    type: HttpErrorDto,
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'Category not found',
+    type: HttpErrorDto,
+  })
   @AllowAny()
   async getCategoryById(@Param('id') id: string) {
     return this.categoriesService.getCategoryById(id);

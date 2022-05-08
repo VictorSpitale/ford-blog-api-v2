@@ -25,6 +25,8 @@ var HttpErrorCode;
     HttpErrorCode[HttpErrorCode["FILE_FORMAT"] = 9] = "FILE_FORMAT";
     HttpErrorCode[HttpErrorCode["FAIL_UPLOAD"] = 10] = "FAIL_UPLOAD";
     HttpErrorCode[HttpErrorCode["ROLE_UNAUTHORIZED"] = 11] = "ROLE_UNAUTHORIZED";
+    HttpErrorCode[HttpErrorCode["DUPLICATE_CATEGORY"] = 12] = "DUPLICATE_CATEGORY";
+    HttpErrorCode[HttpErrorCode["INVALID_ID"] = 13] = "INVALID_ID";
 })(HttpErrorCode = exports.HttpErrorCode || (exports.HttpErrorCode = {}));
 class HttpValidationError {
 }
@@ -160,6 +162,14 @@ HttpError.errors = new Map([
             statusCode: 401,
             code: 11,
         },
+    ],
+    [
+        HttpErrorCode.DUPLICATE_CATEGORY,
+        { message: 'Category already exist', statusCode: 409, code: 12 },
+    ],
+    [
+        HttpErrorCode.INVALID_ID,
+        { message: 'Invalid object id', statusCode: 400, code: 13 },
     ],
 ]);
 //# sourceMappingURL=HttpError.js.map
