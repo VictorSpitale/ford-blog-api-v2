@@ -8,6 +8,7 @@ import { User } from '../users/entities/user.entity';
 import { GoogleService } from '../cloud/google.service';
 import { UpdatePostDto } from './dto/update-post.dto';
 import { UsersService } from '../users/users.service';
+import { BasicPostDto } from './dto/basic-post.dto';
 export declare class PostsService {
     private readonly postModel;
     private readonly googleService;
@@ -26,23 +27,13 @@ export declare class PostsService {
     }>;
     getLastPosts(user: User): Promise<PostDto[]>;
     getPost(slug: string, user: User): Promise<PostDto>;
-    getLikedPosts(userId: string, authUser: User): Promise<{
-        slug: string;
-        title: string;
-        desc: string;
-        picture: string;
-    }[]>;
+    getLikedPosts(userId: string, authUser: User): Promise<BasicPostDto[]>;
     getQueriedPosts(search: string): Promise<PostDto[]>;
     private checkIfPostIsDuplicatedBySlug;
     private find;
     findOne(match: MatchType): Promise<Post & import("mongoose").Document<any, any, any> & {
         _id: any;
     }>;
-    asBasicDto(post: Post): {
-        slug: string;
-        title: string;
-        desc: string;
-        picture: string;
-    };
+    asBasicDto(post: Post): BasicPostDto;
     asDto(post: Post, authUser?: User): PostDto;
 }

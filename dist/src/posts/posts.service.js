@@ -74,6 +74,8 @@ let PostsService = class PostsService {
         if (!page)
             posts = await this.find({});
         else {
+            if (page <= 0)
+                page = 1;
             posts = await this.postModel
                 .find({})
                 .sort({ createdAt: -1 })
@@ -110,7 +112,7 @@ let PostsService = class PostsService {
     }
     async getQueriedPosts(search) {
         if (!search || (search && search.length < 3)) {
-            throw new common_1.BadRequestException('Search query is missing or should be more than 2 characters');
+            throw new common_1.BadRequestException(HttpError_1.HttpError.getHttpError(HttpError_1.HttpErrorCode.SEARCH_QUERY));
         }
         const searchReg = new RegExp('.*' + search + '.*', 'i');
         const posts = await this.find({
@@ -141,7 +143,7 @@ let PostsService = class PostsService {
     async find(match = {}, limit = 0) {
         if (match._id) {
             if (!(0, mongoose_2.isValidObjectId)(match._id)) {
-                throw new common_1.BadRequestException();
+                throw new common_1.BadRequestException(HttpError_1.HttpError.getHttpError(HttpError_1.HttpErrorCode.INVALID_ID));
             }
             else {
                 match._id = new mongoose_2.Types.ObjectId(match._id);

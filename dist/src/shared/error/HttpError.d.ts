@@ -12,7 +12,8 @@ export declare enum HttpErrorCode {
     FAIL_UPLOAD = 10,
     ROLE_UNAUTHORIZED = 11,
     DUPLICATE_CATEGORY = 12,
-    INVALID_ID = 13
+    INVALID_ID = 13,
+    SEARCH_QUERY = 14
 }
 export declare class HttpValidationError {
     statusCode: number;

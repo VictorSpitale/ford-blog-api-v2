@@ -70,13 +70,13 @@ __decorate([
         description: "Post's comments",
         example: `[{
             "_id": "621bd3239a004010c4ba3b06",
-            "commenter": {
-              pseudo: 'John',
-              picture: 'url_to_picture'
-             },
             "comment": "my comment",
             "createdAt": "date",
-            "updatedAt": "date"
+            "updatedAt": "date",
+            "commenter": {
+            "pseudo": "John Doe",
+            "picture": "url_to_profile"
+            }
         }]`,
         type: [comment_dto_1.CommentDto],
     }),

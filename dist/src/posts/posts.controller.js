@@ -24,6 +24,8 @@ const allow_any_decorator_1 = require("../auth/decorators/allow-any.decorator");
 const platform_express_1 = require("@nestjs/platform-express");
 const update_post_dto_1 = require("./dto/update-post.dto");
 const paginated_post_dto_1 = require("./dto/paginated-post.dto");
+const HttpError_1 = require("../shared/error/HttpError");
+const basic_post_dto_1 = require("./dto/basic-post.dto");
 let PostsController = class PostsController {
     constructor(postsService) {
         this.postsService = postsService;
@@ -67,14 +69,24 @@ __decorate([
         description: 'The post has been created',
         type: post_dto_1.PostDto,
     }),
-    (0, swagger_1.ApiResponse)({ status: 400, description: 'Validations failed' }),
-    (0, swagger_1.ApiResponse)({ status: 401, description: 'Unauthorized access' }),
+    (0, swagger_1.ApiResponse)({
+        status: 400,
+        description: 'Validations failed',
+        type: HttpError_1.HttpValidationError,
+    }),
+    (0, swagger_1.ApiResponse)({
+        status: 401,
+        description: 'Unauthorized access',
+        type: HttpError_1.HttpErrorDto,
+    }),
     (0, swagger_1.ApiResponse)({
         status: 409,
         description: 'A post with this slug already exist',
+        type: HttpError_1.HttpErrorDto,
     }),
     (0, common_1.UseInterceptors)((0, platform_express_1.FileInterceptor)('file')),
     (0, roles_decorator_1.Role)(users_role_interface_1.IUserRole.POSTER),
+    (0, swagger_1.ApiCookieAuth)(),
     __param(0, (0, common_1.Body)()),
     __param(1, (0, common_1.UploadedFile)()),
     __metadata("design:type", Function),
@@ -83,12 +95,24 @@ __decorate([
 ], PostsController.prototype, "create", null);
 __decorate([
     (0, common_1.Get)(),
-    (0, swagger_1.ApiOperation)({ summary: 'Get all posts' }),
+    (0, swagger_1.ApiOperation)({ summary: 'Get all/paginated posts' }),
     (0, swagger_1.ApiResponse)({
         status: 200,
         description: 'List all posts',
         type: paginated_post_dto_1.PaginatedPostDto,
     }),
+    (0, swagger_1.ApiResponse)({
+        status: 401,
+        description: 'Jwt failed',
+        type: HttpError_1.HttpErrorDto,
+    }),
+    (0, swagger_1.ApiQuery)({
+        name: 'page',
+        type: Number,
+        description: 'Page to fetch, 3 items per page',
+        required: false,
+    }),
+    (0, swagger_1.ApiCookieAuth)(),
     __param(0, (0, common_1.Req)()),
     __param(1, (0, common_1.Query)('page')),
     __metadata("design:type", Function),
@@ -111,7 +135,8 @@ __decorate([
 ], PostsController.prototype, "getLastPosts", null);
 __decorate([
     (0, common_1.Get)('query'),
-    (0, swagger_1.ApiQuery)({ name: 'search' }),
+    (0, swagger_1.ApiOperation)({ summary: 'Query posts' }),
+    (0, swagger_1.ApiQuery)({ name: 'search', type: String, example: 'puma' }),
     (0, swagger_1.ApiResponse)({
         status: 200,
         description: 'List the 5 queried posts',
@@ -120,6 +145,7 @@ __decorate([
     (0, swagger_1.ApiResponse)({
         status: 400,
         description: 'Search query failed, search must be defined and more than 2 characters',
+        type: HttpError_1.HttpErrorDto,
     }),
     (0, allow_any_decorator_1.AllowAny)(),
     __param(0, (0, common_1.Query)('search')),
@@ -129,6 +155,23 @@ __decorate([
 ], PostsController.prototype, "getQueriedPosts", null);
 __decorate([
     (0, common_1.Get)('liked/:id'),
+    (0, swagger_1.ApiOperation)({ summary: 'Get posts liked by the user' }),
+    (0, swagger_1.ApiParam)({
+        name: 'id',
+        type: String,
+        description: 'User id',
+    }),
+    (0, swagger_1.ApiResponse)({
+        status: 200,
+        description: 'Posts list',
+        type: [basic_post_dto_1.BasicPostDto],
+    }),
+    (0, swagger_1.ApiResponse)({
+        status: 401,
+        description: 'Jwt failed | Insufficient permissions',
+        type: HttpError_1.HttpErrorDto,
+    }),
+    (0, swagger_1.ApiCookieAuth)(),
     __param(0, (0, common_1.Req)()),
     __param(1, (0, common_1.Param)('id')),
     __metadata("design:type", Function),
@@ -138,6 +181,7 @@ __decorate([
 __decorate([
     (0, common_1.Get)(':slug'),
     (0, allow_any_decorator_1.AllowAny)(),
+    (0, swagger_1.ApiOperation)({ summary: 'Get post by slug' }),
     (0, swagger_1.ApiResponse)({
         status: 200,
         description: 'The post got by its slug',
@@ -146,7 +190,16 @@ __decorate([
     (0, swagger_1.ApiResponse)({
         status: 404,
         description: 'The post doesnt exist',
+        type: HttpError_1.HttpErrorDto,
     }),
+    (0, swagger_1.ApiParam)({
+        description: "Post's slug to query",
+        name: 'slug',
+        example: 'que-penser-de-la-ford-focus-st-line',
+        required: true,
+        type: String,
+    }),
+    (0, swagger_1.ApiCookieAuth)(),
     __param(0, (0, common_1.Req)()),
     __param(1, (0, common_1.Param)('slug')),
     __metadata("design:type", Function),
@@ -155,15 +208,28 @@ __decorate([
 ], PostsController.prototype, "getPost", null);
 __decorate([
     (0, common_1.Patch)('/like/:slug'),
+    (0, swagger_1.ApiOperation)({ summary: 'Like a post' }),
+    (0, swagger_1.ApiParam)({
+        name: 'slug',
+        description: 'Post slug',
+        type: String,
+    }),
     (0, swagger_1.ApiResponse)({
         status: 200,
         description: 'The post has been liked, return the number of likes',
         type: Number,
     }),
     (0, swagger_1.ApiResponse)({
+        status: 401,
+        description: 'Jwt failed',
+        type: HttpError_1.HttpErrorDto,
+    }),
+    (0, swagger_1.ApiResponse)({
         status: 404,
         description: 'The post doesnt exist',
+        type: HttpError_1.HttpErrorDto,
     }),
+    (0, swagger_1.ApiCookieAuth)(),
     __param(0, (0, common_1.Req)()),
     __param(1, (0, common_1.Param)('slug')),
     __metadata("design:type", Function),
@@ -172,15 +238,23 @@ __decorate([
 ], PostsController.prototype, "likePost", null);
 __decorate([
     (0, common_1.Patch)('/unlike/:slug'),
+    (0, swagger_1.ApiOperation)({ summary: 'Unlike a post' }),
     (0, swagger_1.ApiResponse)({
         status: 200,
         description: 'The post has been unliked, return the number of likes',
         type: Number,
     }),
     (0, swagger_1.ApiResponse)({
+        status: 401,
+        description: 'Jwt failed',
+        type: HttpError_1.HttpErrorDto,
+    }),
+    (0, swagger_1.ApiResponse)({
         status: 404,
         description: 'The post doesnt exist',
+        type: HttpError_1.HttpErrorDto,
     }),
+    (0, swagger_1.ApiCookieAuth)(),
     __param(0, (0, common_1.Req)()),
     __param(1, (0, common_1.Param)('slug')),
     __metadata("design:type", Function),
@@ -190,18 +264,22 @@ __decorate([
 __decorate([
     (0, common_1.Delete)(':slug'),
     (0, roles_decorator_1.Role)(users_role_interface_1.IUserRole.ADMIN),
+    (0, swagger_1.ApiOperation)({ summary: 'Delete a post' }),
     (0, swagger_1.ApiResponse)({
         status: 200,
         description: 'The post has been deleted',
     }),
     (0, swagger_1.ApiResponse)({
         status: 401,
-        description: 'Insuffisant permissions',
+        description: 'Jwt failed | Insufficient permissions',
+        type: HttpError_1.HttpErrorDto,
     }),
     (0, swagger_1.ApiResponse)({
         status: 404,
         description: 'The post doesnt exist',
+        type: HttpError_1.HttpErrorDto,
     }),
+    (0, swagger_1.ApiCookieAuth)(),
     __param(0, (0, common_1.Req)()),
     __param(1, (0, common_1.Param)('slug')),
     __metadata("design:type", Function),
@@ -211,17 +289,33 @@ __decorate([
 __decorate([
     (0, common_1.Patch)(':slug'),
     (0, roles_decorator_1.Role)(users_role_interface_1.IUserRole.ADMIN),
+    (0, swagger_1.ApiOperation)({ summary: 'Update a post' }),
+    (0, swagger_1.ApiParam)({
+        type: String,
+        name: 'slug',
+        description: 'Post slug',
+    }),
     (0, swagger_1.ApiResponse)({
         status: 201,
         description: 'The post has been updated',
         type: post_dto_1.PostDto,
     }),
-    (0, swagger_1.ApiResponse)({ status: 400, description: 'Validations failed' }),
-    (0, swagger_1.ApiResponse)({ status: 401, description: 'Unauthorized access' }),
+    (0, swagger_1.ApiResponse)({
+        status: 400,
+        description: 'Validations failed',
+        type: HttpError_1.HttpValidationError,
+    }),
+    (0, swagger_1.ApiResponse)({
+        status: 401,
+        description: 'Unauthorized access',
+        type: HttpError_1.HttpErrorDto,
+    }),
     (0, swagger_1.ApiResponse)({
         status: 404,
         description: 'The post doesnt exist',
+        type: HttpError_1.HttpErrorDto,
     }),
+    (0, swagger_1.ApiCookieAuth)(),
     __param(0, (0, common_1.Req)()),
     __param(1, (0, common_1.Body)()),
     __param(2, (0, common_1.Param)('slug')),

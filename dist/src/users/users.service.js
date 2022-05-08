@@ -94,7 +94,7 @@ let UsersService = class UsersService {
     }
     isSelfOrAdmin(id, user) {
         if (!(id === user._id.toString() || user.role === users_role_interface_1.IUserRole.ADMIN)) {
-            throw new common_1.UnauthorizedException();
+            throw new common_1.UnauthorizedException(HttpError_1.HttpError.getHttpError(HttpError_1.HttpErrorCode.ROLE_UNAUTHORIZED));
         }
     }
     async deleteUser(id, user) {

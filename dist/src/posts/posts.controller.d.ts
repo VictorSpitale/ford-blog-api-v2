@@ -3,6 +3,7 @@ import { PostsService } from './posts.service';
 import { PostDto } from './dto/post.dto';
 import { CreatePostDto } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
+import { BasicPostDto } from './dto/basic-post.dto';
 export declare class PostsController {
     private readonly postsService;
     constructor(postsService: PostsService);
@@ -14,12 +15,7 @@ export declare class PostsController {
     }>;
     getLastPosts(req: any): Promise<PostDto[]>;
     getQueriedPosts(search: any): Promise<PostDto[]>;
-    getLikedPost(req: any, id: any): Promise<{
-        slug: string;
-        title: string;
-        desc: string;
-        picture: string;
-    }[]>;
+    getLikedPost(req: any, id: any): Promise<BasicPostDto[]>;
     getPost(req: any, slug: any): Promise<PostDto>;
     likePost(req: any, slug: any): Promise<number>;
     unlikePost(req: any, slug: any): Promise<number>;

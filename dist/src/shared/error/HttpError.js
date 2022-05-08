@@ -27,6 +27,7 @@ var HttpErrorCode;
     HttpErrorCode[HttpErrorCode["ROLE_UNAUTHORIZED"] = 11] = "ROLE_UNAUTHORIZED";
     HttpErrorCode[HttpErrorCode["DUPLICATE_CATEGORY"] = 12] = "DUPLICATE_CATEGORY";
     HttpErrorCode[HttpErrorCode["INVALID_ID"] = 13] = "INVALID_ID";
+    HttpErrorCode[HttpErrorCode["SEARCH_QUERY"] = 14] = "SEARCH_QUERY";
 })(HttpErrorCode = exports.HttpErrorCode || (exports.HttpErrorCode = {}));
 class HttpValidationError {
 }
@@ -170,6 +171,14 @@ HttpError.errors = new Map([
     [
         HttpErrorCode.INVALID_ID,
         { message: 'Invalid object id', statusCode: 400, code: 13 },
+    ],
+    [
+        HttpErrorCode.SEARCH_QUERY,
+        {
+            message: 'Search query is missing or should be more than 2 characters',
+            statusCode: 400,
+            code: 14,
+        },
     ],
 ]);
 //# sourceMappingURL=HttpError.js.map

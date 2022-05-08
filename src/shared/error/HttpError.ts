@@ -15,6 +15,7 @@ export enum HttpErrorCode {
   ROLE_UNAUTHORIZED,
   DUPLICATE_CATEGORY,
   INVALID_ID,
+  SEARCH_QUERY,
 }
 export class HttpValidationError {
   @ApiProperty({
@@ -145,6 +146,14 @@ export class HttpError {
     [
       HttpErrorCode.INVALID_ID,
       { message: 'Invalid object id', statusCode: 400, code: 13 },
+    ],
+    [
+      HttpErrorCode.SEARCH_QUERY,
+      {
+        message: 'Search query is missing or should be more than 2 characters',
+        statusCode: 400,
+        code: 14,
+      },
     ],
   ]);
 
