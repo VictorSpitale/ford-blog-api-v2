@@ -199,7 +199,6 @@ __decorate([
         required: true,
         type: String,
     }),
-    (0, swagger_1.ApiCookieAuth)(),
     __param(0, (0, common_1.Req)()),
     __param(1, (0, common_1.Param)('slug')),
     __metadata("design:type", Function),
@@ -239,6 +238,11 @@ __decorate([
 __decorate([
     (0, common_1.Patch)('/unlike/:slug'),
     (0, swagger_1.ApiOperation)({ summary: 'Unlike a post' }),
+    (0, swagger_1.ApiParam)({
+        name: 'slug',
+        description: 'Post slug',
+        type: String,
+    }),
     (0, swagger_1.ApiResponse)({
         status: 200,
         description: 'The post has been unliked, return the number of likes',
@@ -265,6 +269,11 @@ __decorate([
     (0, common_1.Delete)(':slug'),
     (0, roles_decorator_1.Role)(users_role_interface_1.IUserRole.ADMIN),
     (0, swagger_1.ApiOperation)({ summary: 'Delete a post' }),
+    (0, swagger_1.ApiParam)({
+        name: 'slug',
+        description: 'Post slug',
+        type: String,
+    }),
     (0, swagger_1.ApiResponse)({
         status: 200,
         description: 'The post has been deleted',

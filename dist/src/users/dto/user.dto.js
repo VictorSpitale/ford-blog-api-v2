@@ -16,7 +16,7 @@ const class_validator_1 = require("class-validator");
 const users_role_interface_1 = require("../entities/users.role.interface");
 const swagger_1 = require("@nestjs/swagger");
 const regex_validation_1 = require("../../shared/utils/regex.validation");
-class UserDto extends (0, swagger_1.PartialType)(create_user_dto_1.CreateUserDto) {
+class UserDto extends (0, swagger_1.PickType)(create_user_dto_1.CreateUserDto, ['email', 'pseudo']) {
 }
 __decorate([
     (0, class_validator_1.IsNotEmpty)(),

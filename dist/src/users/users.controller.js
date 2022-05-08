@@ -181,6 +181,7 @@ __decorate([
         status: 200,
         schema: {
             type: 'object',
+            required: ['picture'],
             properties: {
                 picture: {
                     type: 'string',

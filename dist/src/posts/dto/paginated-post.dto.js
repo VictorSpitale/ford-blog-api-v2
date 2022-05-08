@@ -31,5 +31,14 @@ __decorate([
     }),
     __metadata("design:type", Array)
 ], PaginatedPostDto.prototype, "posts", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({
+        required: true,
+        type: Number,
+        description: 'Page number',
+        example: 1,
+    }),
+    __metadata("design:type", Number)
+], PaginatedPostDto.prototype, "page", void 0);
 exports.PaginatedPostDto = PaginatedPostDto;
 //# sourceMappingURL=paginated-post.dto.js.map

@@ -1,7 +1,7 @@
 import * as Mongoose from 'mongoose';
 import { CreateUserDto } from './create-user.dto';
 import { IUserRole } from '../entities/users.role.interface';
-declare const UserDto_base: import("@nestjs/common").Type<Partial<CreateUserDto>>;
+declare const UserDto_base: import("@nestjs/common").Type<Pick<CreateUserDto, "email" | "pseudo">>;
 export declare class UserDto extends UserDto_base {
     readonly _id: Mongoose.Types.ObjectId;
     readonly role: IUserRole;

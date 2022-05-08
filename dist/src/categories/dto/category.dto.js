@@ -14,7 +14,7 @@ const swagger_1 = require("@nestjs/swagger");
 const create_category_dto_1 = require("./create-category.dto");
 const class_validator_1 = require("class-validator");
 const Mongoose = require("mongoose");
-class CategoryDto extends (0, swagger_1.PartialType)(create_category_dto_1.CreateCategoryDto) {
+class CategoryDto extends (0, swagger_1.PickType)(create_category_dto_1.CreateCategoryDto, ['name']) {
 }
 __decorate([
     (0, class_validator_1.IsNotEmpty)(),

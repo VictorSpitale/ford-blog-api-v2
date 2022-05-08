@@ -164,7 +164,6 @@ export class PostsController {
     required: true,
     type: String,
   })
-  @ApiCookieAuth()
   async getPost(@Req() req, @Param('slug') slug): Promise<PostDto> {
     return this.postsService.getPost(slug, req.user);
   }
@@ -198,6 +197,11 @@ export class PostsController {
 
   @Patch('/unlike/:slug')
   @ApiOperation({ summary: 'Unlike a post' })
+  @ApiParam({
+    name: 'slug',
+    description: 'Post slug',
+    type: String,
+  })
   @ApiResponse({
     status: 200,
     description: 'The post has been unliked, return the number of likes',
@@ -221,6 +225,11 @@ export class PostsController {
   @Delete(':slug')
   @Role(IUserRole.ADMIN)
   @ApiOperation({ summary: 'Delete a post' })
+  @ApiParam({
+    name: 'slug',
+    description: 'Post slug',
+    type: String,
+  })
   @ApiResponse({
     status: 200,
     description: 'The post has been deleted',

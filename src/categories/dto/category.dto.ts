@@ -1,9 +1,9 @@
-import { ApiProperty, PartialType } from '@nestjs/swagger';
+import { ApiProperty, PickType } from '@nestjs/swagger';
 import { CreateCategoryDto } from './create-category.dto';
 import { IsMongoId, IsNotEmpty } from 'class-validator';
 import * as Mongoose from 'mongoose';
 
-export class CategoryDto extends PartialType(CreateCategoryDto) {
+export class CategoryDto extends PickType(CreateCategoryDto, ['name']) {
   @IsNotEmpty()
   @IsMongoId()
   @ApiProperty({

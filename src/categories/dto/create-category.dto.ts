@@ -7,6 +7,7 @@ export class CreateCategoryDto {
     example: 'Sport',
     required: true,
     type: String,
+    name: 'name',
   })
   @IsString()
   @IsNotEmpty()

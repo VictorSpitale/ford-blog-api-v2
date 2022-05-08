@@ -12,10 +12,10 @@ import {
   MinLength,
 } from 'class-validator';
 import { IUserRole } from '../entities/users.role.interface';
-import { ApiProperty, PartialType } from '@nestjs/swagger';
+import { ApiProperty, PickType } from '@nestjs/swagger';
 import { urlPattern } from '../../shared/utils/regex.validation';
 
-export class UserDto extends PartialType(CreateUserDto) {
+export class UserDto extends PickType(CreateUserDto, ['email', 'pseudo']) {
   @IsNotEmpty()
   @IsMongoId()
   @ApiProperty({

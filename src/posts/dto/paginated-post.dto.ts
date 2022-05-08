@@ -16,4 +16,12 @@ export class PaginatedPostDto {
     description: 'Posts',
   })
   readonly posts: [PostDto];
+
+  @ApiProperty({
+    required: true,
+    type: Number,
+    description: 'Page number',
+    example: 1,
+  })
+  readonly page: number;
 }

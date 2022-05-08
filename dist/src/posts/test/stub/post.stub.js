@@ -2,6 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.PostStub = void 0;
 const Mongoose = require("mongoose");
+const category_stub_1 = require("../../../categories/test/stub/category.stub");
 const mockDate = '2016-05-18T16:00:00Z';
 const PostStub = (slug = 'le-slug') => {
     const mockObjectId = new Mongoose.Types.ObjectId();
@@ -15,7 +16,7 @@ const PostStub = (slug = 'le-slug') => {
         likes: 0,
         updatedAt: mockDate,
         slug,
-        categories: [mockObjectId],
+        categories: [(0, category_stub_1.CategoryStub)()],
         picture: '',
         comments: [],
     };

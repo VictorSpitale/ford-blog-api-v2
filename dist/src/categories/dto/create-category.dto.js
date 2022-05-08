@@ -20,6 +20,7 @@ __decorate([
         example: 'Sport',
         required: true,
         type: String,
+        name: 'name',
     }),
     (0, class_validator_1.IsString)(),
     (0, class_validator_1.IsNotEmpty)(),

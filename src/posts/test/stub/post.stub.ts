@@ -1,5 +1,6 @@
 import { PostDto } from '../../dto/post.dto';
 import * as Mongoose from 'mongoose';
+import { CategoryStub } from '../../../categories/test/stub/category.stub';
 
 const mockDate = '2016-05-18T16:00:00Z';
 
@@ -15,7 +16,7 @@ export const PostStub = (slug = 'le-slug'): Omit<PostDto, 'authUserLiked'> => {
     likes: 0,
     updatedAt: mockDate,
     slug,
-    categories: [mockObjectId],
+    categories: [CategoryStub()],
     picture: '',
     comments: [],
   };
