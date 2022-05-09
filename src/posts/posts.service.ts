@@ -17,6 +17,7 @@ import { LikeOperation } from '../shared/types/post.types';
 import { HttpError, HttpErrorCode } from '../shared/error/HttpError';
 import { UpdatePostDto } from './dto/update-post.dto';
 import { UsersService } from '../users/users.service';
+import { BasicPostDto } from './dto/basic-post.dto';
 
 @Injectable()
 export class PostsService {
@@ -95,6 +96,7 @@ export class PostsService {
     let hasMore = false;
     if (!page) posts = await this.find({});
     else {
+      if (page <= 0) page = 1;
       posts = await this.postModel
         .find({})
         .sort({ createdAt: -1 })
@@ -138,7 +140,7 @@ export class PostsService {
   async getQueriedPosts(search: string) {
     if (!search || (search && search.length < 3)) {
       throw new BadRequestException(
-        'Search query is missing or should be more than 2 characters',
+        HttpError.getHttpError(HttpErrorCode.SEARCH_QUERY),
       );
     }
     const searchReg = new RegExp('.*' + search + '.*', 'i');
@@ -175,7 +177,9 @@ export class PostsService {
   private async find(match: MatchType = {}, limit = 0) {
     if (match._id) {
       if (!isValidObjectId(match._id)) {
-        throw new BadRequestException();
+        throw new BadRequestException(
+          HttpError.getHttpError(HttpErrorCode.INVALID_ID),
+        );
       } else {
         match._id = new Types.ObjectId(match._id as string);
       }
@@ -211,7 +215,7 @@ export class PostsService {
     }
   }
 
-  asBasicDto(post: Post) {
+  asBasicDto(post: Post): BasicPostDto {
     return {
       slug: post.slug,
       title: post.title,

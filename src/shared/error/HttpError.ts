@@ -1,3 +1,5 @@
+import { ApiProperty } from '@nestjs/swagger';
+
 export enum HttpErrorCode {
   JWT_FAILED,
   UNAUTHORIZED_LOGIN,
@@ -10,16 +12,65 @@ export enum HttpErrorCode {
   FILE_TOO_BIG,
   FILE_FORMAT,
   FAIL_UPLOAD,
+  ROLE_UNAUTHORIZED,
+  DUPLICATE_CATEGORY,
+  INVALID_ID,
+  SEARCH_QUERY,
+}
+export class HttpValidationError {
+  @ApiProperty({
+    type: Number,
+    description: 'Http status code',
+    example: 400,
+    required: true,
+  })
+  statusCode: number;
+
+  @ApiProperty({
+    type: String,
+    description: 'Http error messages',
+    example: ['x must not be empty', 'x must be a string'],
+    required: true,
+  })
+  message: string[];
+
+  @ApiProperty({
+    type: String,
+    description: 'Http error message',
+    example: 'Error occurred',
+    required: true,
+  })
+  error: string;
 }
 
-type HttpErrorObj = {
+export class HttpErrorDto {
+  @ApiProperty({
+    type: Number,
+    description: 'Http status code',
+    example: 400,
+    required: true,
+  })
   statusCode: number;
+
+  @ApiProperty({
+    type: String,
+    description: 'Http error message',
+    example: 'Error occurred',
+    required: true,
+  })
   message: string;
+
+  @ApiProperty({
+    type: Number,
+    description: 'Error number',
+    example: 6,
+    required: true,
+  })
   code: number;
-};
+}
 
 export class HttpError {
-  private static errors = new Map<HttpErrorCode, HttpErrorObj>([
+  private static errors = new Map<HttpErrorCode, HttpErrorDto>([
     [
       HttpErrorCode.JWT_FAILED,
       { message: 'Jwt failed', statusCode: 401, code: 0 },
@@ -78,6 +129,30 @@ export class HttpError {
         message: 'File upload failed',
         statusCode: 500,
         code: 10,
+      },
+    ],
+    [
+      HttpErrorCode.ROLE_UNAUTHORIZED,
+      {
+        message: 'Insufficient permissions',
+        statusCode: 401,
+        code: 11,
+      },
+    ],
+    [
+      HttpErrorCode.DUPLICATE_CATEGORY,
+      { message: 'Category already exist', statusCode: 409, code: 12 },
+    ],
+    [
+      HttpErrorCode.INVALID_ID,
+      { message: 'Invalid object id', statusCode: 400, code: 13 },
+    ],
+    [
+      HttpErrorCode.SEARCH_QUERY,
+      {
+        message: 'Search query is missing or should be more than 2 characters',
+        statusCode: 400,
+        code: 14,
       },
     ],
   ]);

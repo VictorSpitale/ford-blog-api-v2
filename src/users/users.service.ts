@@ -125,7 +125,9 @@ export class UsersService {
 
   isSelfOrAdmin(id: string, user: User) {
     if (!(id === user._id.toString() || user.role === IUserRole.ADMIN)) {
-      throw new UnauthorizedException();
+      throw new UnauthorizedException(
+        HttpError.getHttpError(HttpErrorCode.ROLE_UNAUTHORIZED),
+      );
     }
   }
 
