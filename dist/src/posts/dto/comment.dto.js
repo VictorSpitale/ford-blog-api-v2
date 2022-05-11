@@ -33,6 +33,7 @@ __decorate([
         type: commenter_dto_1.CommenterDto,
         description: "Commenter's informations",
         example: `{
+        id: "61f59acf09f089c9df951c37",
         pseudo: 'John',
         picture: 'url_to_picture'
     }`,
@@ -65,6 +66,7 @@ __decorate([
         description: "Comment's last update date",
         type: String,
         format: 'YYYY-mm-ddTHH:MM:ssZ',
+        required: false,
     }),
     __metadata("design:type", String)
 ], CommentDto.prototype, "updatedAt", void 0);

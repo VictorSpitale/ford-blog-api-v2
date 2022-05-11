@@ -5,5 +5,5 @@ export declare class CommentDto {
     readonly commenter: CommenterDto;
     readonly comment: string;
     readonly createdAt: string;
-    readonly updatedAt: string;
+    readonly updatedAt?: string;
 }
