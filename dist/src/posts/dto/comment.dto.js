@@ -50,25 +50,23 @@ __decorate([
     __metadata("design:type", String)
 ], CommentDto.prototype, "comment", void 0);
 __decorate([
-    (0, class_validator_1.IsDateString)(),
     (0, class_validator_1.IsNotEmpty)(),
+    (0, class_validator_1.IsNumber)(),
     (0, swagger_1.ApiProperty)({
-        description: "Comment's created date",
-        type: String,
-        format: 'YYYY-mm-ddTHH:MM:ssZ',
+        description: "Comment's created date (timestamp)",
+        type: Number,
     }),
-    __metadata("design:type", String)
+    __metadata("design:type", Number)
 ], CommentDto.prototype, "createdAt", void 0);
 __decorate([
-    (0, class_validator_1.IsDateString)(),
     (0, class_validator_1.IsNotEmpty)(),
+    (0, class_validator_1.IsNumber)(),
     (0, swagger_1.ApiProperty)({
-        description: "Comment's last update date",
-        type: String,
-        format: 'YYYY-mm-ddTHH:MM:ssZ',
+        description: "Comment's last update date (timestamp)",
+        type: Number,
         required: false,
     }),
-    __metadata("design:type", String)
+    __metadata("design:type", Number)
 ], CommentDto.prototype, "updatedAt", void 0);
 exports.CommentDto = CommentDto;
 //# sourceMappingURL=comment.dto.js.map

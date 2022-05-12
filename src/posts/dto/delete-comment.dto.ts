@@ -3,7 +3,7 @@ import { CommentDto } from './comment.dto';
 import { IsMongoId, IsNotEmpty } from 'class-validator';
 import * as Mongoose from 'mongoose';
 
-export class UpdateCommentDto extends PickType(CommentDto, ['comment', '_id']) {
+export class DeleteCommentDto extends PickType(CommentDto, ['_id']) {
   @IsNotEmpty()
   @IsMongoId()
   @ApiProperty({

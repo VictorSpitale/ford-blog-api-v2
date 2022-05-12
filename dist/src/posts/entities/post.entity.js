@@ -77,9 +77,27 @@ __decorate([
 ], Post.prototype, "sourceLink", void 0);
 __decorate([
     (0, mongoose_1.Prop)({
-        type: [],
+        type: [
+            {
+                comment: {
+                    type: String,
+                },
+                createdAt: {
+                    type: Number,
+                },
+                updatedAt: {
+                    type: String,
+                    required: false,
+                },
+                commenter: {
+                    type: Mongoose.Types.ObjectId,
+                    ref: user_entity_1.User.name,
+                },
+            },
+        ],
         default: [],
     }),
+    (0, class_transformer_1.Type)(() => user_entity_1.User),
     __metadata("design:type", Array)
 ], Post.prototype, "comments", void 0);
 __decorate([

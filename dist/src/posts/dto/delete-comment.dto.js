@@ -9,12 +9,12 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.UpdateCommentDto = void 0;
+exports.DeleteCommentDto = void 0;
 const swagger_1 = require("@nestjs/swagger");
 const comment_dto_1 = require("./comment.dto");
 const class_validator_1 = require("class-validator");
 const Mongoose = require("mongoose");
-class UpdateCommentDto extends (0, swagger_1.PickType)(comment_dto_1.CommentDto, ['comment', '_id']) {
+class DeleteCommentDto extends (0, swagger_1.PickType)(comment_dto_1.CommentDto, ['_id']) {
 }
 __decorate([
     (0, class_validator_1.IsNotEmpty)(),
@@ -25,6 +25,6 @@ __decorate([
         example: '61f59acf09f089c9df951c37',
     }),
     __metadata("design:type", Mongoose.Types.ObjectId)
-], UpdateCommentDto.prototype, "commenterId", void 0);
-exports.UpdateCommentDto = UpdateCommentDto;
-//# sourceMappingURL=update-comment.dto.js.map
+], DeleteCommentDto.prototype, "commenterId", void 0);
+exports.DeleteCommentDto = DeleteCommentDto;
+//# sourceMappingURL=delete-comment.dto.js.map

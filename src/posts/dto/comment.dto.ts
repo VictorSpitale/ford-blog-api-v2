@@ -1,5 +1,5 @@
 import * as Mongoose from 'mongoose';
-import { IsDateString, IsMongoId, IsNotEmpty } from 'class-validator';
+import { IsMongoId, IsNotEmpty, IsNumber } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 import { CommenterDto } from '../../users/dto/commenter.dto';
 
@@ -34,22 +34,20 @@ export class CommentDto {
   })
   readonly comment: string;
 
-  @IsDateString()
   @IsNotEmpty()
+  @IsNumber()
   @ApiProperty({
-    description: "Comment's created date",
-    type: String,
-    format: 'YYYY-mm-ddTHH:MM:ssZ',
+    description: "Comment's created date (timestamp)",
+    type: Number,
   })
-  readonly createdAt: string;
+  readonly createdAt: number;
 
-  @IsDateString()
   @IsNotEmpty()
+  @IsNumber()
   @ApiProperty({
-    description: "Comment's last update date",
-    type: String,
-    format: 'YYYY-mm-ddTHH:MM:ssZ',
+    description: "Comment's last update date (timestamp)",
+    type: Number,
     required: false,
   })
-  readonly updatedAt?: string;
+  readonly updatedAt?: number;
 }
