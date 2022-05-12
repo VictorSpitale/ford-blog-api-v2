@@ -46,6 +46,7 @@ __decorate([
         description: "User's profile picture",
         example: 'url_to_picture',
         type: String,
+        required: false,
     }),
     (0, class_validator_1.IsString)(),
     (0, class_validator_1.IsUrl)(),

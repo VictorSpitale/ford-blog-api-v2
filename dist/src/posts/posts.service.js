@@ -16,6 +16,7 @@ exports.PostsService = void 0;
 const common_1 = require("@nestjs/common");
 const mongoose_1 = require("@nestjs/mongoose");
 const post_entity_1 = require("./entities/post.entity");
+const Mongoose = require("mongoose");
 const mongoose_2 = require("mongoose");
 const google_service_1 = require("../cloud/google.service");
 const upload_types_1 = require("../shared/types/upload.types");
@@ -65,7 +66,8 @@ let PostsService = class PostsService {
         await this.getPost(slug, user);
         const updated = await this.postModel
             .findOneAndUpdate({ slug }, Object.assign({}, updatePostDto), { new: true })
-            .populate('categories likers');
+            .populate('categories likers')
+            .populate('comments.commenter', ['pseudo', 'picture']);
         return this.asDto(updated, user);
     }
     async getPosts(user, page) {
@@ -134,7 +136,56 @@ let PostsService = class PostsService {
                 },
             ],
         }, 5);
-        return posts.map((p) => this.asDto(p));
+        return posts.map((p) => this.asBasicDto(p));
+    }
+    async commentPost(user, createCommentDto, slug) {
+        if (!(await this.findOne({ slug }))) {
+            throw new common_1.NotFoundException(HttpError_1.HttpError.getHttpError(HttpError_1.HttpErrorCode.POST_NOT_FOUND));
+        }
+        const post = await this.postModel
+            .findOneAndUpdate({ slug }, {
+            $addToSet: {
+                comments: {
+                    _id: new Mongoose.Types.ObjectId(),
+                    commenter: user._id,
+                    comment: createCommentDto.comment,
+                    createdAt: Date.now(),
+                },
+            },
+        }, { new: true })
+            .populate('likers categories')
+            .populate('comments.commenter', ['pseudo', 'picture']);
+        return this.asDto(post, user);
+    }
+    async deletePostComment(user, slug, comment) {
+        await this.usersService.isSelfOrAdmin(comment.commenterId.toString(), user);
+        if (!(await this.findOne({ slug }))) {
+            throw new common_1.NotFoundException(HttpError_1.HttpError.getHttpError(HttpError_1.HttpErrorCode.POST_NOT_FOUND));
+        }
+        const post = await this.postModel
+            .findOneAndUpdate({ slug }, {
+            $pull: {
+                comments: { _id: new Mongoose.Types.ObjectId(comment._id) },
+            },
+        }, { new: true })
+            .populate('categories likers')
+            .populate('comments.commenter', ['pseudo', 'picture']);
+        return this.asDto(post, user);
+    }
+    async updatePostComment(user, slug, comment) {
+        await this.usersService.isSelfOrAdmin(comment.commenterId.toString(), user);
+        if (!(await this.findOne({ slug }))) {
+            throw new common_1.NotFoundException(HttpError_1.HttpError.getHttpError(HttpError_1.HttpErrorCode.POST_NOT_FOUND));
+        }
+        const post = await this.postModel
+            .findOneAndUpdate({ slug }, {
+            $set: {
+                'comments.$[commentId].comment': comment.comment,
+            },
+        }, { new: true, arrayFilters: [{ 'commentId._id': comment._id }] })
+            .populate('categories likers')
+            .populate('comments.commenter', ['pseudo', 'picture']);
+        return this.asDto(post, user);
     }
     async checkIfPostIsDuplicatedBySlug(slug) {
         const post = await this.findOne({ slug });
@@ -166,6 +217,7 @@ let PostsService = class PostsService {
         })
             .sort({ createdAt: -1 })
             .populate('categories likers')
+            .populate('comments.commenter', ['pseudo', 'picture'])
             .sort({ createdAt: -1 });
         if (limit)
             docs.limit(limit);

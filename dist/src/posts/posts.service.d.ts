@@ -1,5 +1,6 @@
 /// <reference types="multer" />
 import { Post, PostDocument } from './entities/post.entity';
+import * as Mongoose from 'mongoose';
 import { Model } from 'mongoose';
 import { MatchType } from '../shared/types/match.types';
 import { PostDto } from './dto/post.dto';
@@ -9,6 +10,9 @@ import { GoogleService } from '../cloud/google.service';
 import { UpdatePostDto } from './dto/update-post.dto';
 import { UsersService } from '../users/users.service';
 import { BasicPostDto } from './dto/basic-post.dto';
+import { CreateCommentDto } from './dto/create-comment.dto';
+import { DeleteCommentDto } from './dto/delete-comment.dto';
+import { UpdateCommentDto } from './dto/update-comment.dto';
 export declare class PostsService {
     private readonly postModel;
     private readonly googleService;
@@ -28,10 +32,13 @@ export declare class PostsService {
     getLastPosts(user: User): Promise<PostDto[]>;
     getPost(slug: string, user: User): Promise<PostDto>;
     getLikedPosts(userId: string, authUser: User): Promise<BasicPostDto[]>;
-    getQueriedPosts(search: string): Promise<PostDto[]>;
+    getQueriedPosts(search: string): Promise<BasicPostDto[]>;
+    commentPost(user: User, createCommentDto: CreateCommentDto, slug: string): Promise<PostDto>;
+    deletePostComment(user: User, slug: string, comment: DeleteCommentDto): Promise<PostDto>;
+    updatePostComment(user: User, slug: string, comment: UpdateCommentDto): Promise<PostDto>;
     private checkIfPostIsDuplicatedBySlug;
     private find;
-    findOne(match: MatchType): Promise<Post & import("mongoose").Document<any, any, any> & {
+    findOne(match: MatchType): Promise<Post & Mongoose.Document<any, any, any> & {
         _id: any;
     }>;
     asBasicDto(post: Post): BasicPostDto;

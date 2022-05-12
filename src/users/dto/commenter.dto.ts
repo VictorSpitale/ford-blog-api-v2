@@ -39,6 +39,7 @@ export class CommenterDto {
     description: "User's profile picture",
     example: 'url_to_picture',
     type: String,
+    required: false,
   })
   @IsString()
   @IsUrl()
