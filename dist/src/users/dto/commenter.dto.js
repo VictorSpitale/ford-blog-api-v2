@@ -13,8 +13,19 @@ exports.CommenterDto = void 0;
 const class_validator_1 = require("class-validator");
 const swagger_1 = require("@nestjs/swagger");
 const regex_validation_1 = require("../../shared/utils/regex.validation");
+const Mongoose = require("mongoose");
 class CommenterDto {
 }
+__decorate([
+    (0, class_validator_1.IsNotEmpty)(),
+    (0, class_validator_1.IsMongoId)(),
+    (0, swagger_1.ApiProperty)({
+        type: String,
+        description: 'User id',
+        example: '61f59acf09f089c9df951c37',
+    }),
+    __metadata("design:type", Mongoose.Types.ObjectId)
+], CommenterDto.prototype, "_id", void 0);
 __decorate([
     (0, swagger_1.ApiProperty)({
         description: "User's pseudo",
@@ -35,6 +46,7 @@ __decorate([
         description: "User's profile picture",
         example: 'url_to_picture',
         type: String,
+        required: false,
     }),
     (0, class_validator_1.IsString)(),
     (0, class_validator_1.IsUrl)(),

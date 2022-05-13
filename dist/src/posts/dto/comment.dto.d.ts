@@ -4,6 +4,6 @@ export declare class CommentDto {
     readonly _id: Mongoose.Types.ObjectId;
     readonly commenter: CommenterDto;
     readonly comment: string;
-    readonly createdAt: string;
-    readonly updatedAt: string;
+    readonly createdAt: number;
+    readonly updatedAt?: number;
 }

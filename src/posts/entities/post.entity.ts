@@ -64,9 +64,27 @@ export class Post {
   sourceLink: string;
 
   @Prop({
-    type: [],
+    type: [
+      {
+        comment: {
+          type: String,
+        },
+        createdAt: {
+          type: Number,
+        },
+        updatedAt: {
+          type: String,
+          required: false,
+        },
+        commenter: {
+          type: Mongoose.Types.ObjectId,
+          ref: User.name,
+        },
+      },
+    ],
     default: [],
   })
+  @Type(() => User)
   comments: [CommentDto];
 
   @Prop({

@@ -26,6 +26,9 @@ const update_post_dto_1 = require("./dto/update-post.dto");
 const paginated_post_dto_1 = require("./dto/paginated-post.dto");
 const HttpError_1 = require("../shared/error/HttpError");
 const basic_post_dto_1 = require("./dto/basic-post.dto");
+const create_comment_dto_1 = require("./dto/create-comment.dto");
+const update_comment_dto_1 = require("./dto/update-comment.dto");
+const delete_comment_dto_1 = require("./dto/delete-comment.dto");
 let PostsController = class PostsController {
     constructor(postsService) {
         this.postsService = postsService;
@@ -59,6 +62,15 @@ let PostsController = class PostsController {
     }
     async updatePost(req, updatePostDto, slug) {
         return this.postsService.updatePost(slug, updatePostDto, req.user);
+    }
+    async commentPost(req, comment, slug) {
+        return this.postsService.commentPost(req.user, comment, slug);
+    }
+    async editPostComment(req, comment, slug) {
+        return this.postsService.updatePostComment(req.user, slug, comment);
+    }
+    async deletePostComment(req, slug, commentDto) {
+        return this.postsService.deletePostComment(req.user, slug, commentDto);
     }
 };
 __decorate([
@@ -332,6 +344,114 @@ __decorate([
     __metadata("design:paramtypes", [Object, update_post_dto_1.UpdatePostDto, Object]),
     __metadata("design:returntype", Promise)
 ], PostsController.prototype, "updatePost", null);
+__decorate([
+    (0, common_1.Post)('/comment/:slug'),
+    (0, swagger_1.ApiOperation)({ summary: 'Comment a post' }),
+    (0, swagger_1.ApiParam)({
+        type: String,
+        name: 'slug',
+        description: 'Post slug',
+    }),
+    (0, swagger_1.ApiResponse)({
+        status: 201,
+        description: 'The post has been commented',
+        type: post_dto_1.PostDto,
+    }),
+    (0, swagger_1.ApiResponse)({
+        status: 400,
+        description: 'Validations failed',
+        type: HttpError_1.HttpValidationError,
+    }),
+    (0, swagger_1.ApiResponse)({
+        status: 401,
+        description: 'Unauthorized access',
+        type: HttpError_1.HttpErrorDto,
+    }),
+    (0, swagger_1.ApiResponse)({
+        status: 404,
+        description: 'The post doesnt exist',
+        type: HttpError_1.HttpErrorDto,
+    }),
+    (0, swagger_1.ApiCookieAuth)(),
+    __param(0, (0, common_1.Req)()),
+    __param(1, (0, common_1.Body)()),
+    __param(2, (0, common_1.Param)('slug')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, create_comment_dto_1.CreateCommentDto, Object]),
+    __metadata("design:returntype", Promise)
+], PostsController.prototype, "commentPost", null);
+__decorate([
+    (0, common_1.Patch)('/comment/:slug'),
+    (0, swagger_1.ApiOperation)({ summary: 'Update a comment' }),
+    (0, swagger_1.ApiParam)({
+        type: String,
+        name: 'slug',
+        description: 'Post slug',
+    }),
+    (0, swagger_1.ApiResponse)({
+        status: 201,
+        description: 'The updated post',
+        type: post_dto_1.PostDto,
+    }),
+    (0, swagger_1.ApiResponse)({
+        status: 400,
+        description: 'Validations failed',
+        type: HttpError_1.HttpValidationError,
+    }),
+    (0, swagger_1.ApiResponse)({
+        status: 401,
+        description: 'Unauthorized access',
+        type: HttpError_1.HttpErrorDto,
+    }),
+    (0, swagger_1.ApiResponse)({
+        status: 404,
+        description: 'The post doesnt exist',
+        type: HttpError_1.HttpErrorDto,
+    }),
+    (0, swagger_1.ApiCookieAuth)(),
+    __param(0, (0, common_1.Req)()),
+    __param(1, (0, common_1.Body)()),
+    __param(2, (0, common_1.Param)('slug')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, update_comment_dto_1.UpdateCommentDto, Object]),
+    __metadata("design:returntype", Promise)
+], PostsController.prototype, "editPostComment", null);
+__decorate([
+    (0, common_1.Delete)('/comment/:slug'),
+    (0, swagger_1.ApiOperation)({ summary: 'Delete a comment' }),
+    (0, swagger_1.ApiParam)({
+        type: String,
+        name: 'slug',
+        description: 'Post slug',
+    }),
+    (0, swagger_1.ApiResponse)({
+        status: 201,
+        description: 'The updated post',
+        type: post_dto_1.PostDto,
+    }),
+    (0, swagger_1.ApiResponse)({
+        status: 400,
+        description: 'Validations failed',
+        type: HttpError_1.HttpValidationError,
+    }),
+    (0, swagger_1.ApiResponse)({
+        status: 401,
+        description: 'Unauthorized access',
+        type: HttpError_1.HttpErrorDto,
+    }),
+    (0, swagger_1.ApiResponse)({
+        status: 404,
+        description: 'The post doesnt exist',
+        type: HttpError_1.HttpErrorDto,
+    }),
+    (0, swagger_1.ApiCookieAuth)(),
+    __param(0, (0, common_1.Req)()),
+    __param(1, (0, common_1.Param)('slug')),
+    __param(2, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, Object, delete_comment_dto_1.DeleteCommentDto]),
+    __metadata("design:returntype", Promise)
+], PostsController.prototype, "deletePostComment", null);
 PostsController = __decorate([
     (0, common_1.Controller)('posts'),
     (0, swagger_1.ApiTags)('Posts'),

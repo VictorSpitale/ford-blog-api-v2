@@ -30,6 +30,9 @@ import { UpdatePostDto } from './dto/update-post.dto';
 import { PaginatedPostDto } from './dto/paginated-post.dto';
 import { HttpErrorDto, HttpValidationError } from '../shared/error/HttpError';
 import { BasicPostDto } from './dto/basic-post.dto';
+import { CreateCommentDto } from './dto/create-comment.dto';
+import { UpdateCommentDto } from './dto/update-comment.dto';
+import { DeleteCommentDto } from './dto/delete-comment.dto';
 
 @Controller('posts')
 @ApiTags('Posts')
@@ -284,5 +287,113 @@ export class PostsController {
     @Param('slug') slug,
   ) {
     return this.postsService.updatePost(slug, updatePostDto, req.user);
+  }
+
+  @Post('/comment/:slug')
+  @ApiOperation({ summary: 'Comment a post' })
+  @ApiParam({
+    type: String,
+    name: 'slug',
+    description: 'Post slug',
+  })
+  @ApiResponse({
+    status: 201,
+    description: 'The post has been commented',
+    type: PostDto,
+  })
+  @ApiResponse({
+    status: 400,
+    description: 'Validations failed',
+    type: HttpValidationError,
+  })
+  @ApiResponse({
+    status: 401,
+    description: 'Unauthorized access',
+    type: HttpErrorDto,
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'The post doesnt exist',
+    type: HttpErrorDto,
+  })
+  @ApiCookieAuth()
+  async commentPost(
+    @Req() req,
+    @Body() comment: CreateCommentDto,
+    @Param('slug') slug,
+  ) {
+    return this.postsService.commentPost(req.user, comment, slug);
+  }
+
+  @Patch('/comment/:slug')
+  @ApiOperation({ summary: 'Update a comment' })
+  @ApiParam({
+    type: String,
+    name: 'slug',
+    description: 'Post slug',
+  })
+  @ApiResponse({
+    status: 201,
+    description: 'The updated post',
+    type: PostDto,
+  })
+  @ApiResponse({
+    status: 400,
+    description: 'Validations failed',
+    type: HttpValidationError,
+  })
+  @ApiResponse({
+    status: 401,
+    description: 'Unauthorized access',
+    type: HttpErrorDto,
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'The post doesnt exist',
+    type: HttpErrorDto,
+  })
+  @ApiCookieAuth()
+  async editPostComment(
+    @Req() req,
+    @Body() comment: UpdateCommentDto,
+    @Param('slug') slug,
+  ) {
+    return this.postsService.updatePostComment(req.user, slug, comment);
+  }
+
+  @Delete('/comment/:slug')
+  @ApiOperation({ summary: 'Delete a comment' })
+  @ApiParam({
+    type: String,
+    name: 'slug',
+    description: 'Post slug',
+  })
+  @ApiResponse({
+    status: 201,
+    description: 'The updated post',
+    type: PostDto,
+  })
+  @ApiResponse({
+    status: 400,
+    description: 'Validations failed',
+    type: HttpValidationError,
+  })
+  @ApiResponse({
+    status: 401,
+    description: 'Unauthorized access',
+    type: HttpErrorDto,
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'The post doesnt exist',
+    type: HttpErrorDto,
+  })
+  @ApiCookieAuth()
+  async deletePostComment(
+    @Req() req,
+    @Param('slug') slug,
+    @Body() commentDto: DeleteCommentDto,
+  ) {
+    return this.postsService.deletePostComment(req.user, slug, commentDto);
   }
 }
