@@ -63,7 +63,7 @@ describe('auth (e2e)', () => {
       const response = await request
         .get('/auth/jwt')
         .set('Cookie', `access_token=blabla;`);
-      expect(response.status).toBe(404);
+      expect(response.status).toBe(401);
     });
     it('should decode the jwt and send the user', async () => {
       const response = await request

@@ -36,3 +36,7 @@ lerna-debug.log*
 
 .development.env
 fordblog-bfc482c198ea.json
+
+schema.json
+generated-schema.ts
+**/*/generated-schema.*

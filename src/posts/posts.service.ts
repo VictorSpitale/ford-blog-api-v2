@@ -6,6 +6,7 @@ import {
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Post, PostDocument } from './entities/post.entity';
+import * as Mongoose from 'mongoose';
 import { isValidObjectId, Model, Types } from 'mongoose';
 import { MatchType } from '../shared/types/match.types';
 import { PostDto } from './dto/post.dto';
@@ -17,6 +18,10 @@ import { LikeOperation } from '../shared/types/post.types';
 import { HttpError, HttpErrorCode } from '../shared/error/HttpError';
 import { UpdatePostDto } from './dto/update-post.dto';
 import { UsersService } from '../users/users.service';
+import { BasicPostDto } from './dto/basic-post.dto';
+import { CreateCommentDto } from './dto/create-comment.dto';
+import { DeleteCommentDto } from './dto/delete-comment.dto';
+import { UpdateCommentDto } from './dto/update-comment.dto';
 
 @Injectable()
 export class PostsService {
@@ -49,15 +54,19 @@ export class PostsService {
     return this.asDto(createdPost, null);
   }
 
-  async likePost(slug, user) {
+  async likePost(slug, user): Promise<number> {
     return this.updateLikeStatus(slug, user, LikeOperation.LIKE);
   }
 
-  async unlikePost(slug, user) {
+  async unlikePost(slug, user): Promise<number> {
     return this.updateLikeStatus(slug, user, LikeOperation.UNLIKE);
   }
 
-  private async updateLikeStatus(slug, user, operation: LikeOperation) {
+  private async updateLikeStatus(
+    slug,
+    user,
+    operation: LikeOperation,
+  ): Promise<number> {
     if (!(await this.postModel.findOne({ slug }))) {
       throw new NotFoundException(
         HttpError.getHttpError(HttpErrorCode.POST_NOT_FOUND),
@@ -79,11 +88,16 @@ export class PostsService {
     await this.googleService.deleteFile(slug, UploadTypes.POST);
   }
 
-  async updatePost(slug: string, updatePostDto: UpdatePostDto, user: User) {
+  async updatePost(
+    slug: string,
+    updatePostDto: UpdatePostDto,
+    user: User,
+  ): Promise<PostDto> {
     await this.getPost(slug, user);
     const updated = await this.postModel
       .findOneAndUpdate({ slug }, { ...updatePostDto }, { new: true })
-      .populate('categories likers');
+      .populate('categories likers')
+      .populate('comments.commenter', ['pseudo', 'picture']);
     return this.asDto(updated, user);
   }
 
@@ -95,6 +109,7 @@ export class PostsService {
     let hasMore = false;
     if (!page) posts = await this.find({});
     else {
+      if (page <= 0) page = 1;
       posts = await this.postModel
         .find({})
         .sort({ createdAt: -1 })
@@ -128,17 +143,17 @@ export class PostsService {
     return this.asDto(post, user);
   }
 
-  async getLikedPosts(userId: string, authUser: User) {
+  async getLikedPosts(userId: string, authUser: User): Promise<BasicPostDto[]> {
     await this.usersService.getUserById(userId);
     this.usersService.isSelfOrAdmin(userId, authUser);
     const posts = await this.postModel.find({ likers: userId });
     return posts.map((p) => this.asBasicDto(p));
   }
 
-  async getQueriedPosts(search: string) {
+  async getQueriedPosts(search: string): Promise<BasicPostDto[]> {
     if (!search || (search && search.length < 3)) {
       throw new BadRequestException(
-        'Search query is missing or should be more than 2 characters',
+        HttpError.getHttpError(HttpErrorCode.SEARCH_QUERY),
       );
     }
     const searchReg = new RegExp('.*' + search + '.*', 'i');
@@ -164,7 +179,91 @@ export class PostsService {
       },
       5,
     );
-    return posts.map((p) => this.asDto(p));
+    return posts.map((p) => this.asBasicDto(p));
+  }
+
+  async commentPost(
+    user: User,
+    createCommentDto: CreateCommentDto,
+    slug: string,
+  ): Promise<PostDto> {
+    if (!(await this.findOne({ slug }))) {
+      throw new NotFoundException(
+        HttpError.getHttpError(HttpErrorCode.POST_NOT_FOUND),
+      );
+    }
+    const post = await this.postModel
+      .findOneAndUpdate(
+        { slug },
+        {
+          $addToSet: {
+            comments: {
+              _id: new Mongoose.Types.ObjectId(),
+              commenter: user._id,
+              // pseudo: user.pseudo,
+              // picture: user.picture,
+              comment: createCommentDto.comment,
+              createdAt: Date.now(),
+            },
+          },
+        },
+        { new: true },
+      )
+      .populate('likers categories')
+      .populate('comments.commenter', ['pseudo', 'picture']);
+    return this.asDto(post, user);
+  }
+
+  async deletePostComment(
+    user: User,
+    slug: string,
+    comment: DeleteCommentDto,
+  ): Promise<PostDto> {
+    await this.usersService.isSelfOrAdmin(comment.commenterId.toString(), user);
+    if (!(await this.findOne({ slug }))) {
+      throw new NotFoundException(
+        HttpError.getHttpError(HttpErrorCode.POST_NOT_FOUND),
+      );
+    }
+    const post = await this.postModel
+      .findOneAndUpdate(
+        { slug },
+        {
+          $pull: {
+            comments: { _id: new Mongoose.Types.ObjectId(comment._id) },
+          },
+        },
+        { new: true },
+      )
+      .populate('categories likers')
+      .populate('comments.commenter', ['pseudo', 'picture']);
+    return this.asDto(post, user);
+  }
+
+  async updatePostComment(
+    user: User,
+    slug: string,
+    comment: UpdateCommentDto,
+  ): Promise<PostDto> {
+    await this.usersService.isSelfOrAdmin(comment.commenterId.toString(), user);
+    if (!(await this.findOne({ slug }))) {
+      throw new NotFoundException(
+        HttpError.getHttpError(HttpErrorCode.POST_NOT_FOUND),
+      );
+    }
+    const post = await this.postModel
+      .findOneAndUpdate(
+        { slug },
+        {
+          $set: {
+            'comments.$[commentId].comment': comment.comment,
+          },
+        },
+        { new: true, arrayFilters: [{ 'commentId._id': comment._id }] },
+      )
+      .populate('categories likers')
+      .populate('comments.commenter', ['pseudo', 'picture']);
+    return this.asDto(post, user);
   }
 
   private async checkIfPostIsDuplicatedBySlug(slug: string): Promise<PostDto> {
@@ -175,7 +274,9 @@ export class PostsService {
   private async find(match: MatchType = {}, limit = 0) {
     if (match._id) {
       if (!isValidObjectId(match._id)) {
-        throw new BadRequestException();
+        throw new BadRequestException(
+          HttpError.getHttpError(HttpErrorCode.INVALID_ID),
+        );
       } else {
         match._id = new Types.ObjectId(match._id as string);
       }
@@ -197,6 +298,7 @@ export class PostsService {
       })
       .sort({ createdAt: -1 })
       .populate('categories likers')
+      .populate('comments.commenter', ['pseudo', 'picture'])
       .sort({ createdAt: -1 });
     if (limit) docs.limit(limit);
     return docs;
@@ -211,7 +313,7 @@ export class PostsService {
     }
   }
 
-  asBasicDto(post: Post) {
+  asBasicDto(post: Post): BasicPostDto {
     return {
       slug: post.slug,
       title: post.title,

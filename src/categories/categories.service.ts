@@ -10,6 +10,7 @@ import { isValidObjectId, Model, Types } from 'mongoose';
 import { CategoryDto } from './dto/category.dto';
 import { CreateCategoryDto } from './dto/create-category.dto';
 import { MatchType } from '../shared/types/match.types';
+import { HttpError, HttpErrorCode } from '../shared/error/HttpError';
 
 @Injectable()
 export class CategoriesService {
@@ -20,7 +21,9 @@ export class CategoriesService {
 
   async create(createCategoryDto: CreateCategoryDto): Promise<CategoryDto> {
     if (await this.getCategoryByName(createCategoryDto.name)) {
-      throw new ConflictException('category already exist');
+      throw new ConflictException(
+        HttpError.getHttpError(HttpErrorCode.DUPLICATE_CATEGORY),
+      );
     }
     const createdCategory = await this.categoryModel.create(createCategoryDto);
     return this.asDto(createdCategory);
@@ -45,7 +48,9 @@ export class CategoriesService {
   private async find(match: MatchType = {}) {
     if (match._id) {
       if (!isValidObjectId(match._id)) {
-        throw new BadRequestException();
+        throw new BadRequestException(
+          HttpError.getHttpError(HttpErrorCode.INVALID_ID),
+        );
       } else {
         match._id = new Types.ObjectId(match._id as string);
       }

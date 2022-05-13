@@ -3,7 +3,7 @@ import * as Mongoose from 'mongoose';
 import { Connection } from 'mongoose';
 import { initE2eWithGuards } from '../../shared/test/init.e2e';
 import { clearDatabase } from '../../shared/test/utils';
-import { PostStub } from './stub/post.stub';
+import { CreatePostStub, PostStub } from './stub/post.stub';
 import { doArraysIntersect } from '../../shared/utils/tests.utils';
 import { urlRegex } from '../../shared/utils/regex.validation';
 import { AuthService } from '../../auth/auth.service';
@@ -33,7 +33,7 @@ describe('PostsController (e2e)', () => {
   describe('createPost', () => {
     describe('successfully create a post', () => {
       it('should create a post', async () => {
-        const post = PostStub();
+        const post = CreatePostStub();
         const user = UserStub(IUserRole.POSTER);
         const token = authService.signToken(user);
         await dbConnection.collection('users').insertOne(user);
@@ -96,7 +96,7 @@ describe('PostsController (e2e)', () => {
         expect(response.status).toBe(400);
       });
       it('should not create a duplicate post', async () => {
-        const post = PostStub();
+        const post = CreatePostStub();
         const user = UserStub(IUserRole.POSTER);
         const token = authService.signToken(user);
         await dbConnection.collection('users').insertOne(user);
