@@ -181,6 +181,7 @@ let PostsService = class PostsService {
             .findOneAndUpdate({ slug }, {
             $set: {
                 'comments.$[commentId].comment': comment.comment,
+                'comments.$[commentId].updatedAt': Date.now(),
             },
         }, { new: true, arrayFilters: [{ 'commentId._id': comment._id }] })
             .populate('categories likers')
