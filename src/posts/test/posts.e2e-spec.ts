@@ -3,13 +3,18 @@ import * as Mongoose from 'mongoose';
 import { Connection } from 'mongoose';
 import { initE2eWithGuards } from '../../shared/test/init.e2e';
 import { clearDatabase } from '../../shared/test/utils';
-import { CreatePostStub, PostStub } from './stub/post.stub';
+import { CreatePostStub, mockedComment, PostStub } from './stub/post.stub';
 import { doArraysIntersect } from '../../shared/utils/tests.utils';
 import { urlRegex } from '../../shared/utils/regex.validation';
 import { AuthService } from '../../auth/auth.service';
 import { adminStub, UserStub } from '../../users/test/stub/user.stub';
 import { IUserRole } from '../../users/entities/users.role.interface';
 import { UpdatePostDto } from '../dto/update-post.dto';
+import { CreateCommentDto } from '../dto/create-comment.dto';
+import { CommentDto } from '../dto/comment.dto';
+import { CommenterDto } from '../../users/dto/commenter.dto';
+import { UpdateCommentDto } from '../dto/update-comment.dto';
+import { DeleteCommentDto } from '../dto/delete-comment.dto';
 
 describe('PostsController (e2e)', () => {
   let app: INestApplication;
@@ -475,6 +480,302 @@ describe('PostsController (e2e)', () => {
       });
     });
 
+    afterEach(async () => {
+      await clearDatabase(dbConnection, 'posts');
+      await clearDatabase(dbConnection, 'users');
+    });
+  });
+
+  describe('Comment a post', function () {
+    describe('Failing', function () {
+      it('should not comment while not logged in', async function () {
+        const post = PostStub();
+        await dbConnection.collection('posts').insertOne(post);
+        const response = await request
+          .post(`/posts/comment/${post.slug}`)
+          .send({
+            comment: 'un commentaire',
+          } as CreateCommentDto);
+        expect(response.status).toBe(401);
+      });
+
+      it('should not comment a non-existant post', async function () {
+        const user = UserStub();
+        await dbConnection.collection('users').insertOne(user);
+        const token = authService.signToken(user);
+        const response = await request
+          .post(`/posts/comment/aerzzae`)
+          .send({
+            comment: 'un commentaire',
+          } as CreateCommentDto)
+          .set('Cookie', `access_token=${token}`);
+        expect(response.status).toBe(404);
+      });
+
+      it('should not comment with bad validations', async function () {
+        const user = UserStub();
+        const post = PostStub();
+        await dbConnection.collection('users').insertOne(user);
+        const token = authService.signToken(user);
+        const response = await request
+          .post(`/posts/comment/${post.slug}`)
+          .send({
+            comment: '',
+          } as CreateCommentDto)
+          .set('Cookie', `access_token=${token}`);
+        expect(response.status).toBe(400);
+      });
+    });
+
+    describe('Successfully', function () {
+      it('should comment a post', async function () {
+        const post = PostStub();
+        const user = UserStub();
+        await dbConnection.collection('users').insertOne(user);
+        await dbConnection.collection('posts').insertOne(post);
+        const token = authService.signToken(user);
+        const response = await request
+          .post(`/posts/comment/${post.slug}`)
+          .send({
+            comment: 'un commentaire',
+          } as CreateCommentDto)
+          .set('Cookie', `access_token=${token}`);
+        expect(response.status).toBe(201);
+        expect(response.body.comments).toBeInstanceOf(Array);
+        expect(response.body.comments.length).toBe(1);
+        const { _id, comment, commenter, updatedAt, createdAt } = response.body
+          .comments[0] as CommentDto;
+        const { picture, pseudo } = commenter as CommenterDto;
+        expect(comment).toBe('un commentaire');
+        expect(updatedAt).not.toBeDefined();
+        expect([pseudo, picture]).toEqual([user.pseudo, user.picture]);
+      });
+    });
+
+    afterEach(async () => {
+      await clearDatabase(dbConnection, 'posts');
+      await clearDatabase(dbConnection, 'users');
+    });
+  });
+
+  describe('Update comment', function () {
+    describe('Failing', function () {
+      it('should not update comment while not logged in', async function () {
+        const post = PostStub();
+        await dbConnection.collection('posts').insertOne(post);
+        const response = await request
+          .patch(`/posts/comment/${post.slug}`)
+          .send({
+            comment: 'un commentaire',
+            _id: new Mongoose.Types.ObjectId(),
+            commenterId: new Mongoose.Types.ObjectId(),
+          } as UpdateCommentDto);
+        expect(response.status).toBe(401);
+      });
+      it('should not update comment on a non-existant post', async function () {
+        const user = UserStub();
+        await dbConnection.collection('users').insertOne(user);
+        const token = authService.signToken(user);
+        const response = await request
+          .patch(`/posts/comment/aerzzae`)
+          .send({
+            comment: 'un commentaire',
+            _id: new Mongoose.Types.ObjectId(),
+            commenterId: user._id,
+          } as UpdateCommentDto)
+          .set('Cookie', `access_token=${token}`);
+        expect(response.status).toBe(404);
+      });
+      it('should not update comment with bad validations', async function () {
+        const user = UserStub();
+        const post = PostStub();
+        await dbConnection.collection('users').insertOne(user);
+        const token = authService.signToken(user);
+        const response = await request
+          .patch(`/posts/comment/${post.slug}`)
+          .send({
+            comment: '',
+            _id: new Mongoose.Types.ObjectId(),
+            commenterId: new Mongoose.Types.ObjectId(),
+          } as CreateCommentDto)
+          .set('Cookie', `access_token=${token}`);
+        expect(response.status).toBe(400);
+      });
+      it('should not update a comment that not belong to the logged in user', async function () {
+        const commenter = adminStub();
+        const updaterId = new Mongoose.Types.ObjectId();
+        const updater = UserStub(IUserRole.USER, updaterId);
+        const post = PostStub();
+        const comment: CommentDto = {
+          ...mockedComment(),
+          commenter: {
+            _id: commenter._id,
+            pseudo: commenter.pseudo,
+          },
+        };
+        post.comments.push(comment);
+        await dbConnection.collection('posts').insertOne(post);
+        await dbConnection.collection('users').insertMany([commenter, updater]);
+        const token = authService.signToken(updater);
+        const response = await request
+          .patch(`/posts/comment/${post.slug}`)
+          .set('Cookie', `access_token=${token}`)
+          .send({
+            comment: 'heyhey',
+            _id: post.comments[0]._id,
+            commenterId: commenter._id,
+          } as UpdateCommentDto);
+        expect(response.status).toBe(401);
+      });
+    });
+
+    describe('Successfully', function () {
+      it("should update the logged in user's comment", async function () {
+        const commenter = adminStub();
+        const post = PostStub();
+        const comment: CommentDto = {
+          ...mockedComment(),
+          commenter: {
+            _id: commenter._id,
+            pseudo: commenter.pseudo,
+          },
+        };
+        post.comments.push(comment);
+        await dbConnection.collection('posts').insertOne(post);
+        await dbConnection.collection('users').insertOne(commenter);
+        const token = authService.signToken(commenter);
+        const response = await request
+          .patch(`/posts/comment/${post.slug}`)
+          .set('Cookie', `access_token=${token}`)
+          .send({
+            comment: 'heyhey',
+            _id: post.comments[0]._id,
+            commenterId: commenter._id,
+          } as UpdateCommentDto);
+        expect(response.status).toBe(200);
+        expect(response.body.comments[0].comment).toBe('heyhey');
+        expect(response.body.comments[0].updatedAt).toBeDefined();
+      });
+      it('should update a comment that not belong to the logged in admin user', async function () {
+        const commenter = UserStub();
+        const post = PostStub();
+        const updater = adminStub();
+        const comment: CommentDto = {
+          ...mockedComment(),
+          commenter: {
+            _id: commenter._id,
+            pseudo: commenter.pseudo,
+          },
+        };
+        post.comments.push(comment);
+        await dbConnection.collection('posts').insertOne(post);
+        await dbConnection.collection('users').insertMany([commenter, updater]);
+        const token = authService.signToken(updater);
+        const response = await request
+          .patch(`/posts/comment/${post.slug}`)
+          .set('Cookie', `access_token=${token}`)
+          .send({
+            comment: 'heyhey',
+            _id: post.comments[0]._id,
+            commenterId: commenter._id,
+          } as UpdateCommentDto);
+        expect(response.status).toBe(200);
+      });
+    });
+
+    afterEach(async () => {
+      await clearDatabase(dbConnection, 'posts');
+      await clearDatabase(dbConnection, 'users');
+    });
+  });
+
+  describe('Delete comment', function () {
+    describe('Failing', function () {
+      it('should not delete a comment while not logged in', async function () {
+        const response = await request
+          .delete(`/posts/comment/slug`)
+          .send({} as DeleteCommentDto);
+        expect(response.status).toBe(401);
+      });
+      it('should not delete a comment on a non-existent post', async function () {
+        const user = UserStub();
+        await dbConnection.collection('users').insertOne(user);
+        const token = authService.signToken(user);
+        const response = await request
+          .delete(`/posts/comment/slug`)
+          .set('Cookie', `access_token=${token}`)
+          .send({
+            _id: new Mongoose.Types.ObjectId(),
+            commenterId: user._id,
+          } as DeleteCommentDto);
+        expect(response.status).toBe(404);
+      });
+      it('should not delete a comment that does not belong to the logged user', async function () {
+        const user = UserStub();
+        const post = PostStub();
+        await dbConnection.collection('users').insertOne(user);
+        await dbConnection.collection('posts').insertOne(post);
+        const token = authService.signToken(user);
+        const response = await request
+          .delete(`/posts/comment/${post.slug}`)
+          .set('Cookie', `access_token=${token}`)
+          .send({
+            _id: new Mongoose.Types.ObjectId(),
+            commenterId: new Mongoose.Types.ObjectId(),
+          } as DeleteCommentDto);
+        expect(response.status).toBe(401);
+      });
+    });
+    describe('Successfully', function () {
+      it('should delete a comment', async function () {
+        const commenter = adminStub();
+        const post = PostStub();
+        const comment: CommentDto = {
+          ...mockedComment(),
+          commenter: {
+            _id: commenter._id,
+            pseudo: commenter.pseudo,
+          },
+        };
+        post.comments.push(comment);
+        await dbConnection.collection('posts').insertOne(post);
+        await dbConnection.collection('users').insertOne(commenter);
+        const token = authService.signToken(commenter);
+        const response = await request
+          .delete(`/posts/comment/${post.slug}`)
+          .set('Cookie', `access_token=${token}`)
+          .send({
+            _id: post.comments[0]._id,
+            commenterId: commenter._id,
+          } as DeleteCommentDto);
+        expect(response.status).toBe(200);
+        expect(response.body.comments.length).toBe(0);
+      });
+      it('should delete a comment that does not belong to the logged admin user', async function () {
+        const commenter = UserStub();
+        const post = PostStub();
+        const updater = adminStub();
+        const comment: CommentDto = {
+          ...mockedComment(),
+          commenter: {
+            _id: commenter._id,
+            pseudo: commenter.pseudo,
+          },
+        };
+        post.comments.push(comment);
+        await dbConnection.collection('posts').insertOne(post);
+        await dbConnection.collection('users').insertMany([commenter, updater]);
+        const token = authService.signToken(updater);
+        const response = await request
+          .delete(`/posts/comment/${post.slug}`)
+          .set('Cookie', `access_token=${token}`)
+          .send({
+            _id: post.comments[0]._id,
+            commenterId: commenter._id,
+          } as DeleteCommentDto);
+        expect(response.status).toBe(200);
+      });
+    });
     afterEach(async () => {
       await clearDatabase(dbConnection, 'posts');
       await clearDatabase(dbConnection, 'users');

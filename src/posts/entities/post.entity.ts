@@ -73,7 +73,7 @@ export class Post {
           type: Number,
         },
         updatedAt: {
-          type: String,
+          type: Number,
           required: false,
         },
         commenter: {
