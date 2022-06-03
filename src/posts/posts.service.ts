@@ -272,6 +272,12 @@ export class PostsService {
     return post ? this.asDto(post, null) : null;
   }
 
+  async getPostLikeStatus(slug: string, user: User): Promise<boolean> {
+    const post = await this.findOne({ slug });
+    if (!post) return false;
+    return !!post.likers.find((u) => u._id.toString() === user._id.toString());
+  }
+
   private async find(match: MatchType = {}, limit = 0) {
     if (match._id) {
       if (!isValidObjectId(match._id)) {
@@ -336,7 +342,8 @@ export class PostsService {
       title: post.title,
       categories: post.categories,
       likes: post.likers.length,
-      authUserLiked: likeStatus,
+      // authUserLiked: likeStatus,
+      authUserLiked: false,
       desc: post.desc,
       sourceName: post.sourceName,
       sourceLink: post.sourceLink,

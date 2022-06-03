@@ -1,7 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.default = () => ({
-    port: process.env.PORT || 5000,
+    port: process.env.PORT || 8080,
     database: {
         host: process.env.DB_URI,
         username: process.env.DB_USER,
