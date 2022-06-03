@@ -27,4 +27,5 @@ export declare class PostsController {
     commentPost(req: any, comment: CreateCommentDto, slug: any): Promise<PostDto>;
     editPostComment(req: any, comment: UpdateCommentDto, slug: any): Promise<PostDto>;
     deletePostComment(req: any, slug: any, commentDto: DeleteCommentDto): Promise<PostDto>;
+    patchLikePost(slug: string, req: any): Promise<boolean>;
 }

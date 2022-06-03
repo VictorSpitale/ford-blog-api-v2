@@ -72,6 +72,9 @@ let PostsController = class PostsController {
     async deletePostComment(req, slug, commentDto) {
         return this.postsService.deletePostComment(req.user, slug, commentDto);
     }
+    async patchLikePost(slug, req) {
+        return this.postsService.getPostLikeStatus(slug, req.user);
+    }
 };
 __decorate([
     (0, common_1.Post)(),
@@ -452,6 +455,26 @@ __decorate([
     __metadata("design:paramtypes", [Object, Object, delete_comment_dto_1.DeleteCommentDto]),
     __metadata("design:returntype", Promise)
 ], PostsController.prototype, "deletePostComment", null);
+__decorate([
+    (0, common_1.Get)('/isLiked/:slug'),
+    (0, swagger_1.ApiOperation)({ summary: 'Send the auth like status of a post' }),
+    (0, swagger_1.ApiResponse)({
+        status: 200,
+        description: 'The like status',
+        type: Boolean,
+    }),
+    (0, swagger_1.ApiParam)({
+        type: String,
+        name: 'slug',
+        description: 'Post slug',
+    }),
+    (0, swagger_1.ApiCookieAuth)(),
+    __param(0, (0, common_1.Param)('slug')),
+    __param(1, (0, common_1.Req)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, Object]),
+    __metadata("design:returntype", Promise)
+], PostsController.prototype, "patchLikePost", null);
 PostsController = __decorate([
     (0, common_1.Controller)('posts'),
     (0, swagger_1.ApiTags)('Posts'),
