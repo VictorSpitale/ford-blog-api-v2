@@ -37,6 +37,7 @@ export declare class PostsService {
     deletePostComment(user: User, slug: string, comment: DeleteCommentDto): Promise<PostDto>;
     updatePostComment(user: User, slug: string, comment: UpdateCommentDto): Promise<PostDto>;
     private checkIfPostIsDuplicatedBySlug;
+    getPostLikeStatus(slug: string, user: User): Promise<boolean>;
     private find;
     findOne(match: MatchType): Promise<Post & Mongoose.Document<any, any, any> & {
         _id: any;

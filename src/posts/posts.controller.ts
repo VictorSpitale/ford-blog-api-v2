@@ -396,4 +396,21 @@ export class PostsController {
   ) {
     return this.postsService.deletePostComment(req.user, slug, commentDto);
   }
+
+  @Get('/isLiked/:slug')
+  @ApiOperation({ summary: 'Send the auth like status of a post' })
+  @ApiResponse({
+    status: 200,
+    description: 'The like status',
+    type: Boolean,
+  })
+  @ApiParam({
+    type: String,
+    name: 'slug',
+    description: 'Post slug',
+  })
+  @ApiCookieAuth()
+  async patchLikePost(@Param('slug') slug: string, @Req() req) {
+    return this.postsService.getPostLikeStatus(slug, req.user);
+  }
 }

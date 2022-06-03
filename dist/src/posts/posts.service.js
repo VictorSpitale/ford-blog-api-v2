@@ -181,6 +181,7 @@ let PostsService = class PostsService {
             .findOneAndUpdate({ slug }, {
             $set: {
                 'comments.$[commentId].comment': comment.comment,
+                'comments.$[commentId].updatedAt': Date.now(),
             },
         }, { new: true, arrayFilters: [{ 'commentId._id': comment._id }] })
             .populate('categories likers')
@@ -190,6 +191,12 @@ let PostsService = class PostsService {
     async checkIfPostIsDuplicatedBySlug(slug) {
         const post = await this.findOne({ slug });
         return post ? this.asDto(post, null) : null;
+    }
+    async getPostLikeStatus(slug, user) {
+        const post = await this.findOne({ slug });
+        if (!post)
+            return false;
+        return !!post.likers.find((u) => u._id.toString() === user._id.toString());
     }
     async find(match = {}, limit = 0) {
         if (match._id) {
@@ -251,7 +258,7 @@ let PostsService = class PostsService {
             title: post.title,
             categories: post.categories,
             likes: post.likers.length,
-            authUserLiked: likeStatus,
+            authUserLiked: false,
             desc: post.desc,
             sourceName: post.sourceName,
             sourceLink: post.sourceLink,
