@@ -192,6 +192,12 @@ let PostsService = class PostsService {
         const post = await this.findOne({ slug });
         return post ? this.asDto(post, null) : null;
     }
+    async getPostLikeStatus(slug, user) {
+        const post = await this.findOne({ slug });
+        if (!post)
+            return false;
+        return !!post.likers.find((u) => u._id.toString() === user._id.toString());
+    }
     async find(match = {}, limit = 0) {
         if (match._id) {
             if (!(0, mongoose_2.isValidObjectId)(match._id)) {
