@@ -22,6 +22,7 @@ import { BasicPostDto } from './dto/basic-post.dto';
 import { CreateCommentDto } from './dto/create-comment.dto';
 import { DeleteCommentDto } from './dto/delete-comment.dto';
 import { UpdateCommentDto } from './dto/update-comment.dto';
+import { CategoriesService } from '../categories/categories.service';
 
 @Injectable()
 export class PostsService {
@@ -29,6 +30,7 @@ export class PostsService {
     @InjectModel(Post.name) private readonly postModel: Model<PostDocument>,
     private readonly googleService: GoogleService,
     private readonly usersService: UsersService,
+    private readonly categoriesService: CategoriesService,
   ) {}
 
   async create(
@@ -276,6 +278,17 @@ export class PostsService {
     const post = await this.findOne({ slug });
     if (!post) return false;
     return !!post.likers.find((u) => u._id.toString() === user._id.toString());
+  }
+
+  async getCategorizedPosts(categoryName: string): Promise<PostDto[]> {
+    const category = await this.categoriesService.findOne({
+      name: categoryName,
+    });
+    if (!category) return [];
+    const posts = await this.postModel
+      .find({ categories: category._id })
+      .populate('categories');
+    return posts.map((post) => this.asDto(post));
   }
 
   private async find(match: MatchType = {}, limit = 0) {

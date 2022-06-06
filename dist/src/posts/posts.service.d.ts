@@ -13,11 +13,13 @@ import { BasicPostDto } from './dto/basic-post.dto';
 import { CreateCommentDto } from './dto/create-comment.dto';
 import { DeleteCommentDto } from './dto/delete-comment.dto';
 import { UpdateCommentDto } from './dto/update-comment.dto';
+import { CategoriesService } from '../categories/categories.service';
 export declare class PostsService {
     private readonly postModel;
     private readonly googleService;
     private readonly usersService;
-    constructor(postModel: Model<PostDocument>, googleService: GoogleService, usersService: UsersService);
+    private readonly categoriesService;
+    constructor(postModel: Model<PostDocument>, googleService: GoogleService, usersService: UsersService, categoriesService: CategoriesService);
     create(createPostDto: CreatePostDto, file: Express.Multer.File): Promise<PostDto | any>;
     likePost(slug: any, user: any): Promise<number>;
     unlikePost(slug: any, user: any): Promise<number>;
@@ -38,6 +40,7 @@ export declare class PostsService {
     updatePostComment(user: User, slug: string, comment: UpdateCommentDto): Promise<PostDto>;
     private checkIfPostIsDuplicatedBySlug;
     getPostLikeStatus(slug: string, user: User): Promise<boolean>;
+    getCategorizedPosts(categoryName: string): Promise<PostDto[]>;
     private find;
     findOne(match: MatchType): Promise<Post & Mongoose.Document<any, any, any> & {
         _id: any;
