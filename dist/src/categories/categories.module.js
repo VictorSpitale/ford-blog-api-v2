@@ -23,6 +23,7 @@ CategoriesModule = __decorate([
         ],
         controllers: [categories_controller_1.CategoriesController],
         providers: [categories_service_1.CategoriesService],
+        exports: [categories_service_1.CategoriesService],
     })
 ], CategoriesModule);
 exports.CategoriesModule = CategoriesModule;

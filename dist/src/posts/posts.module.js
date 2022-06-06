@@ -14,12 +14,14 @@ const mongoose_1 = require("@nestjs/mongoose");
 const post_entity_1 = require("./entities/post.entity");
 const google_service_1 = require("../cloud/google.service");
 const users_module_1 = require("../users/users.module");
+const categories_module_1 = require("../categories/categories.module");
 let PostsModule = class PostsModule {
 };
 PostsModule = __decorate([
     (0, common_1.Module)({
         imports: [
             users_module_1.UsersModule,
+            categories_module_1.CategoriesModule,
             mongoose_1.MongooseModule.forFeature([{ name: post_entity_1.Post.name, schema: post_entity_1.PostEntity }]),
         ],
         controllers: [posts_controller_1.PostsController],
