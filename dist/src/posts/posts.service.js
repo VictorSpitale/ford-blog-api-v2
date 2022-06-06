@@ -23,11 +23,13 @@ const upload_types_1 = require("../shared/types/upload.types");
 const post_types_1 = require("../shared/types/post.types");
 const HttpError_1 = require("../shared/error/HttpError");
 const users_service_1 = require("../users/users.service");
+const categories_service_1 = require("../categories/categories.service");
 let PostsService = class PostsService {
-    constructor(postModel, googleService, usersService) {
+    constructor(postModel, googleService, usersService, categoriesService) {
         this.postModel = postModel;
         this.googleService = googleService;
         this.usersService = usersService;
+        this.categoriesService = categoriesService;
     }
     async create(createPostDto, file) {
         if (await this.checkIfPostIsDuplicatedBySlug(createPostDto.slug)) {
@@ -198,6 +200,17 @@ let PostsService = class PostsService {
             return false;
         return !!post.likers.find((u) => u._id.toString() === user._id.toString());
     }
+    async getCategorizedPosts(categoryName) {
+        const category = await this.categoriesService.findOne({
+            name: categoryName,
+        });
+        if (!category)
+            return [];
+        const posts = await this.postModel
+            .find({ categories: category._id })
+            .populate('categories');
+        return posts.map((post) => this.asDto(post));
+    }
     async find(match = {}, limit = 0) {
         if (match._id) {
             if (!(0, mongoose_2.isValidObjectId)(match._id)) {
@@ -258,7 +271,7 @@ let PostsService = class PostsService {
             title: post.title,
             categories: post.categories,
             likes: post.likers.length,
-            authUserLiked: false,
+            authUserLiked: likeStatus,
             desc: post.desc,
             sourceName: post.sourceName,
             sourceLink: post.sourceLink,
@@ -274,7 +287,8 @@ PostsService = __decorate([
     __param(0, (0, mongoose_1.InjectModel)(post_entity_1.Post.name)),
     __metadata("design:paramtypes", [mongoose_2.Model,
         google_service_1.GoogleService,
-        users_service_1.UsersService])
+        users_service_1.UsersService,
+        categories_service_1.CategoriesService])
 ], PostsService);
 exports.PostsService = PostsService;
 //# sourceMappingURL=posts.service.js.map

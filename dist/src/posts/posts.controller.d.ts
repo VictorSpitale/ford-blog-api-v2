@@ -28,4 +28,5 @@ export declare class PostsController {
     editPostComment(req: any, comment: UpdateCommentDto, slug: any): Promise<PostDto>;
     deletePostComment(req: any, slug: any, commentDto: DeleteCommentDto): Promise<PostDto>;
     patchLikePost(slug: string, req: any): Promise<boolean>;
+    getCategorizedPosts(category: string): Promise<PostDto[]>;
 }
