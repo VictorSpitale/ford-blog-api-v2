@@ -15,6 +15,7 @@ import { CommentDto } from '../dto/comment.dto';
 import { CommenterDto } from '../../users/dto/commenter.dto';
 import { UpdateCommentDto } from '../dto/update-comment.dto';
 import { DeleteCommentDto } from '../dto/delete-comment.dto';
+import { CategoryStub } from '../../categories/test/stub/category.stub';
 
 describe('PostsController (e2e)', () => {
   let app: INestApplication;
@@ -779,6 +780,32 @@ describe('PostsController (e2e)', () => {
     afterEach(async () => {
       await clearDatabase(dbConnection, 'posts');
       await clearDatabase(dbConnection, 'users');
+    });
+  });
+
+  describe('Get categorized posts', function () {
+    it('should return an empty array if the category does not exist', async function () {
+      const post = PostStub();
+      const category = CategoryStub();
+      await dbConnection.collection('posts').insertOne(post);
+      const response = await request.get(`/posts/categorized/${category.name}`);
+      expect(response.body).toEqual([]);
+    });
+    it('should return posts related to the category', async function () {
+      const category = CategoryStub();
+      const post = {
+        ...PostStub(),
+        categories: [category._id],
+      };
+      await dbConnection.collection('categories').insertOne(category);
+      await dbConnection.collection('posts').insertOne(post);
+      const response = await request.get(`/posts/categorized/${category.name}`);
+      expect(response.body.length).toBe(1);
+    });
+
+    afterEach(async () => {
+      await clearDatabase(dbConnection, 'posts');
+      await clearDatabase(dbConnection, 'categories');
     });
   });
 
