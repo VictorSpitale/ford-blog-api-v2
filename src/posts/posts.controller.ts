@@ -413,4 +413,22 @@ export class PostsController {
   async patchLikePost(@Param('slug') slug: string, @Req() req) {
     return this.postsService.getPostLikeStatus(slug, req.user);
   }
+
+  @Get('/categorized/:category')
+  @ApiOperation({ summary: 'Get posts related to a category' })
+  @ApiResponse({
+    status: 200,
+    description: 'The posts',
+    type: [PostDto],
+  })
+  @ApiParam({
+    type: String,
+    name: 'category',
+    description: 'The category name',
+    example: 'Sport',
+  })
+  @AllowAny()
+  async getCategorizedPosts(@Param('category') category: string) {
+    return this.postsService.getCategorizedPosts(category);
+  }
 }

@@ -75,6 +75,9 @@ let PostsController = class PostsController {
     async patchLikePost(slug, req) {
         return this.postsService.getPostLikeStatus(slug, req.user);
     }
+    async getCategorizedPosts(category) {
+        return this.postsService.getCategorizedPosts(category);
+    }
 };
 __decorate([
     (0, common_1.Post)(),
@@ -475,6 +478,26 @@ __decorate([
     __metadata("design:paramtypes", [String, Object]),
     __metadata("design:returntype", Promise)
 ], PostsController.prototype, "patchLikePost", null);
+__decorate([
+    (0, common_1.Get)('/categorized/:category'),
+    (0, swagger_1.ApiOperation)({ summary: 'Get posts related to a category' }),
+    (0, swagger_1.ApiResponse)({
+        status: 200,
+        description: 'The posts',
+        type: [post_dto_1.PostDto],
+    }),
+    (0, swagger_1.ApiParam)({
+        type: String,
+        name: 'category',
+        description: 'The category name',
+        example: 'Sport',
+    }),
+    (0, allow_any_decorator_1.AllowAny)(),
+    __param(0, (0, common_1.Param)('category')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", Promise)
+], PostsController.prototype, "getCategorizedPosts", null);
 PostsController = __decorate([
     (0, common_1.Controller)('posts'),
     (0, swagger_1.ApiTags)('Posts'),
