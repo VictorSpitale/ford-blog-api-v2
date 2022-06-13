@@ -115,7 +115,9 @@ let PostsService = class PostsService {
         return posts.map((p) => this.asBasicDto(p));
     }
     async getQueriedPosts(search) {
-        if (!search || (search && search.length < 3)) {
+        if (!search ||
+            typeof search !== 'string' ||
+            (search && search.length < 3)) {
             throw new common_1.BadRequestException(HttpError_1.HttpError.getHttpError(HttpError_1.HttpErrorCode.SEARCH_QUERY));
         }
         const searchReg = new RegExp('.*' + search + '.*', 'i');

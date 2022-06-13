@@ -17,7 +17,7 @@ export declare class PostsController {
         page: number;
     }>;
     getLastPosts(req: any): Promise<PostDto[]>;
-    getQueriedPosts(search: any): Promise<BasicPostDto[]>;
+    getQueriedPosts(search: string | string[]): Promise<BasicPostDto[]>;
     getLikedPost(req: any, id: any): Promise<BasicPostDto[]>;
     getPost(req: any, slug: any): Promise<PostDto>;
     likePost(req: any, slug: any): Promise<number>;

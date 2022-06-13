@@ -152,8 +152,12 @@ export class PostsService {
     return posts.map((p) => this.asBasicDto(p));
   }
 
-  async getQueriedPosts(search: string): Promise<BasicPostDto[]> {
-    if (!search || (search && search.length < 3)) {
+  async getQueriedPosts(search: string | string[]): Promise<BasicPostDto[]> {
+    if (
+      !search ||
+      typeof search !== 'string' ||
+      (search && search.length < 3)
+    ) {
       throw new BadRequestException(
         HttpError.getHttpError(HttpErrorCode.SEARCH_QUERY),
       );
