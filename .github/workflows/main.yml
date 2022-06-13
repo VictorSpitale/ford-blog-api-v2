@@ -1,0 +1,35 @@
+name: E2E Tests
+
+on: [ pull_request ]
+
+jobs:
+ build:
+   runs-on: ubuntu-latest
+   steps:
+     - uses: actions/checkout@v3
+     - uses: actions/setup-node@v3
+       with:
+         node-version: 14
+     - run: npm ci
+     - run: npm run test:e2e
+       env:
+         DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+         DB_USER: ${{ secrets.DB_USER }}
+         DB_URI: ${{ secrets.DB_URI }}
+         DB_CLUSTER_NAME: ${{ secrets.DB_CLUSTER_NAME }}
+         DB_NAME: ${{ secrets.DB_NAME }}
+         DB_TEST_NAME: ${{ secrets.DB_TEST_NAME }}
+         DB_DEV_NAME: ${{ secrets.DB_DEV_NAME }}
+         JWT_SECRET: ${{ secrets.JWT_SECRET }}
+         BUCKET_NAME: ${{ secrets.BUCKET_NAME }}
+         GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
+         GOOGLE_SECRET: ${{ secrets.GOOGLE_SECRET }}
+         GOOGLE_CALLBACK_URL: ${{ secrets.GOOGLE_CALLBACK_URL }}
+         CLIENT_URL: ${{ secrets.CLIENT_URL }}
+         MAIL_USERNAME: ${{ secrets.MAIL_USERNAME }}
+         MAIL_PASSWORD: ${{ secrets.MAIL_PASSWORD }}
+         MAIL_TO: ${{ secrets.MAIL_TO }}
+         REDIS_HOST: ${{ secrets.REDIS_HOST }}
+         REDIS_PORT: ${{ secrets.REDIS_PORT }}
+         REDIS_USERNAME: ${{ secrets.REDIS_USERNAME }}
+         REDIS_PASSWORD: ${{ secrets.REDIS_PASSWORD }}
