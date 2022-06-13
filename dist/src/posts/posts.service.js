@@ -115,10 +115,16 @@ let PostsService = class PostsService {
         return posts.map((p) => this.asBasicDto(p));
     }
     async getQueriedPosts(search) {
-        if (!search || (search && search.length < 3)) {
+        let query;
+        if (typeof search === 'string') {
+            query = search;
+        }
+        else
+            query = search[0];
+        if (!query || (query && query.length < 3)) {
             throw new common_1.BadRequestException(HttpError_1.HttpError.getHttpError(HttpError_1.HttpErrorCode.SEARCH_QUERY));
         }
-        const searchReg = new RegExp('.*' + search + '.*', 'i');
+        const searchReg = new RegExp('.*' + query + '.*', 'i');
         const posts = await this.find({
             $or: [
                 {

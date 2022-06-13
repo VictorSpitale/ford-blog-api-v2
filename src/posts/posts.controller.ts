@@ -121,7 +121,7 @@ export class PostsController {
     type: HttpErrorDto,
   })
   @AllowAny()
-  async getQueriedPosts(@Query('search') search) {
+  async getQueriedPosts(@Query('search') search: string | string[]) {
     return this.postsService.getQueriedPosts(search);
   }
 

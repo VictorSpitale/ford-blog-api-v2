@@ -152,13 +152,18 @@ export class PostsService {
     return posts.map((p) => this.asBasicDto(p));
   }
 
-  async getQueriedPosts(search: string): Promise<BasicPostDto[]> {
-    if (!search || (search && search.length < 3)) {
+  async getQueriedPosts(search: string | string[]): Promise<BasicPostDto[]> {
+    let query: string;
+    if (typeof search === 'string') {
+      query = search;
+    } else query = search[0];
+
+    if (!query || (query && query.length < 3)) {
       throw new BadRequestException(
         HttpError.getHttpError(HttpErrorCode.SEARCH_QUERY),
       );
     }
-    const searchReg = new RegExp('.*' + search + '.*', 'i');
+    const searchReg = new RegExp('.*' + query + '.*', 'i');
     const posts = await this.find(
       {
         $or: [
