@@ -813,6 +813,7 @@ describe('PostsController (e2e)', () => {
     await clearDatabase(dbConnection, 'categories');
     await clearDatabase(dbConnection, 'posts');
     await clearDatabase(dbConnection, 'users');
+    await dbConnection.close();
     await app.close();
   });
 });

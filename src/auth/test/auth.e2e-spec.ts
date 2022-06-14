@@ -90,6 +90,7 @@ describe('auth (e2e)', () => {
   });
   afterAll(async () => {
     await clearDatabase(dbConnection, 'users');
+    await dbConnection.close();
     await app.close();
   });
 });
