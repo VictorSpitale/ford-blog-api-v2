@@ -19,6 +19,11 @@ export default () => ({
     secret: process.env.GOOGLE_SECRET,
     callback: process.env.GOOGLE_CALLBACK_URL,
     client_url: process.env.CLIENT_URL,
+    storage: {
+      project_name: process.env.GOOGLE_CLOUD_PROJECT_NAME,
+      client_email: process.env.GOOGLE_CLOUD_CLIENT_EMAIL,
+      private_key: process.env.GOOGLE_CLOUD_PRIVATE_KEY,
+    },
   },
   email: {
     username: process.env.MAIL_USERNAME,
