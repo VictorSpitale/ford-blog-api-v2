@@ -363,6 +363,7 @@ describe('UsersController (e2e)', () => {
 
   afterAll(async () => {
     await clearDatabase(dbConnection, 'users');
+    await dbConnection.close(true);
     await app.close();
   });
 });

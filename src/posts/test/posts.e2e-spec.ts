@@ -42,6 +42,7 @@ describe('PostsController (e2e)', () => {
         const post = CreatePostStub();
         const user = UserStub(IUserRole.POSTER);
         const token = authService.signToken(user);
+        // Mongodb keep from exiting here ....
         await dbConnection.collection('users').insertOne(user);
         const response = await request
           .post('/posts')
@@ -813,6 +814,7 @@ describe('PostsController (e2e)', () => {
     await clearDatabase(dbConnection, 'categories');
     await clearDatabase(dbConnection, 'posts');
     await clearDatabase(dbConnection, 'users');
+    await dbConnection.close(true);
     await app.close();
   });
 });
