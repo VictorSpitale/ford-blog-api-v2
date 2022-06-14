@@ -5,7 +5,6 @@ import { clearDatabase } from '../../shared/test/utils';
 import { UserStub } from '../../users/test/stub/user.stub';
 import { UsersService } from '../../users/users.service';
 import { doArraysIntersect } from '../../shared/utils/tests.utils';
-import { DatabaseService } from '../../database/database.service';
 
 describe('auth (e2e)', () => {
   let app: INestApplication;
@@ -91,11 +90,7 @@ describe('auth (e2e)', () => {
   });
   afterAll(async () => {
     await clearDatabase(dbConnection, 'users');
-    await app
-      .get<DatabaseService>(DatabaseService)
-      .getDbHandle()
-      .getClient()
-      .close();
+    await dbConnection.close(true);
     await app.close();
   });
 });

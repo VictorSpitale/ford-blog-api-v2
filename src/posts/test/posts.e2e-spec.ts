@@ -16,7 +16,6 @@ import { CommenterDto } from '../../users/dto/commenter.dto';
 import { UpdateCommentDto } from '../dto/update-comment.dto';
 import { DeleteCommentDto } from '../dto/delete-comment.dto';
 import { CategoryStub } from '../../categories/test/stub/category.stub';
-import { DatabaseService } from '../../database/database.service';
 
 describe('PostsController (e2e)', () => {
   let app: INestApplication;
@@ -815,11 +814,7 @@ describe('PostsController (e2e)', () => {
     await clearDatabase(dbConnection, 'categories');
     await clearDatabase(dbConnection, 'posts');
     await clearDatabase(dbConnection, 'users');
-    await app
-      .get<DatabaseService>(DatabaseService)
-      .getDbHandle()
-      .getClient()
-      .close();
+    await dbConnection.close(true);
     await app.close();
   });
 });
