@@ -61,7 +61,7 @@ Ou Github CLI
 | DB_DEV_NAME               | dev_database                                | Nom de la base de données utilisée en phase de développement | 
 | JWT_SECRET                | secret_key                                  | Clé secrète utilisée pour générer les tokens d'accès         | 
 | BUCKET_NAME               | bucket_name                                 | Nom du bucket Google Storage                                 | 
-| GOOLE_CLIENT_ID           | google_client_id                            | Nom du client Google pour OAuth                              | 
+| GOOGLE_CLIENT_ID          | google_client_id                            | Nom du client Google pour OAuth                              | 
 | GOOGLE_SECRET             | google_secret                               | Clé secrète Google pour OAuth                                | 
 | GOOGLE_CALLBACK_URL       | http://url_du_back/api/auth/google/redirect | Url de redirection après l'authentification                  | 
 | CLIENT_URL                | client_url                                  | Url du client front                                          | 
@@ -73,12 +73,13 @@ Ou Github CLI
 | REDIS_USERNAME            | username                                    | Nom d'utilisateur créé sur Redis                             | 
 | REDIS_PASSWORD            | password                                    | Mot de passe de l'utilisateur créé sur Redis                 | 
 | GOOGLE_CLOUD_PROJECT_NAME | project_name                                | Nom du projet sur Google Cloud Storage                       | 
-| GOOGLE_CLOUD_KEYFILE_JSON | {credentials}                               | JSON des informations du compte de service                   | 
+| GOOGLE_CLOUD_CLIENT_EMAIL | email@gservice.com                          | Email du compte de service                                   | 
+| GOOGLE_CLOUD_PRIVATE_KEY  | private_key                                 | Clef privée d'identification au service Google Cloud         | 
 
 ## Lancer le projet
 
 
-Installer les dépendences
+Installer les dépendances
 
 ```bash
   npm install
