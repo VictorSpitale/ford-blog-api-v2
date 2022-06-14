@@ -12,6 +12,7 @@ import { clearDatabase } from '../../shared/test/utils';
 import { initE2eWithGuards } from '../../shared/test/init.e2e';
 import { AuthService } from '../../auth/auth.service';
 import { IUserRole } from '../entities/users.role.interface';
+import { DatabaseService } from '../../database/database.service';
 
 describe('UsersController (e2e)', () => {
   let dbConnection: Connection;
@@ -363,7 +364,11 @@ describe('UsersController (e2e)', () => {
 
   afterAll(async () => {
     await clearDatabase(dbConnection, 'users');
-    await dbConnection.close();
+    await app
+      .get<DatabaseService>(DatabaseService)
+      .getDbHandle()
+      .getClient()
+      .close();
     await app.close();
   });
 });

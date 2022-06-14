@@ -7,6 +7,7 @@ import { initE2eWithGuards } from '../../shared/test/init.e2e';
 import { UserStub } from '../../users/test/stub/user.stub';
 import { AuthService } from '../../auth/auth.service';
 import { IUserRole } from '../../users/entities/users.role.interface';
+import { DatabaseService } from '../../database/database.service';
 
 describe.only('CategoriesController (e2e)', () => {
   let app: INestApplication;
@@ -107,7 +108,11 @@ describe.only('CategoriesController (e2e)', () => {
   afterAll(async () => {
     await clearDatabase(dbConnection, 'categories');
     await clearDatabase(dbConnection, 'users');
-    await dbConnection.close();
+    await app
+      .get<DatabaseService>(DatabaseService)
+      .getDbHandle()
+      .getClient()
+      .close();
     await app.close();
   });
 });
