@@ -10,12 +10,22 @@ import { HttpError, HttpErrorCode } from '../shared/error/HttpError';
 
 @Injectable()
 export class GoogleService {
-  constructor(private readonly configService: ConfigService) {}
+  storage: Storage = undefined;
 
-  storage = new Storage({
-    projectId: 'fordblog',
-    keyFilename: './fordblog-bfc482c198ea.json',
-  });
+  constructor(private readonly configService: ConfigService) {
+    if (!this.storage) {
+      this.storage = new Storage({
+        projectId: configService.get('google.storage.project_name'),
+        credentials: {
+          private_key: configService
+            .get('google.storage.private_key')
+            .toString()
+            .replace(/\\n/g, '\n'),
+          client_email: configService.get('google.storage.client_email'),
+        },
+      });
+    }
+  }
 
   async uploadFile(
     file: Express.Multer.File,
@@ -38,7 +48,7 @@ export class GoogleService {
     }
     try {
       const bucket = this.storage.bucket(this.configService.get('bucket_name'));
-      const folder = this.getFolder(type);
+      const folder = GoogleService.getFolder(type);
       const path = folder + name + '.jpg';
       const fileCloud = this.storage
         .bucket(this.configService.get('bucket_name'))
@@ -57,14 +67,14 @@ export class GoogleService {
   async deleteFile(name: string, type: UploadTypes) {
     try {
       const bucket = this.storage.bucket(this.configService.get('bucket_name'));
-      const folder = this.getFolder(type);
+      const folder = GoogleService.getFolder(type);
       const path = folder + name + '.jpg';
       const fileCloud = bucket.file(path);
       await fileCloud.delete();
     } catch (e) {}
   }
 
-  private getFolder(type: UploadTypes) {
+  private static getFolder(type: UploadTypes) {
     switch (type) {
       case UploadTypes.POST:
         return 'posts/';

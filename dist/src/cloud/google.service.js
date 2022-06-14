@@ -8,6 +8,7 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
+var GoogleService_1;
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.GoogleService = void 0;
 const common_1 = require("@nestjs/common");
@@ -15,13 +16,22 @@ const storage_1 = require("@google-cloud/storage");
 const config_1 = require("@nestjs/config");
 const upload_types_1 = require("../shared/types/upload.types");
 const HttpError_1 = require("../shared/error/HttpError");
-let GoogleService = class GoogleService {
+let GoogleService = GoogleService_1 = class GoogleService {
     constructor(configService) {
         this.configService = configService;
-        this.storage = new storage_1.Storage({
-            projectId: 'fordblog',
-            keyFilename: './fordblog-bfc482c198ea.json',
-        });
+        this.storage = undefined;
+        if (!this.storage) {
+            this.storage = new storage_1.Storage({
+                projectId: configService.get('google.storage.project_name'),
+                credentials: {
+                    private_key: configService
+                        .get('google.storage.private_key')
+                        .toString()
+                        .replace(/\\n/g, '\n'),
+                    client_email: configService.get('google.storage.client_email'),
+                },
+            });
+        }
     }
     async uploadFile(file, name, type) {
         if (file.size > 500000) {
@@ -34,7 +44,7 @@ let GoogleService = class GoogleService {
         }
         try {
             const bucket = this.storage.bucket(this.configService.get('bucket_name'));
-            const folder = this.getFolder(type);
+            const folder = GoogleService_1.getFolder(type);
             const path = folder + name + '.jpg';
             const fileCloud = this.storage
                 .bucket(this.configService.get('bucket_name'))
@@ -51,14 +61,14 @@ let GoogleService = class GoogleService {
     async deleteFile(name, type) {
         try {
             const bucket = this.storage.bucket(this.configService.get('bucket_name'));
-            const folder = this.getFolder(type);
+            const folder = GoogleService_1.getFolder(type);
             const path = folder + name + '.jpg';
             const fileCloud = bucket.file(path);
             await fileCloud.delete();
         }
         catch (e) { }
     }
-    getFolder(type) {
+    static getFolder(type) {
         switch (type) {
             case upload_types_1.UploadTypes.POST:
                 return 'posts/';
@@ -69,7 +79,7 @@ let GoogleService = class GoogleService {
         }
     }
 };
-GoogleService = __decorate([
+GoogleService = GoogleService_1 = __decorate([
     (0, common_1.Injectable)(),
     __metadata("design:paramtypes", [config_1.ConfigService])
 ], GoogleService);
