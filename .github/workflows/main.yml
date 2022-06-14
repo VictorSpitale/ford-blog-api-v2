@@ -33,3 +33,6 @@ jobs:
          REDIS_PORT: ${{ secrets.REDIS_PORT }}
          REDIS_USERNAME: ${{ secrets.REDIS_USERNAME }}
          REDIS_PASSWORD: ${{ secrets.REDIS_PASSWORD }}
+         GOOGLE_CLOUD_PROJECT_NAME: ${{ secrets.GOOGLE_CLOUD_PROJECT_NAME }}
+         GOOGLE_CLOUD_CLIENT_EMAIL: ${{ secrets.GOOGLE_CLOUD_CLIENT_EMAIL }}
+         GOOGLE_CLOUD_PRIVATE_KEY: ${{ secrets.GOOGLE_CLOUD_PRIVATE_KEY }}

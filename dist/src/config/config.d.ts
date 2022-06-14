@@ -19,6 +19,11 @@ declare const _default: () => {
         secret: string;
         callback: string;
         client_url: string;
+        storage: {
+            project_name: string;
+            client_email: string;
+            private_key: string;
+        };
     };
     email: {
         username: string;

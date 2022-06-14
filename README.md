@@ -48,39 +48,38 @@ Ou Github CLI
 - Créer un utilisateur dans "Data Access Control"
 - Créer une base de données dans "Databases"
 
-**ATTENTION :**
-- 
-Si vous utilisez Google Cloud Storage, changez le lien vers le fichier json content vos clés de service Google et le nom de votre projet dans le fichier : **src/cloud/google.service.ts** ligne 15/16.
+### Configurer les variables d'environnement .env
 
-Configurer les variables d'environnement .env
-
-| Nom                 | Exemple                                     | Instructions                                                 |
-|---------------------|---------------------------------------------|--------------------------------------------------------------|
-| DB_PASSWORD         | password                                    | Mot de passe du cluster MongoDB                              | 
-| DB_USER             | username                                    | Nom d'utilisateur MongoDB                                    | 
-| DB_URI              | mongodb0.example.com:27017                  | Url de connexion vers la base de données MongoDB             | 
-| DB_CLUSTER_NAME     | mycluster                                   | Nom du cluster de production                                 | 
-| DB_NAME             | database                                    | Nom de la base de données de production                      | 
-| DB_TEST_NAME        | test_database                               | Nom de la base de données utilisée pour les tests e2e        | 
-| DB_DEV_NAME         | dev_database                                | Nom de la base de données utilisée en phase de développement | 
-| JWT_SECRET          | secret_key                                  | Clé secrète utilisée pour générer les tokens d'accès         | 
-| BUCKET_NAME         | bucket_name                                 | Nom du bucket Google Storage                                 | 
-| GOOLE_CLIENT_ID     | google_client_id                            | Nom du client Google pour OAuth                              | 
-| GOOGLE_SECRET       | google_secret                               | Clé secrète Google pour OAuth                                | 
-| GOOGLE_CALLBACK_URL | http://url_du_back/api/auth/google/redirect | Url de redirection après l'authentification                  | 
-| CLIENT_URL          | client_url                                  | Url du client front                                          | 
-| MAIL_USERNAME       | mail_username                               | Nom de l'adresse email utilisé pour le mailing               | 
-| MAIL_PASSWORD       | mail_password                               | Mot de passe du compte mail                                  | 
-| MAIL_TO             | contact_mail_to                             | Adresse destinataire de la page contact                      | 
-| REDIS_HOST          | host                                        | Url vers la base de données Redis                            | 
-| REDIS_PORT          | port                                        | Port de la base de données Redis                             | 
-| REDIS_USERNAME      | username                                    | Nom d'utilisateur créé sur Redis                             | 
-| REDIS_PASSWORD      | password                                    | Mot de passe de l'utilisateur créé sur Redis                 | 
+| Nom                       | Exemple                                     | Instructions                                                 |
+|---------------------------|---------------------------------------------|--------------------------------------------------------------|
+| DB_PASSWORD               | password                                    | Mot de passe du cluster MongoDB                              | 
+| DB_USER                   | username                                    | Nom d'utilisateur MongoDB                                    | 
+| DB_URI                    | mongodb0.example.com:27017                  | Url de connexion vers la base de données MongoDB             | 
+| DB_CLUSTER_NAME           | mycluster                                   | Nom du cluster de production                                 | 
+| DB_NAME                   | database                                    | Nom de la base de données de production                      | 
+| DB_TEST_NAME              | test_database                               | Nom de la base de données utilisée pour les tests e2e        | 
+| DB_DEV_NAME               | dev_database                                | Nom de la base de données utilisée en phase de développement | 
+| JWT_SECRET                | secret_key                                  | Clé secrète utilisée pour générer les tokens d'accès         | 
+| BUCKET_NAME               | bucket_name                                 | Nom du bucket Google Storage                                 | 
+| GOOGLE_CLIENT_ID          | google_client_id                            | Nom du client Google pour OAuth                              | 
+| GOOGLE_SECRET             | google_secret                               | Clé secrète Google pour OAuth                                | 
+| GOOGLE_CALLBACK_URL       | http://url_du_back/api/auth/google/redirect | Url de redirection après l'authentification                  | 
+| CLIENT_URL                | client_url                                  | Url du client front                                          | 
+| MAIL_USERNAME             | mail_username                               | Nom de l'adresse email utilisé pour le mailing               | 
+| MAIL_PASSWORD             | mail_password                               | Mot de passe du compte mail                                  | 
+| MAIL_TO                   | contact_mail_to                             | Adresse destinataire de la page contact                      | 
+| REDIS_HOST                | host                                        | Url vers la base de données Redis                            | 
+| REDIS_PORT                | port                                        | Port de la base de données Redis                             | 
+| REDIS_USERNAME            | username                                    | Nom d'utilisateur créé sur Redis                             | 
+| REDIS_PASSWORD            | password                                    | Mot de passe de l'utilisateur créé sur Redis                 | 
+| GOOGLE_CLOUD_PROJECT_NAME | project_name                                | Nom du projet sur Google Cloud Storage                       | 
+| GOOGLE_CLOUD_CLIENT_EMAIL | email@gservice.com                          | Email du compte de service                                   | 
+| GOOGLE_CLOUD_PRIVATE_KEY  | private_key                                 | Clef privée d'identification au service Google Cloud         | 
 
 ## Lancer le projet
 
 
-Installer les dépendences
+Installer les dépendances
 
 ```bash
   npm install
@@ -115,7 +114,7 @@ Lancer les tests e2e
 
 ## Stack technique
 
-**Client:** NextJS, React, TailwindCSS, ReduxToolkit, Axios, ReactSelect
+**Client:** NextJS, React, TailwindCSS, ReduxToolkit, Axios, ReactSelect, ReactSlick
 
 **Server:** Node, NestJS, Redis, Nodemailer, Google OAuth
 
