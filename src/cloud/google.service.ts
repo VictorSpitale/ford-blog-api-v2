@@ -47,11 +47,13 @@ export class GoogleService {
       );
     }
     try {
-      const bucket = this.storage.bucket(this.configService.get('bucket_name'));
+      const bucket = this.storage.bucket(
+        this.configService.get('google.bucket_name'),
+      );
       const folder = GoogleService.getFolder(type);
       const path = folder + name + '.jpg';
       const fileCloud = this.storage
-        .bucket(this.configService.get('bucket_name'))
+        .bucket(this.configService.get('google.bucket_name'))
         .file(path);
       await fileCloud.save(file.buffer, {
         contentType: 'image/jpg',
@@ -66,7 +68,9 @@ export class GoogleService {
 
   async deleteFile(name: string, type: UploadTypes) {
     try {
-      const bucket = this.storage.bucket(this.configService.get('bucket_name'));
+      const bucket = this.storage.bucket(
+        this.configService.get('google.bucket_name'),
+      );
       const folder = GoogleService.getFolder(type);
       const path = folder + name + '.jpg';
       const fileCloud = bucket.file(path);

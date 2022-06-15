@@ -43,11 +43,11 @@ let GoogleService = GoogleService_1 = class GoogleService {
             throw new common_1.BadRequestException(HttpError_1.HttpError.getHttpError(HttpError_1.HttpErrorCode.FILE_FORMAT));
         }
         try {
-            const bucket = this.storage.bucket(this.configService.get('bucket_name'));
+            const bucket = this.storage.bucket(this.configService.get('google.bucket_name'));
             const folder = GoogleService_1.getFolder(type);
             const path = folder + name + '.jpg';
             const fileCloud = this.storage
-                .bucket(this.configService.get('bucket_name'))
+                .bucket(this.configService.get('google.bucket_name'))
                 .file(path);
             await fileCloud.save(file.buffer, {
                 contentType: 'image/jpg',
@@ -60,7 +60,7 @@ let GoogleService = GoogleService_1 = class GoogleService {
     }
     async deleteFile(name, type) {
         try {
-            const bucket = this.storage.bucket(this.configService.get('bucket_name'));
+            const bucket = this.storage.bucket(this.configService.get('google.bucket_name'));
             const folder = GoogleService_1.getFolder(type);
             const path = folder + name + '.jpg';
             const fileCloud = bucket.file(path);
