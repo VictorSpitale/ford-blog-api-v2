@@ -8,13 +8,13 @@ export default () => ({
     name: process.env.DB_NAME,
     test_name: process.env.DB_TEST_NAME,
     dev_name: process.env.DB_DEV_NAME,
-    bucket_name: process.env.BUCKET_NAME,
   },
   jwt: {
     secret: process.env.JWT_SECRET,
   },
   client_url: process.env.CLIENT_URL,
   google: {
+    bucket_name: process.env.BUCKET_NAME,
     client_id: process.env.GOOGLE_CLIENT_ID,
     secret: process.env.GOOGLE_SECRET,
     callback: process.env.GOOGLE_CALLBACK_URL,

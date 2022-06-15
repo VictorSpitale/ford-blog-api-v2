@@ -8,13 +8,13 @@ declare const _default: () => {
         name: string;
         test_name: string;
         dev_name: string;
-        bucket_name: string;
     };
     jwt: {
         secret: string;
     };
     client_url: string;
     google: {
+        bucket_name: string;
         client_id: string;
         secret: string;
         callback: string;
