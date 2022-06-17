@@ -31,7 +31,7 @@
     "@nestjs/core": "8.4.7",
     "@nestjs/jwt": "8.0.1",
     "@nestjs/mapped-types": "*",
-    "@nestjs/mongoose": "9.0.2",
+    "@nestjs/mongoose": "9.1.1",
     "@nestjs/passport": "8.2.2",
     "@nestjs/platform-express": "8.4.7",
     "@nestjs/swagger": "5.2.1",
@@ -80,7 +80,7 @@
     "supertest": "6.2.3",
     "ts-jest": "27.1.5",
     "ts-loader": "9.3.0",
-    "ts-node": "10.4.0",
+    "ts-node": "10.8.1",
     "tsconfig-paths": "4.0.0",
     "typescript": "4.7.3"
   },
