@@ -14,4 +14,4 @@ export declare class User {
     createdAt: string;
     checkPassword: (plainPassword: string) => Promise<boolean>;
 }
-export declare const UserEntity: Mongoose.Schema<Mongoose.Document<User, any, any>, Mongoose.Model<Mongoose.Document<User, any, any>, any, any, any>, any, any>;
+export declare const UserEntity: Mongoose.Schema<User, Mongoose.Model<User, any, any, any>, {}, {}, any>;

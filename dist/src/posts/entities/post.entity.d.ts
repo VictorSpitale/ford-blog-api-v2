@@ -18,4 +18,4 @@ export declare class Post {
     updatedAt: string;
     createdAt: string;
 }
-export declare const PostEntity: Mongoose.Schema<Mongoose.Document<Post, any, any>, Mongoose.Model<Mongoose.Document<Post, any, any>, any, any, any>, any, any>;
+export declare const PostEntity: Mongoose.Schema<Post, Mongoose.Model<Post, any, any, any>, {}, {}, any>;
