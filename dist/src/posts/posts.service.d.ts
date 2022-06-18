@@ -42,9 +42,9 @@ export declare class PostsService {
     getPostLikeStatus(slug: string, user: User): Promise<boolean>;
     getCategorizedPosts(categoryName: string): Promise<PostDto[]>;
     private find;
-    findOne(match: MatchType): Promise<Post & Mongoose.Document<any, any, any> & {
+    findOne(match: MatchType): Promise<Omit<Omit<Post & Mongoose.Document<any, any, any> & {
         _id: any;
-    }>;
+    }, never>, never>>;
     asBasicDto(post: Post): BasicPostDto;
     asDto(post: Post, authUser?: User): PostDto;
 }

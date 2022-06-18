@@ -23,6 +23,7 @@ import { CreateCommentDto } from './dto/create-comment.dto';
 import { DeleteCommentDto } from './dto/delete-comment.dto';
 import { UpdateCommentDto } from './dto/update-comment.dto';
 import { CategoriesService } from '../categories/categories.service';
+import * as _ from 'lodash';
 
 @Injectable()
 export class PostsService {
@@ -162,7 +163,9 @@ export class PostsService {
         HttpError.getHttpError(HttpErrorCode.SEARCH_QUERY),
       );
     }
-    const searchReg = new RegExp('.*' + search + '.*', 'i');
+
+    const query = _.escapeRegExp(search);
+    const searchReg = new RegExp('.*' + query + '.*', 'i');
     const posts = await this.find(
       {
         $or: [

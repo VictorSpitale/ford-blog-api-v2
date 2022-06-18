@@ -24,6 +24,7 @@ const post_types_1 = require("../shared/types/post.types");
 const HttpError_1 = require("../shared/error/HttpError");
 const users_service_1 = require("../users/users.service");
 const categories_service_1 = require("../categories/categories.service");
+const _ = require("lodash");
 let PostsService = class PostsService {
     constructor(postModel, googleService, usersService, categoriesService) {
         this.postModel = postModel;
@@ -120,7 +121,8 @@ let PostsService = class PostsService {
             (search && search.length < 3)) {
             throw new common_1.BadRequestException(HttpError_1.HttpError.getHttpError(HttpError_1.HttpErrorCode.SEARCH_QUERY));
         }
-        const searchReg = new RegExp('.*' + search + '.*', 'i');
+        const query = _.escapeRegExp(search);
+        const searchReg = new RegExp('.*' + query + '.*', 'i');
         const posts = await this.find({
             $or: [
                 {
