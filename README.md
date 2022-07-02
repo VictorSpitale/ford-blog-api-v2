@@ -116,9 +116,9 @@ Lancer les tests e2e
 
 **Client:** NextJS, React, TailwindCSS, ReduxToolkit, Axios, ReactSelect, ReactSlick
 
-**Server:** Node, NestJS, Redis, Nodemailer, Google OAuth
+**Server:** Node, NestJS, Redis, Nodemailer, Google OAuth, Google Cloud Storage
 
-**CI/CD:** Google Cloud Run, Google Cloud Storage, Vercel
+**CI/CD:** Google Cloud Run, Vercel
 
 
 ## Auteur
