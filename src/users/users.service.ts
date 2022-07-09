@@ -46,10 +46,10 @@ export class UsersService {
       );
     }
     const createdUser = await this.userModel.create(createUserDto);
-    // await this.mailService.addWelcomeMailToQueue({
-    //   mailTo: createdUser.email,
-    //   pseudo: createdUser.pseudo,
-    // });
+    await this.mailService.addWelcomeMailToQueue({
+      mailTo: createdUser.email,
+      pseudo: createdUser.pseudo,
+    });
     return this.asDtoWithoutPassword(createdUser);
   }
 
@@ -140,7 +140,6 @@ export class UsersService {
   async deleteUser(id: string, authUser: User) {
     await this.getUserById(id);
     this.isSelfOrAdmin(id, authUser);
-    console.log('suppression');
     const likedPosts = await this.postsService.getLikedPosts(id, authUser);
     for (const likedPost of likedPosts) {
       await this.postsService.unlikePost(likedPost.slug, authUser);
