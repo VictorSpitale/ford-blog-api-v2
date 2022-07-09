@@ -42,7 +42,9 @@ export class CategoriesController {
   })
   @Role(IUserRole.ADMIN)
   @ApiCookieAuth()
-  create(@Body() createCategoryDto: CreateCategoryDto): Promise<CategoryDto> {
+  async create(
+    @Body() createCategoryDto: CreateCategoryDto,
+  ): Promise<CategoryDto> {
     return this.categoriesService.create(createCategoryDto);
   }
 

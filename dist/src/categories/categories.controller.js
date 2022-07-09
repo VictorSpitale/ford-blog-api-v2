@@ -26,7 +26,7 @@ let CategoriesController = class CategoriesController {
     constructor(categoriesService) {
         this.categoriesService = categoriesService;
     }
-    create(createCategoryDto) {
+    async create(createCategoryDto) {
         return this.categoriesService.create(createCategoryDto);
     }
     async getCategories() {
