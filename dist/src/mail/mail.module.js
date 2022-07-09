@@ -33,7 +33,7 @@ MailModule = __decorate([
                             },
                         },
                         template: {
-                            dir: (0, path_1.join)(__dirname, 'templates'),
+                            dir: (0, path_1.join)(__dirname, '..', '..', 'mail', 'templates'),
                             adapter: new handlebars_adapter_1.HandlebarsAdapter(),
                             options: {
                                 strict: true,
