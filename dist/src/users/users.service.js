@@ -16,6 +16,7 @@ exports.UsersService = void 0;
 const common_1 = require("@nestjs/common");
 const mongoose_1 = require("@nestjs/mongoose");
 const user_entity_1 = require("./entities/user.entity");
+const Mongoose = require("mongoose");
 const mongoose_2 = require("mongoose");
 const HttpError_1 = require("../shared/error/HttpError");
 const users_role_interface_1 = require("./entities/users.role.interface");
@@ -23,11 +24,13 @@ const google_service_1 = require("../cloud/google.service");
 const upload_types_1 = require("../shared/types/upload.types");
 const mail_service_1 = require("../mail/mail.service");
 const password_utils_1 = require("../shared/utils/password.utils");
+const posts_service_1 = require("../posts/posts.service");
 let UsersService = class UsersService {
-    constructor(userModel, googleService, mailService) {
+    constructor(userModel, googleService, mailService, postsService) {
         this.userModel = userModel;
         this.googleService = googleService;
         this.mailService = mailService;
+        this.postsService = postsService;
     }
     async create(createUserDto) {
         if (await this.getUserByEmail(createUserDto.email)) {
@@ -37,10 +40,6 @@ let UsersService = class UsersService {
             throw new common_1.ConflictException(HttpError_1.HttpError.getHttpError(HttpError_1.HttpErrorCode.USER_ALREADY_EXIST));
         }
         const createdUser = await this.userModel.create(createUserDto);
-        await this.mailService.addWelcomeMailToQueue({
-            mailTo: createdUser.email,
-            pseudo: createdUser.pseudo,
-        });
         return this.asDtoWithoutPassword(createdUser);
     }
     async getUsers() {
@@ -97,9 +96,24 @@ let UsersService = class UsersService {
             throw new common_1.UnauthorizedException(HttpError_1.HttpError.getHttpError(HttpError_1.HttpErrorCode.ROLE_UNAUTHORIZED));
         }
     }
-    async deleteUser(id, user) {
+    async deleteUser(id, authUser) {
         await this.getUserById(id);
-        this.isSelfOrAdmin(id, user);
+        this.isSelfOrAdmin(id, authUser);
+        console.log('suppression');
+        const likedPosts = await this.postsService.getLikedPosts(id, authUser);
+        for (const likedPost of likedPosts) {
+            await this.postsService.unlikePost(likedPost.slug, authUser);
+        }
+        const commentedPosts = await this.postsService.getCommentedPosts(id, authUser);
+        for (const commentedPost of commentedPosts) {
+            const comments = commentedPost.comments.filter((comment) => comment.commenter._id.toString() === id);
+            for (const comment of comments) {
+                await this.postsService.deletePostComment(authUser, commentedPost.slug, {
+                    commenterId: new Mongoose.Types.ObjectId(id),
+                    _id: comment._id,
+                });
+            }
+        }
         await this.userModel.findOneAndDelete({ _id: id });
     }
     async sendPasswordRecovery(email, locale) {
@@ -183,9 +197,11 @@ let UsersService = class UsersService {
 UsersService = __decorate([
     (0, common_1.Injectable)(),
     __param(0, (0, mongoose_1.InjectModel)(user_entity_1.User.name)),
+    __param(3, (0, common_1.Inject)((0, common_1.forwardRef)(() => posts_service_1.PostsService))),
     __metadata("design:paramtypes", [mongoose_2.Model,
         google_service_1.GoogleService,
-        mail_service_1.MailService])
+        mail_service_1.MailService,
+        posts_service_1.PostsService])
 ], UsersService);
 exports.UsersService = UsersService;
 //# sourceMappingURL=users.service.js.map
