@@ -298,6 +298,7 @@ PostsService = __decorate([
     (0, common_1.Injectable)(),
     __param(0, (0, mongoose_1.InjectModel)(post_entity_1.Post.name)),
     __param(2, (0, common_1.Inject)((0, common_1.forwardRef)(() => users_service_1.UsersService))),
+    __param(3, (0, common_1.Inject)((0, common_1.forwardRef)(() => categories_service_1.CategoriesService))),
     __metadata("design:paramtypes", [mongoose_2.Model,
         google_service_1.GoogleService,
         users_service_1.UsersService,

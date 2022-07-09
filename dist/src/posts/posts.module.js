@@ -21,7 +21,7 @@ PostsModule = __decorate([
     (0, common_1.Module)({
         imports: [
             (0, common_1.forwardRef)(() => users_module_1.UsersModule),
-            categories_module_1.CategoriesModule,
+            (0, common_1.forwardRef)(() => categories_module_1.CategoriesModule),
             mongoose_1.MongooseModule.forFeature([{ name: post_entity_1.Post.name, schema: post_entity_1.PostEntity }]),
         ],
         controllers: [posts_controller_1.PostsController],

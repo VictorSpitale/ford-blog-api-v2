@@ -12,6 +12,7 @@ const categories_service_1 = require("./categories.service");
 const categories_controller_1 = require("./categories.controller");
 const mongoose_1 = require("@nestjs/mongoose");
 const category_entity_1 = require("./entities/category.entity");
+const posts_module_1 = require("../posts/posts.module");
 let CategoriesModule = class CategoriesModule {
 };
 CategoriesModule = __decorate([
@@ -20,6 +21,7 @@ CategoriesModule = __decorate([
             mongoose_1.MongooseModule.forFeature([
                 { name: category_entity_1.Category.name, schema: category_entity_1.CategoryEntity },
             ]),
+            (0, common_1.forwardRef)(() => posts_module_1.PostsModule),
         ],
         controllers: [categories_controller_1.CategoriesController],
         providers: [categories_service_1.CategoriesService],

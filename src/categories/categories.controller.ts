@@ -1,8 +1,17 @@
-import { Body, Controller, Get, Param, Post } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Post,
+  Req,
+} from '@nestjs/common';
 import { CategoriesService } from './categories.service';
 import {
   ApiCookieAuth,
   ApiOperation,
+  ApiParam,
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
@@ -80,5 +89,32 @@ export class CategoriesController {
   @AllowAny()
   async getCategoryById(@Param('id') id: string) {
     return this.categoriesService.getCategoryById(id);
+  }
+
+  @Delete(':id')
+  @Role(IUserRole.ADMIN)
+  @ApiOperation({ summary: 'Delete a category' })
+  @ApiParam({
+    name: 'id',
+    description: 'Category slug',
+    type: String,
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'The category has been deleted',
+  })
+  @ApiResponse({
+    status: 401,
+    description: 'Jwt failed | Insufficient permissions',
+    type: HttpErrorDto,
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'The category doesnt exist',
+    type: HttpErrorDto,
+  })
+  @ApiCookieAuth()
+  async deleteCategory(@Param('id') id: string, @Req() req) {
+    return this.categoriesService.deleteCategory(id, req.user);
   }
 }

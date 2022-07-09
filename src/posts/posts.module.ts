@@ -10,7 +10,7 @@ import { CategoriesModule } from '../categories/categories.module';
 @Module({
   imports: [
     forwardRef(() => UsersModule),
-    CategoriesModule,
+    forwardRef(() => CategoriesModule),
     MongooseModule.forFeature([{ name: Post.name, schema: PostEntity }]),
   ],
   controllers: [PostsController],

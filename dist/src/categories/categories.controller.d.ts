@@ -7,4 +7,5 @@ export declare class CategoriesController {
     create(createCategoryDto: CreateCategoryDto): Promise<CategoryDto>;
     getCategories(): Promise<CategoryDto[]>;
     getCategoryById(id: string): Promise<CategoryDto>;
+    deleteCategory(id: string, req: any): Promise<void>;
 }

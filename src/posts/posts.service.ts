@@ -34,6 +34,7 @@ export class PostsService {
     private readonly googleService: GoogleService,
     @Inject(forwardRef(() => UsersService))
     private readonly usersService: UsersService,
+    @Inject(forwardRef(() => CategoriesService))
     private readonly categoriesService: CategoriesService,
   ) {}
 
