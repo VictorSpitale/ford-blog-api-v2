@@ -11,7 +11,7 @@ jobs:
        with:
          node-version: 14
      - run: npm ci
-     - run: npm run test:e2e
+     - run: npm run test:e2e-coverage
        env:
          DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
          DB_USER: ${{ secrets.DB_USER }}
