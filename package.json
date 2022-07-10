@@ -20,6 +20,7 @@
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "jest --config ./jest-e2e.json --runInBand --verbose --detectOpenHandles",
     "test:e2e-watch": "jest --config ./jest-e2e.json --watch",
+    "test:e2e-coverage": "jest --config ./jest-e2e.json --runInBand --verbose --detectOpenHandles --coverage",
     "openapi:export": "npx openapi-typescript schema.json > generated-schema.ts"
   },
   "dependencies": {
