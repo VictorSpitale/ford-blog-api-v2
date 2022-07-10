@@ -8,7 +8,6 @@ import { UserStub } from '../../users/test/stub/user.stub';
 import { AuthService } from '../../auth/auth.service';
 import { IUserRole } from '../../users/entities/users.role.interface';
 import { CreatePostStub } from '../../posts/test/stub/post.stub';
-import { PostsService } from '../../posts/posts.service';
 import { PostDto } from '../../posts/dto/post.dto';
 
 describe.only('CategoriesController (e2e)', () => {
@@ -16,7 +15,6 @@ describe.only('CategoriesController (e2e)', () => {
   let dbConnection: Connection;
   let request;
   let authService: AuthService;
-  let postsService: PostsService;
 
   beforeAll(async () => {
     const {
@@ -29,7 +27,6 @@ describe.only('CategoriesController (e2e)', () => {
     dbConnection = db;
     app = nestApp;
     authService = moduleFixture.get<AuthService>(AuthService);
-    postsService = moduleFixture.get<PostsService>(PostsService);
   });
 
   describe('getCategories', () => {
@@ -41,6 +38,7 @@ describe.only('CategoriesController (e2e)', () => {
       await clearDatabase(dbConnection, 'categories');
     });
   });
+
   describe('falling getCategory', () => {
     it('should failed to get a category if id is invalid', async () => {
       const response = await request.get('/categories/eee');
@@ -52,6 +50,7 @@ describe.only('CategoriesController (e2e)', () => {
       expect(response.status).toBe(404);
     });
   });
+
   describe('create category', () => {
     let createdCategoryId;
     let user;
@@ -89,6 +88,7 @@ describe.only('CategoriesController (e2e)', () => {
       await clearDatabase(dbConnection, 'users');
     });
   });
+
   describe('create category not logged in', () => {
     it('should not create a category is user is not login', async () => {
       const response = await request.post('/categories').send({
@@ -107,6 +107,12 @@ describe.only('CategoriesController (e2e)', () => {
         })
         .set('Cookie', `access_token=${token};`);
       expect(response.status).toBe(401);
+    });
+
+    afterEach(async () => {
+      await clearDatabase(dbConnection, 'posts');
+      await clearDatabase(dbConnection, 'categories');
+      await clearDatabase(dbConnection, 'users');
     });
   });
 
@@ -139,6 +145,7 @@ describe.only('CategoriesController (e2e)', () => {
         expect(response.status).toBe(404);
       });
     });
+
     describe('delete a category', () => {
       it('should delete cascade a category', async () => {
         const category = CategoryStub();
