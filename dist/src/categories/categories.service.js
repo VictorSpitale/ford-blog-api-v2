@@ -18,9 +18,11 @@ const mongoose_1 = require("@nestjs/mongoose");
 const category_entity_1 = require("./entities/category.entity");
 const mongoose_2 = require("mongoose");
 const HttpError_1 = require("../shared/error/HttpError");
+const posts_service_1 = require("../posts/posts.service");
 let CategoriesService = class CategoriesService {
-    constructor(categoryModel) {
+    constructor(categoryModel, postsService) {
         this.categoryModel = categoryModel;
+        this.postsService = postsService;
     }
     async create(createCategoryDto) {
         if (await this.getCategoryByName(createCategoryDto.name)) {
@@ -40,8 +42,21 @@ let CategoriesService = class CategoriesService {
     async getCategoryById(id) {
         const category = await this.findOne({ _id: id });
         if (!category)
-            throw new common_1.NotFoundException();
+            throw new common_1.NotFoundException(HttpError_1.HttpError.getHttpError(HttpError_1.HttpErrorCode.CATEGORY_NOT_FOUND));
         return this.asDto(category);
+    }
+    async deleteCategory(id, authUser) {
+        const category = await this.getCategoryById(id);
+        const posts = await this.postsService.getCategorizedPosts(category.name);
+        for (const post of posts) {
+            const categories = post.categories
+                .filter((cat) => cat._id.toString() !== id)
+                .map((cat) => cat._id);
+            await this.postsService.updatePost(post.slug, {
+                categories,
+            }, authUser);
+        }
+        await this.categoryModel.findOneAndDelete({ _id: id });
     }
     async find(match = {}) {
         if (match._id) {
@@ -76,7 +91,9 @@ let CategoriesService = class CategoriesService {
 CategoriesService = __decorate([
     (0, common_1.Injectable)(),
     __param(0, (0, mongoose_1.InjectModel)(category_entity_1.Category.name)),
-    __metadata("design:paramtypes", [mongoose_2.Model])
+    __param(1, (0, common_1.Inject)((0, common_1.forwardRef)(() => posts_service_1.PostsService))),
+    __metadata("design:paramtypes", [mongoose_2.Model,
+        posts_service_1.PostsService])
 ], CategoriesService);
 exports.CategoriesService = CategoriesService;
 //# sourceMappingURL=categories.service.js.map

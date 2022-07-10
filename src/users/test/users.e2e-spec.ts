@@ -12,12 +12,17 @@ import { clearDatabase } from '../../shared/test/utils';
 import { initE2eWithGuards } from '../../shared/test/init.e2e';
 import { AuthService } from '../../auth/auth.service';
 import { IUserRole } from '../entities/users.role.interface';
+import { PostsService } from '../../posts/posts.service';
+import { PostStub } from '../../posts/test/stub/post.stub';
+import { User } from '../entities/user.entity';
+import { PostDto } from '../../posts/dto/post.dto';
 
 describe('UsersController (e2e)', () => {
   let dbConnection: Connection;
   let app: INestApplication;
   let request;
   let authService: AuthService;
+  let postsService: PostsService;
 
   beforeAll(async () => {
     const {
@@ -29,6 +34,7 @@ describe('UsersController (e2e)', () => {
     request = req;
     dbConnection = db;
     app = nestApp;
+    postsService = moduleFixture.get<PostsService>(PostsService);
     authService = moduleFixture.get<AuthService>(AuthService);
   });
 
@@ -262,6 +268,7 @@ describe('UsersController (e2e)', () => {
       await clearDatabase(dbConnection, 'users');
     });
   });
+
   describe('delete user', () => {
     describe('failing delete user', () => {
       it('should not delete a user while not logged in', async () => {
@@ -293,10 +300,20 @@ describe('UsersController (e2e)', () => {
       });
     });
     describe('delete user', () => {
-      it('should delete a user', async () => {
+      it('should delete cascade a user', async () => {
         const user = UserStub();
+        const post = PostStub();
         await dbConnection.collection('users').insertOne(user);
+        await dbConnection.collection('posts').insertOne(post);
         const token = authService.signToken(user);
+        await postsService.commentPost(
+          user as User,
+          {
+            comment: 'un commentaire',
+          },
+          post.slug,
+        );
+        await postsService.likePost(post.slug, user as User);
         const response = await request
           .delete(`/users/${user._id}`)
           .set('Cookie', `access_token=${token}`);
@@ -305,10 +322,16 @@ describe('UsersController (e2e)', () => {
           .collection('users')
           .findOne({ _id: user._id });
         expect(founded).toBeNull();
+        const queriedPost = (await dbConnection
+          .collection('posts')
+          .findOne({ slug: post.slug })) as PostDto;
+        expect(queriedPost.comments).toEqual([]);
+        expect(queriedPost.likes).toBe(0);
       });
     });
     afterEach(async () => {
       await clearDatabase(dbConnection, 'users');
+      await clearDatabase(dbConnection, 'posts');
     });
   });
 

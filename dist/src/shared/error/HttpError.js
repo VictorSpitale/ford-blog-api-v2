@@ -28,6 +28,7 @@ var HttpErrorCode;
     HttpErrorCode[HttpErrorCode["DUPLICATE_CATEGORY"] = 12] = "DUPLICATE_CATEGORY";
     HttpErrorCode[HttpErrorCode["INVALID_ID"] = 13] = "INVALID_ID";
     HttpErrorCode[HttpErrorCode["SEARCH_QUERY"] = 14] = "SEARCH_QUERY";
+    HttpErrorCode[HttpErrorCode["CATEGORY_NOT_FOUND"] = 15] = "CATEGORY_NOT_FOUND";
 })(HttpErrorCode = exports.HttpErrorCode || (exports.HttpErrorCode = {}));
 class HttpValidationError {
 }
@@ -179,6 +180,10 @@ HttpError.errors = new Map([
             statusCode: 400,
             code: 14,
         },
+    ],
+    [
+        HttpErrorCode.CATEGORY_NOT_FOUND,
+        { message: 'Category not found', statusCode: 404, code: 15 },
     ],
 ]);
 //# sourceMappingURL=HttpError.js.map

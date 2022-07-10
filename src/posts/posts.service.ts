@@ -1,6 +1,8 @@
 import {
   BadRequestException,
   ConflictException,
+  forwardRef,
+  Inject,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
@@ -30,7 +32,9 @@ export class PostsService {
   constructor(
     @InjectModel(Post.name) private readonly postModel: Model<PostDocument>,
     private readonly googleService: GoogleService,
+    @Inject(forwardRef(() => UsersService))
     private readonly usersService: UsersService,
+    @Inject(forwardRef(() => CategoriesService))
     private readonly categoriesService: CategoriesService,
   ) {}
 
@@ -66,8 +70,8 @@ export class PostsService {
   }
 
   private async updateLikeStatus(
-    slug,
-    user,
+    slug: string,
+    user: User,
     operation: LikeOperation,
   ): Promise<number> {
     if (!(await this.postModel.findOne({ slug }))) {
@@ -151,6 +155,15 @@ export class PostsService {
     this.usersService.isSelfOrAdmin(userId, authUser);
     const posts = await this.postModel.find({ likers: userId });
     return posts.map((p) => this.asBasicDto(p));
+  }
+
+  async getCommentedPosts(userId: string, authUser: User): Promise<PostDto[]> {
+    await this.usersService.getUserById(userId);
+    this.usersService.isSelfOrAdmin(userId, authUser);
+    const posts = await this.postModel.find({
+      comments: { $elemMatch: { commenter: userId } },
+    });
+    return posts.map((p) => this.asDto(p));
   }
 
   async getQueriedPosts(search: string | string[]): Promise<BasicPostDto[]> {

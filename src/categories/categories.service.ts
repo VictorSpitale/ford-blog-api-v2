@@ -1,6 +1,8 @@
 import {
   BadRequestException,
   ConflictException,
+  forwardRef,
+  Inject,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
@@ -11,12 +13,16 @@ import { CategoryDto } from './dto/category.dto';
 import { CreateCategoryDto } from './dto/create-category.dto';
 import { MatchType } from '../shared/types/match.types';
 import { HttpError, HttpErrorCode } from '../shared/error/HttpError';
+import { PostsService } from '../posts/posts.service';
+import { User } from '../users/entities/user.entity';
 
 @Injectable()
 export class CategoriesService {
   constructor(
     @InjectModel(Category.name)
     private readonly categoryModel: Model<CategoryDocument>,
+    @Inject(forwardRef(() => PostsService))
+    private readonly postsService: PostsService,
   ) {}
 
   async create(createCategoryDto: CreateCategoryDto): Promise<CategoryDto> {
@@ -41,8 +47,30 @@ export class CategoriesService {
 
   async getCategoryById(id: string): Promise<CategoryDto> {
     const category = await this.findOne({ _id: id });
-    if (!category) throw new NotFoundException();
+    if (!category)
+      throw new NotFoundException(
+        HttpError.getHttpError(HttpErrorCode.CATEGORY_NOT_FOUND),
+      );
     return this.asDto(category);
+  }
+
+  async deleteCategory(id: string, authUser: User) {
+    const category = await this.getCategoryById(id);
+    const posts = await this.postsService.getCategorizedPosts(category.name);
+
+    for (const post of posts) {
+      const categories = post.categories
+        .filter((cat) => cat._id.toString() !== id)
+        .map((cat) => cat._id);
+      await this.postsService.updatePost(
+        post.slug,
+        {
+          categories,
+        },
+        authUser,
+      );
+    }
+    await this.categoryModel.findOneAndDelete({ _id: id });
   }
 
   private async find(match: MatchType = {}) {

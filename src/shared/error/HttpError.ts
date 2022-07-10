@@ -16,6 +16,7 @@ export enum HttpErrorCode {
   DUPLICATE_CATEGORY,
   INVALID_ID,
   SEARCH_QUERY,
+  CATEGORY_NOT_FOUND,
 }
 export class HttpValidationError {
   @ApiProperty({
@@ -154,6 +155,10 @@ export class HttpError {
         statusCode: 400,
         code: 14,
       },
+    ],
+    [
+      HttpErrorCode.CATEGORY_NOT_FOUND,
+      { message: 'Category not found', statusCode: 404, code: 15 },
     ],
   ]);
 

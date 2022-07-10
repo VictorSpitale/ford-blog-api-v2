@@ -20,12 +20,13 @@ let PostsModule = class PostsModule {
 PostsModule = __decorate([
     (0, common_1.Module)({
         imports: [
-            users_module_1.UsersModule,
-            categories_module_1.CategoriesModule,
+            (0, common_1.forwardRef)(() => users_module_1.UsersModule),
+            (0, common_1.forwardRef)(() => categories_module_1.CategoriesModule),
             mongoose_1.MongooseModule.forFeature([{ name: post_entity_1.Post.name, schema: post_entity_1.PostEntity }]),
         ],
         controllers: [posts_controller_1.PostsController],
         providers: [posts_service_1.PostsService, google_service_1.GoogleService],
+        exports: [posts_service_1.PostsService],
     })
 ], PostsModule);
 exports.PostsModule = PostsModule;

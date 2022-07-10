@@ -14,6 +14,7 @@ const mongoose_1 = require("@nestjs/mongoose");
 const user_entity_1 = require("./entities/user.entity");
 const google_service_1 = require("../cloud/google.service");
 const mail_module_1 = require("../mail/mail.module");
+const posts_module_1 = require("../posts/posts.module");
 let UsersModule = class UsersModule {
 };
 UsersModule = __decorate([
@@ -21,6 +22,7 @@ UsersModule = __decorate([
         imports: [
             mail_module_1.MailModule,
             mongoose_1.MongooseModule.forFeature([{ name: user_entity_1.User.name, schema: user_entity_1.UserEntity }]),
+            (0, common_1.forwardRef)(() => posts_module_1.PostsModule),
         ],
         controllers: [users_controller_1.UsersController],
         providers: [users_service_1.UsersService, google_service_1.GoogleService],

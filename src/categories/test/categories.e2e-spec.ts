@@ -7,6 +7,8 @@ import { initE2eWithGuards } from '../../shared/test/init.e2e';
 import { UserStub } from '../../users/test/stub/user.stub';
 import { AuthService } from '../../auth/auth.service';
 import { IUserRole } from '../../users/entities/users.role.interface';
+import { CreatePostStub } from '../../posts/test/stub/post.stub';
+import { PostDto } from '../../posts/dto/post.dto';
 
 describe.only('CategoriesController (e2e)', () => {
   let app: INestApplication;
@@ -36,6 +38,7 @@ describe.only('CategoriesController (e2e)', () => {
       await clearDatabase(dbConnection, 'categories');
     });
   });
+
   describe('falling getCategory', () => {
     it('should failed to get a category if id is invalid', async () => {
       const response = await request.get('/categories/eee');
@@ -47,6 +50,7 @@ describe.only('CategoriesController (e2e)', () => {
       expect(response.status).toBe(404);
     });
   });
+
   describe('create category', () => {
     let createdCategoryId;
     let user;
@@ -84,6 +88,7 @@ describe.only('CategoriesController (e2e)', () => {
       await clearDatabase(dbConnection, 'users');
     });
   });
+
   describe('create category not logged in', () => {
     it('should not create a category is user is not login', async () => {
       const response = await request.post('/categories').send({
@@ -103,7 +108,78 @@ describe.only('CategoriesController (e2e)', () => {
         .set('Cookie', `access_token=${token};`);
       expect(response.status).toBe(401);
     });
+
+    afterEach(async () => {
+      await clearDatabase(dbConnection, 'posts');
+      await clearDatabase(dbConnection, 'categories');
+      await clearDatabase(dbConnection, 'users');
+    });
   });
+
+  describe('delete a category', () => {
+    describe('failing delete category', () => {
+      it('should fail to delete a category while not logged in', async () => {
+        const category = CategoryStub();
+        await dbConnection.collection('categories').insertOne(category);
+        const response = await request.delete(`/categories/${category._id}`);
+        expect(response.status).toBe(401);
+      });
+      it('should fail to delete a category while not an admin', async () => {
+        const category = CategoryStub();
+        const user = UserStub();
+        await dbConnection.collection('categories').insertOne(category);
+        await dbConnection.collection('users').insertOne(user);
+        const token = authService.signToken(user);
+        const response = await request
+          .delete(`/categories/${category._id}`)
+          .set('Cookie', `access_token=${token};`);
+        expect(response.status).toBe(401);
+      });
+      it('should fail to delete a non-existent category', async () => {
+        const user = UserStub(IUserRole.ADMIN);
+        await dbConnection.collection('users').insertOne(user);
+        const token = authService.signToken(user);
+        const response = await request
+          .delete(`/categories/${new Mongoose.Types.ObjectId()}`)
+          .set('Cookie', `access_token=${token};`);
+        expect(response.status).toBe(404);
+      });
+    });
+
+    describe('delete a category', () => {
+      it('should delete cascade a category', async () => {
+        const category = CategoryStub();
+        let post = CreatePostStub();
+        post = {
+          ...post,
+          categories: [category._id],
+        };
+        const user = UserStub(IUserRole.ADMIN);
+        await dbConnection.collection('categories').insertOne(category);
+        await dbConnection.collection('users').insertOne(user);
+        const token = authService.signToken(user);
+        await request
+          .post(`/posts`)
+          .set('Cookie', `access_token=${token};`)
+          .send(post);
+        const response = await request
+          .delete(`/categories/${category._id}`)
+          .set('Cookie', `access_token=${token};`);
+        const queriedPosts = (await dbConnection
+          .collection('posts')
+          .findOne({ slug: post.slug })) as PostDto;
+        expect(queriedPosts.categories).toEqual([]);
+        expect(response.status).toBe(200);
+      });
+    });
+
+    afterEach(async () => {
+      await clearDatabase(dbConnection, 'posts');
+      await clearDatabase(dbConnection, 'categories');
+      await clearDatabase(dbConnection, 'users');
+    });
+  });
+
   afterAll(async () => {
     await clearDatabase(dbConnection, 'categories');
     await clearDatabase(dbConnection, 'users');

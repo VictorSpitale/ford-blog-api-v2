@@ -1,6 +1,8 @@
 import {
   BadRequestException,
   ConflictException,
+  forwardRef,
+  Inject,
   Injectable,
   NotFoundException,
   UnauthorizedException,
@@ -9,6 +11,7 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { InjectModel } from '@nestjs/mongoose';
 import { User, UserDocument } from './entities/user.entity';
+import * as Mongoose from 'mongoose';
 import { isValidObjectId, Model, Types } from 'mongoose';
 import { UserDto } from './dto/user.dto';
 import { MatchType } from '../shared/types/match.types';
@@ -20,6 +23,7 @@ import { MailService } from '../mail/mail.service';
 import { uuid } from '../shared/utils/password.utils';
 import { LocalesTypes } from '../shared/types/locales.types';
 import { PasswordRecoveryDto } from './dto/password-recovery.dto';
+import { PostsService } from '../posts/posts.service';
 
 @Injectable()
 export class UsersService {
@@ -27,6 +31,8 @@ export class UsersService {
     @InjectModel(User.name) private userModel: Model<UserDocument>,
     private readonly googleService: GoogleService,
     private readonly mailService: MailService,
+    @Inject(forwardRef(() => PostsService))
+    private readonly postsService: PostsService,
   ) {}
   async create(createUserDto: CreateUserDto): Promise<UserDto> {
     if (await this.getUserByEmail(createUserDto.email)) {
@@ -131,9 +137,32 @@ export class UsersService {
     }
   }
 
-  async deleteUser(id: string, user: User) {
+  async deleteUser(id: string, authUser: User) {
     await this.getUserById(id);
-    this.isSelfOrAdmin(id, user);
+    this.isSelfOrAdmin(id, authUser);
+    const likedPosts = await this.postsService.getLikedPosts(id, authUser);
+    for (const likedPost of likedPosts) {
+      await this.postsService.unlikePost(likedPost.slug, authUser);
+    }
+    const commentedPosts = await this.postsService.getCommentedPosts(
+      id,
+      authUser,
+    );
+    for (const commentedPost of commentedPosts) {
+      const comments = commentedPost.comments.filter(
+        (comment) => comment.commenter._id.toString() === id,
+      );
+      for (const comment of comments) {
+        await this.postsService.deletePostComment(
+          authUser,
+          commentedPost.slug,
+          {
+            commenterId: new Mongoose.Types.ObjectId(id),
+            _id: comment._id,
+          },
+        );
+      }
+    }
     await this.userModel.findOneAndDelete({ _id: id });
   }
 

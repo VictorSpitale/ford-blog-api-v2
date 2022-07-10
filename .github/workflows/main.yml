@@ -11,7 +11,7 @@ jobs:
        with:
          node-version: 14
      - run: npm ci
-     - run: npm run test:e2e
+     - run: npm run test:e2e-coverage
        env:
          DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
          DB_USER: ${{ secrets.DB_USER }}
@@ -36,3 +36,7 @@ jobs:
          GOOGLE_CLOUD_PROJECT_NAME: ${{ secrets.GOOGLE_CLOUD_PROJECT_NAME }}
          GOOGLE_CLOUD_CLIENT_EMAIL: ${{ secrets.GOOGLE_CLOUD_CLIENT_EMAIL }}
          GOOGLE_CLOUD_PRIVATE_KEY: ${{ secrets.GOOGLE_CLOUD_PRIVATE_KEY }}
+     - name: Coveralls
+       uses: coverallsapp/github-action@master
+       with:
+         github-token: ${{ secrets.GITHUB_TOKEN }}

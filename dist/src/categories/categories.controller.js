@@ -26,7 +26,7 @@ let CategoriesController = class CategoriesController {
     constructor(categoriesService) {
         this.categoriesService = categoriesService;
     }
-    create(createCategoryDto) {
+    async create(createCategoryDto) {
         return this.categoriesService.create(createCategoryDto);
     }
     async getCategories() {
@@ -34,6 +34,9 @@ let CategoriesController = class CategoriesController {
     }
     async getCategoryById(id) {
         return this.categoriesService.getCategoryById(id);
+    }
+    async deleteCategory(id, req) {
+        return this.categoriesService.deleteCategory(id, req.user);
     }
 };
 __decorate([
@@ -103,6 +106,36 @@ __decorate([
     __metadata("design:paramtypes", [String]),
     __metadata("design:returntype", Promise)
 ], CategoriesController.prototype, "getCategoryById", null);
+__decorate([
+    (0, common_1.Delete)(':id'),
+    (0, roles_decorator_1.Role)(users_role_interface_1.IUserRole.ADMIN),
+    (0, swagger_1.ApiOperation)({ summary: 'Delete a category' }),
+    (0, swagger_1.ApiParam)({
+        name: 'id',
+        description: 'Category slug',
+        type: String,
+    }),
+    (0, swagger_1.ApiResponse)({
+        status: 200,
+        description: 'The category has been deleted',
+    }),
+    (0, swagger_1.ApiResponse)({
+        status: 401,
+        description: 'Jwt failed | Insufficient permissions',
+        type: HttpError_1.HttpErrorDto,
+    }),
+    (0, swagger_1.ApiResponse)({
+        status: 404,
+        description: 'The category doesnt exist',
+        type: HttpError_1.HttpErrorDto,
+    }),
+    (0, swagger_1.ApiCookieAuth)(),
+    __param(0, (0, common_1.Param)('id')),
+    __param(1, (0, common_1.Req)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, Object]),
+    __metadata("design:returntype", Promise)
+], CategoriesController.prototype, "deleteCategory", null);
 CategoriesController = __decorate([
     (0, common_1.Controller)('categories'),
     (0, swagger_1.ApiTags)('Categories'),

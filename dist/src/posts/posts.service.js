@@ -115,6 +115,14 @@ let PostsService = class PostsService {
         const posts = await this.postModel.find({ likers: userId });
         return posts.map((p) => this.asBasicDto(p));
     }
+    async getCommentedPosts(userId, authUser) {
+        await this.usersService.getUserById(userId);
+        this.usersService.isSelfOrAdmin(userId, authUser);
+        const posts = await this.postModel.find({
+            comments: { $elemMatch: { commenter: userId } },
+        });
+        return posts.map((p) => this.asDto(p));
+    }
     async getQueriedPosts(search) {
         if (!search ||
             typeof search !== 'string' ||
@@ -289,6 +297,8 @@ let PostsService = class PostsService {
 PostsService = __decorate([
     (0, common_1.Injectable)(),
     __param(0, (0, mongoose_1.InjectModel)(post_entity_1.Post.name)),
+    __param(2, (0, common_1.Inject)((0, common_1.forwardRef)(() => users_service_1.UsersService))),
+    __param(3, (0, common_1.Inject)((0, common_1.forwardRef)(() => categories_service_1.CategoriesService))),
     __metadata("design:paramtypes", [mongoose_2.Model,
         google_service_1.GoogleService,
         users_service_1.UsersService,
