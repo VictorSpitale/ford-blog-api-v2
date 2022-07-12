@@ -143,7 +143,7 @@ export class PostsController {
     type: HttpErrorDto,
   })
   @ApiCookieAuth()
-  async getLikedPost(@Req() req, @Param('id') id) {
+  async getLikedPosts(@Req() req, @Param('id') id) {
     return this.postsService.getLikedPosts(id, req.user);
   }
 

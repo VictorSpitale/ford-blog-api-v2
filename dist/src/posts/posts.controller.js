@@ -45,7 +45,7 @@ let PostsController = class PostsController {
     async getQueriedPosts(search) {
         return this.postsService.getQueriedPosts(search);
     }
-    async getLikedPost(req, id) {
+    async getLikedPosts(req, id) {
         return this.postsService.getLikedPosts(id, req.user);
     }
     async getPost(req, slug) {
@@ -195,7 +195,7 @@ __decorate([
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Object, Object]),
     __metadata("design:returntype", Promise)
-], PostsController.prototype, "getLikedPost", null);
+], PostsController.prototype, "getLikedPosts", null);
 __decorate([
     (0, common_1.Get)(':slug'),
     (0, allow_any_decorator_1.AllowAny)(),
