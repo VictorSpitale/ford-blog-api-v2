@@ -191,6 +191,7 @@ export class UsersService {
   }
 
   async sendPasswordRecovery(email: string, locale: LocalesTypes) {
+    /* istanbul ignore if */
     if (!(await this.getUserByEmail(email))) return;
     const token = uuid();
     const user = await this.userModel.findOneAndUpdate(

@@ -382,6 +382,70 @@ describe('UsersController (e2e)', () => {
     });
   });
 
+  describe('Password change', function () {
+    describe('Failings', function () {
+      it('should not change password with missing fields', async function () {
+        const user = UserStub();
+        await dbConnection.collection('users').insertOne(user);
+        const token = authService.signToken(user);
+        const response_1 = await request
+          .patch(`/users/${user._id}`)
+          .set('Cookie', `access_token=${token}`)
+          .send({ password: 'new_password' });
+        expect(response_1.status).toBe(400);
+        const response_2 = await request
+          .patch(`/users/${user._id}`)
+          .set('Cookie', `access_token=${token}`)
+          .send({ currentPassword: 'current_password' });
+        expect(response_2.status).toBe(400);
+      });
+
+      it('should not change password with wrong current password', async function () {
+        const user = UserStub();
+        await dbConnection.collection('users').insertOne(user);
+        const token = authService.signToken(user);
+        const response = await request
+          .patch(`/users/${user._id}`)
+          .set('Cookie', `access_token=${token}`)
+          .send({
+            password: 'new_password',
+            currentPassword: 'wrong_password',
+          });
+        expect(response.status).toBe(400);
+      });
+    });
+
+    describe('Successfully', function () {
+      it('should change user password', async function () {
+        const createdUserResponse = await request.post('/users').send({
+          password: UserStub().password,
+          pseudo: UserStub().pseudo,
+          email: UserStub().email,
+        });
+        const logResponse = await request.post('/auth/login').send({
+          email: UserStub().email,
+          password: UserStub().password,
+        });
+        const token = logResponse.headers['set-cookie'][0].replace(
+          'access_token=',
+          '',
+        );
+        const response = await request
+          .patch(`/users/${createdUserResponse.body._id}`)
+          .set('Cookie', `access_token=${token}`)
+          .send({
+            password: 'new_password',
+            currentPassword: 'password',
+          });
+        expect(response.status).toBe(200);
+      });
+    });
+
+    afterEach(async () => {
+      await clearDatabase(dbConnection, 'users');
+    });
+  });
+
   afterAll(async () => {
     await clearDatabase(dbConnection, 'users');
     await dbConnection.close(true);
