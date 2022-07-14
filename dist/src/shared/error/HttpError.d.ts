@@ -14,7 +14,9 @@ export declare enum HttpErrorCode {
     DUPLICATE_CATEGORY = 12,
     INVALID_ID = 13,
     SEARCH_QUERY = 14,
-    CATEGORY_NOT_FOUND = 15
+    CATEGORY_NOT_FOUND = 15,
+    MISSING_FIELDS = 16,
+    WRONG_CURRENT_PASSWORD = 17
 }
 export declare class HttpValidationError {
     statusCode: number;

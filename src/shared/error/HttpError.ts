@@ -17,6 +17,8 @@ export enum HttpErrorCode {
   INVALID_ID,
   SEARCH_QUERY,
   CATEGORY_NOT_FOUND,
+  MISSING_FIELDS,
+  WRONG_CURRENT_PASSWORD,
 }
 export class HttpValidationError {
   @ApiProperty({
@@ -159,6 +161,22 @@ export class HttpError {
     [
       HttpErrorCode.CATEGORY_NOT_FOUND,
       { message: 'Category not found', statusCode: 404, code: 15 },
+    ],
+    [
+      HttpErrorCode.MISSING_FIELDS,
+      {
+        message: 'You must fill all required fields',
+        statusCode: 404,
+        code: 16,
+      },
+    ],
+    [
+      HttpErrorCode.WRONG_CURRENT_PASSWORD,
+      {
+        message: 'Your current password is wrong',
+        statusCode: 404,
+        code: 17,
+      },
     ],
   ]);
 

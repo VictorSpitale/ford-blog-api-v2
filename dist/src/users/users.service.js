@@ -11,6 +11,17 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 var __param = (this && this.__param) || function (paramIndex, decorator) {
     return function (target, key) { decorator(target, key, paramIndex); }
 };
+var __rest = (this && this.__rest) || function (s, e) {
+    var t = {};
+    for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p) && e.indexOf(p) < 0)
+        t[p] = s[p];
+    if (s != null && typeof Object.getOwnPropertySymbols === "function")
+        for (var i = 0, p = Object.getOwnPropertySymbols(s); i < p.length; i++) {
+            if (e.indexOf(p[i]) < 0 && Object.prototype.propertyIsEnumerable.call(s, p[i]))
+                t[p[i]] = s[p[i]];
+        }
+    return t;
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.UsersService = void 0;
 const common_1 = require("@nestjs/common");
@@ -25,6 +36,7 @@ const upload_types_1 = require("../shared/types/upload.types");
 const mail_service_1 = require("../mail/mail.service");
 const password_utils_1 = require("../shared/utils/password.utils");
 const posts_service_1 = require("../posts/posts.service");
+const bcrypt = require("bcrypt");
 let UsersService = class UsersService {
     constructor(userModel, googleService, mailService, postsService) {
         this.userModel = userModel;
@@ -71,7 +83,18 @@ let UsersService = class UsersService {
             (await this.getUserByPseudo(updateUserDto.pseudo))) {
             throw new common_1.ConflictException(HttpError_1.HttpError.getHttpError(HttpError_1.HttpErrorCode.DUPLICATE_PSEUDO));
         }
-        const updatedUser = await this.userModel.findOneAndUpdate({ _id: id }, Object.assign({}, updateUserDto), {
+        if (id === user._id.toString()) {
+            if (!updateUserDto.password || !updateUserDto.currentPassword) {
+                throw new common_1.BadRequestException(HttpError_1.HttpError.getHttpError(HttpError_1.HttpErrorCode.MISSING_FIELDS));
+            }
+            const userToUpdate = await this.userModel.findOne({ _id: id });
+            const canChange = await bcrypt.compare(updateUserDto.currentPassword, userToUpdate.password);
+            if (!canChange) {
+                throw new common_1.BadRequestException(HttpError_1.HttpError.getHttpError(HttpError_1.HttpErrorCode.WRONG_CURRENT_PASSWORD));
+            }
+        }
+        const { currentPassword } = updateUserDto, dataToUpdate = __rest(updateUserDto, ["currentPassword"]);
+        const updatedUser = await this.userModel.findOneAndUpdate({ _id: id }, Object.assign({}, dataToUpdate), {
             new: true,
         });
         return this.asDtoWithoutPassword(updatedUser);

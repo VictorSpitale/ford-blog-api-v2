@@ -24,6 +24,7 @@ import { uuid } from '../shared/utils/password.utils';
 import { LocalesTypes } from '../shared/types/locales.types';
 import { PasswordRecoveryDto } from './dto/password-recovery.dto';
 import { PostsService } from '../posts/posts.service';
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class UsersService {
@@ -88,9 +89,30 @@ export class UsersService {
         HttpError.getHttpError(HttpErrorCode.DUPLICATE_PSEUDO),
       );
     }
+
+    if (id === user._id.toString()) {
+      if (!updateUserDto.password || !updateUserDto.currentPassword) {
+        throw new BadRequestException(
+          HttpError.getHttpError(HttpErrorCode.MISSING_FIELDS),
+        );
+      }
+      const userToUpdate = await this.userModel.findOne({ _id: id });
+      const canChange = await bcrypt.compare(
+        updateUserDto.currentPassword,
+        userToUpdate.password,
+      );
+      if (!canChange) {
+        throw new BadRequestException(
+          HttpError.getHttpError(HttpErrorCode.WRONG_CURRENT_PASSWORD),
+        );
+      }
+    }
+
+    const { currentPassword, ...dataToUpdate } = updateUserDto;
+
     const updatedUser = await this.userModel.findOneAndUpdate(
       { _id: id },
-      { ...updateUserDto },
+      { ...dataToUpdate },
       {
         new: true,
       },
