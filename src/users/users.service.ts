@@ -91,20 +91,24 @@ export class UsersService {
     }
 
     if (id === user._id.toString()) {
-      if (!updateUserDto.password || !updateUserDto.currentPassword) {
+      if (
+        (updateUserDto.password && !updateUserDto.currentPassword) ||
+        (!updateUserDto.password && updateUserDto.currentPassword)
+      ) {
         throw new BadRequestException(
           HttpError.getHttpError(HttpErrorCode.MISSING_FIELDS),
         );
-      }
-      const userToUpdate = await this.userModel.findOne({ _id: id });
-      const canChange = await bcrypt.compare(
-        updateUserDto.currentPassword,
-        userToUpdate.password,
-      );
-      if (!canChange) {
-        throw new BadRequestException(
-          HttpError.getHttpError(HttpErrorCode.WRONG_CURRENT_PASSWORD),
+      } else if (updateUserDto.currentPassword && updateUserDto.password) {
+        const userToUpdate = await this.userModel.findOne({ _id: id });
+        const canChange = await bcrypt.compare(
+          updateUserDto.currentPassword,
+          userToUpdate.password,
         );
+        if (!canChange) {
+          throw new BadRequestException(
+            HttpError.getHttpError(HttpErrorCode.WRONG_CURRENT_PASSWORD),
+          );
+        }
       }
     }
 

@@ -36,6 +36,14 @@ describe('PostsController (e2e)', () => {
     authService = moduleFixture.get<AuthService>(AuthService);
   });
 
+  afterAll(async () => {
+    await clearDatabase(dbConnection, 'categories');
+    await clearDatabase(dbConnection, 'posts');
+    await clearDatabase(dbConnection, 'users');
+    await dbConnection.close(true);
+    await app.close();
+  });
+
   describe('createPost', () => {
     describe('successfully create a post', () => {
       it('should create a post', async () => {
@@ -808,13 +816,5 @@ describe('PostsController (e2e)', () => {
       await clearDatabase(dbConnection, 'posts');
       await clearDatabase(dbConnection, 'categories');
     });
-  });
-
-  afterAll(async () => {
-    await clearDatabase(dbConnection, 'categories');
-    await clearDatabase(dbConnection, 'posts');
-    await clearDatabase(dbConnection, 'users');
-    await dbConnection.close(true);
-    await app.close();
   });
 });
