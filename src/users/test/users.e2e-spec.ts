@@ -97,12 +97,8 @@ describe('UsersController (e2e)', () => {
   });
 
   describe('createUsers', () => {
-    let token;
-    beforeAll(async () => {
+    afterEach(async () => {
       await clearDatabase(dbConnection, 'users');
-      const authUser = adminStub();
-      await dbConnection.collection('users').insertOne(authUser);
-      token = authService.signToken(authUser);
     });
     it('should not create a user with too short pseudo', async () => {
       const response = await request.post('/users').send({
@@ -136,7 +132,24 @@ describe('UsersController (e2e)', () => {
       });
       expect(response.status).toBe(400);
     });
-    let createdUserId;
+    it('should not create a user with already used email', async function () {
+      await dbConnection.collection('users').insertOne(UserStub());
+      const response = await request.post('/users').send({
+        password: UserStub().password,
+        pseudo: 'autre pseudo',
+        email: UserStub().email,
+      });
+      expect(response.status).toBe(409);
+    });
+    it('should not create a user with already used pseudo', async function () {
+      await dbConnection.collection('users').insertOne(UserStub());
+      const response = await request.post('/users').send({
+        password: UserStub().password,
+        pseudo: UserStub().pseudo,
+        email: 'autre@mail.fr',
+      });
+      expect(response.status).toBe(409);
+    });
     it('should create a user', async () => {
       const response = await request.post('/users').send({
         password: UserStub().password,
@@ -145,21 +158,6 @@ describe('UsersController (e2e)', () => {
       });
       expect(response.status).toBe(201);
       expect(response.body).toMatchObject(UserStubWithoutPasswordAndDates());
-      createdUserId = response.body._id;
-    });
-    it('should get the created user', async () => {
-      const response = await request
-        .get('/users/' + createdUserId)
-        .set('Cookie', `access_token=${token};`);
-      expect(response.status).toBe(200);
-    });
-    it('should not create a duplicate user', async () => {
-      const response = await request.post('/users').send({
-        password: UserStub().password,
-        pseudo: UserStub().pseudo,
-        email: UserStub().email,
-      });
-      expect(response.status).toBe(409);
     });
   });
 
@@ -380,6 +378,70 @@ describe('UsersController (e2e)', () => {
       expect(await bcrypt.compare(password, afterUser.password)).toBe(true);
     });
     afterAll(async () => {
+      await clearDatabase(dbConnection, 'users');
+    });
+  });
+
+  describe('Password change', function () {
+    describe('Failings', function () {
+      it('should not change password with missing fields', async function () {
+        const user = UserStub();
+        await dbConnection.collection('users').insertOne(user);
+        const token = authService.signToken(user);
+        const response_1 = await request
+          .patch(`/users/${user._id}`)
+          .set('Cookie', `access_token=${token}`)
+          .send({ password: 'new_password' });
+        expect(response_1.status).toBe(400);
+        const response_2 = await request
+          .patch(`/users/${user._id}`)
+          .set('Cookie', `access_token=${token}`)
+          .send({ currentPassword: 'current_password' });
+        expect(response_2.status).toBe(400);
+      });
+
+      it('should not change password with wrong current password', async function () {
+        const user = UserStub();
+        await dbConnection.collection('users').insertOne(user);
+        const token = authService.signToken(user);
+        const response = await request
+          .patch(`/users/${user._id}`)
+          .set('Cookie', `access_token=${token}`)
+          .send({
+            password: 'new_password',
+            currentPassword: 'wrong_password',
+          });
+        expect(response.status).toBe(400);
+      });
+    });
+
+    describe('Successfully', function () {
+      it('should change user password', async function () {
+        const createdUserResponse = await request.post('/users').send({
+          password: UserStub().password,
+          pseudo: UserStub().pseudo,
+          email: UserStub().email,
+        });
+        const logResponse = await request.post('/auth/login').send({
+          email: UserStub().email,
+          password: UserStub().password,
+        });
+        const token = logResponse.headers['set-cookie'][0].replace(
+          'access_token=',
+          '',
+        );
+        const response = await request
+          .patch(`/users/${createdUserResponse.body._id}`)
+          .set('Cookie', `access_token=${token}`)
+          .send({
+            password: 'new_password',
+            currentPassword: 'password',
+          });
+        expect(response.status).toBe(200);
+      });
+    });
+
+    afterEach(async () => {
       await clearDatabase(dbConnection, 'users');
     });
   });

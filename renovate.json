@@ -4,5 +4,5 @@
   ],
   "prConcurrentLimit":  1,
   "prCreation": "not-pending",
-  "enabled": false
+  "enabled": true
 }

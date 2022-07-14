@@ -24,6 +24,7 @@ import { uuid } from '../shared/utils/password.utils';
 import { LocalesTypes } from '../shared/types/locales.types';
 import { PasswordRecoveryDto } from './dto/password-recovery.dto';
 import { PostsService } from '../posts/posts.service';
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class UsersService {
@@ -35,12 +36,10 @@ export class UsersService {
     private readonly postsService: PostsService,
   ) {}
   async create(createUserDto: CreateUserDto): Promise<UserDto> {
-    if (await this.getUserByEmail(createUserDto.email)) {
-      throw new ConflictException(
-        HttpError.getHttpError(HttpErrorCode.USER_ALREADY_EXIST),
-      );
-    }
-    if (await this.getUserByPseudo(createUserDto.pseudo)) {
+    if (
+      (await this.getUserByEmail(createUserDto.email)) ||
+      (await this.getUserByPseudo(createUserDto.pseudo))
+    ) {
       throw new ConflictException(
         HttpError.getHttpError(HttpErrorCode.USER_ALREADY_EXIST),
       );
@@ -88,9 +87,34 @@ export class UsersService {
         HttpError.getHttpError(HttpErrorCode.DUPLICATE_PSEUDO),
       );
     }
+
+    if (id === user._id.toString()) {
+      if (
+        (updateUserDto.password && !updateUserDto.currentPassword) ||
+        (!updateUserDto.password && updateUserDto.currentPassword)
+      ) {
+        throw new BadRequestException(
+          HttpError.getHttpError(HttpErrorCode.MISSING_FIELDS),
+        );
+      } else if (updateUserDto.currentPassword && updateUserDto.password) {
+        const userToUpdate = await this.userModel.findOne({ _id: id });
+        const canChange = await bcrypt.compare(
+          updateUserDto.currentPassword,
+          userToUpdate.password,
+        );
+        if (!canChange) {
+          throw new BadRequestException(
+            HttpError.getHttpError(HttpErrorCode.WRONG_CURRENT_PASSWORD),
+          );
+        }
+      }
+    }
+
+    const { currentPassword, ...dataToUpdate } = updateUserDto;
+
     const updatedUser = await this.userModel.findOneAndUpdate(
       { _id: id },
-      { ...updateUserDto },
+      { ...dataToUpdate },
       {
         new: true,
       },
@@ -167,6 +191,7 @@ export class UsersService {
   }
 
   async sendPasswordRecovery(email: string, locale: LocalesTypes) {
+    /* istanbul ignore if */
     if (!(await this.getUserByEmail(email))) return;
     const token = uuid();
     const user = await this.userModel.findOneAndUpdate(

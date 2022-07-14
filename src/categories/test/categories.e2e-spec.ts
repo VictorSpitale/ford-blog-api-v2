@@ -149,13 +149,16 @@ describe.only('CategoriesController (e2e)', () => {
     describe('delete a category', () => {
       it('should delete cascade a category', async () => {
         const category = CategoryStub();
+        const snCategory = CategoryStub('suv');
         let post = CreatePostStub();
         post = {
           ...post,
-          categories: [category._id],
+          categories: [category._id, snCategory._id],
         };
         const user = UserStub(IUserRole.ADMIN);
-        await dbConnection.collection('categories').insertOne(category);
+        await dbConnection
+          .collection('categories')
+          .insertMany([category, snCategory]);
         await dbConnection.collection('users').insertOne(user);
         const token = authService.signToken(user);
         await request
@@ -168,7 +171,7 @@ describe.only('CategoriesController (e2e)', () => {
         const queriedPosts = (await dbConnection
           .collection('posts')
           .findOne({ slug: post.slug })) as PostDto;
-        expect(queriedPosts.categories).toEqual([]);
+        expect(queriedPosts.categories).toEqual([snCategory._id]);
         expect(response.status).toBe(200);
       });
     });

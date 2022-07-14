@@ -36,6 +36,14 @@ describe('PostsController (e2e)', () => {
     authService = moduleFixture.get<AuthService>(AuthService);
   });
 
+  afterAll(async () => {
+    await clearDatabase(dbConnection, 'categories');
+    await clearDatabase(dbConnection, 'posts');
+    await clearDatabase(dbConnection, 'users');
+    await dbConnection.close(true);
+    await app.close();
+  });
+
   describe('createPost', () => {
     describe('successfully create a post', () => {
       it('should create a post', async () => {
@@ -810,11 +818,39 @@ describe('PostsController (e2e)', () => {
     });
   });
 
-  afterAll(async () => {
-    await clearDatabase(dbConnection, 'categories');
-    await clearDatabase(dbConnection, 'posts');
-    await clearDatabase(dbConnection, 'users');
-    await dbConnection.close(true);
-    await app.close();
+  describe('Patch like status', function () {
+    it('should throw error on unAuth', async function () {
+      const response = await request.get('/posts/isLiked/slug');
+      expect(response.status).toBe(401);
+    });
+    it('should return false on post not found', async function () {
+      const user = UserStub();
+      await dbConnection.collection('users').insertOne(user);
+      const token = authService.signToken(user);
+      const response = await request
+        .get('/posts/isLiked/slug')
+        .set('Cookie', `access_token=${token}`);
+      expect(response.text).toBe('false');
+    });
+
+    it('should return the like status', async function () {
+      const user = UserStub();
+      const post = PostStub();
+      await dbConnection.collection('users').insertOne(user);
+      await dbConnection.collection('posts').insertOne(post);
+      const token = authService.signToken(user);
+      await request
+        .patch(`/posts/like/${post.slug}`)
+        .set('Cookie', `access_token=${token}`);
+      const response = await request
+        .get(`/posts/isLiked/${post.slug}`)
+        .set('Cookie', `access_token=${token}`);
+      expect(response.text).toBe('true');
+    });
+
+    afterEach(async () => {
+      await clearDatabase(dbConnection, 'users');
+      await clearDatabase(dbConnection, 'posts');
+    });
   });
 });

@@ -29,6 +29,8 @@ var HttpErrorCode;
     HttpErrorCode[HttpErrorCode["INVALID_ID"] = 13] = "INVALID_ID";
     HttpErrorCode[HttpErrorCode["SEARCH_QUERY"] = 14] = "SEARCH_QUERY";
     HttpErrorCode[HttpErrorCode["CATEGORY_NOT_FOUND"] = 15] = "CATEGORY_NOT_FOUND";
+    HttpErrorCode[HttpErrorCode["MISSING_FIELDS"] = 16] = "MISSING_FIELDS";
+    HttpErrorCode[HttpErrorCode["WRONG_CURRENT_PASSWORD"] = 17] = "WRONG_CURRENT_PASSWORD";
 })(HttpErrorCode = exports.HttpErrorCode || (exports.HttpErrorCode = {}));
 class HttpValidationError {
 }
@@ -184,6 +186,22 @@ HttpError.errors = new Map([
     [
         HttpErrorCode.CATEGORY_NOT_FOUND,
         { message: 'Category not found', statusCode: 404, code: 15 },
+    ],
+    [
+        HttpErrorCode.MISSING_FIELDS,
+        {
+            message: 'You must fill all required fields',
+            statusCode: 404,
+            code: 16,
+        },
+    ],
+    [
+        HttpErrorCode.WRONG_CURRENT_PASSWORD,
+        {
+            message: 'Your current password is wrong',
+            statusCode: 404,
+            code: 17,
+        },
     ],
 ]);
 //# sourceMappingURL=HttpError.js.map
