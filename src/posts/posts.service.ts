@@ -114,7 +114,7 @@ export class PostsService {
   ): Promise<{ hasMore: boolean; posts: PostDto[]; page: number }> {
     let posts;
     let hasMore = false;
-    if (!page) posts = await this.find({});
+    if (!page) posts = await this.find();
     else {
       if (page <= 0) page = 1;
       posts = await this.postModel
