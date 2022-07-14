@@ -36,12 +36,10 @@ export class UsersService {
     private readonly postsService: PostsService,
   ) {}
   async create(createUserDto: CreateUserDto): Promise<UserDto> {
-    if (await this.getUserByEmail(createUserDto.email)) {
-      throw new ConflictException(
-        HttpError.getHttpError(HttpErrorCode.USER_ALREADY_EXIST),
-      );
-    }
-    if (await this.getUserByPseudo(createUserDto.pseudo)) {
+    if (
+      (await this.getUserByEmail(createUserDto.email)) ||
+      (await this.getUserByPseudo(createUserDto.pseudo))
+    ) {
       throw new ConflictException(
         HttpError.getHttpError(HttpErrorCode.USER_ALREADY_EXIST),
       );
