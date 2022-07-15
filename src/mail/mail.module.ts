@@ -6,6 +6,7 @@ import { join } from 'path';
 import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handlebars.adapter';
 import { BullModule } from '@nestjs/bull';
 import { MailProcessor } from './mail.processor';
+import { MailController } from './mail.controller';
 
 @Module({
   imports: [
@@ -36,6 +37,7 @@ import { MailProcessor } from './mail.processor';
       name: 'mailing',
     }),
   ],
+  controllers: [MailController],
   providers: [MailService, MailProcessor],
   exports: [MailService],
 })

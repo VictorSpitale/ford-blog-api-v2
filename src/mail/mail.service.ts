@@ -1,5 +1,4 @@
 import { Injectable } from '@nestjs/common';
-import { MailerService } from '@nestjs-modules/mailer';
 import { InjectQueue } from '@nestjs/bull';
 import { Queue } from 'bull';
 import { ConfigService } from '@nestjs/config';
@@ -8,11 +7,11 @@ import {
   PasswordRecoveryInfos,
   PasswordRecoveryType,
 } from './types/password-recovery.type';
+import { ContactDto } from './dto/Contact.dto';
 
 @Injectable()
 export class MailService {
   constructor(
-    private readonly mailerService: MailerService,
     private readonly configService: ConfigService,
     @InjectQueue('mailing') private readonly mailingQueue: Queue,
   ) {}
@@ -33,5 +32,9 @@ export class MailService {
       clientUrl: this.configService.get('client_url'),
       locale: recoveryInfos.locale,
     } as PasswordRecoveryType);
+  }
+
+  async addContactEmailToQueue(contactDto: ContactDto) {
+    await this.mailingQueue.add('contact', contactDto);
   }
 }

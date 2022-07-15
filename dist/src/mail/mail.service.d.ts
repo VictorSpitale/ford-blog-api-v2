@@ -1,13 +1,13 @@
-import { MailerService } from '@nestjs-modules/mailer';
 import { Queue } from 'bull';
 import { ConfigService } from '@nestjs/config';
 import { WelcomeEmailInfos } from './types/welcome.type';
 import { PasswordRecoveryInfos } from './types/password-recovery.type';
+import { ContactDto } from './dto/Contact.dto';
 export declare class MailService {
-    private readonly mailerService;
     private readonly configService;
     private readonly mailingQueue;
-    constructor(mailerService: MailerService, configService: ConfigService, mailingQueue: Queue);
+    constructor(configService: ConfigService, mailingQueue: Queue);
     addWelcomeMailToQueue(welcomeMailInfos: WelcomeEmailInfos): Promise<void>;
     addPasswordRecoveryEmailToQueue(recoveryInfos: PasswordRecoveryInfos): Promise<void>;
+    addContactEmailToQueue(contactDto: ContactDto): Promise<void>;
 }
