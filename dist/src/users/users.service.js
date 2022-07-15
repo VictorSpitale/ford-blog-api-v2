@@ -45,10 +45,8 @@ let UsersService = class UsersService {
         this.postsService = postsService;
     }
     async create(createUserDto) {
-        if (await this.getUserByEmail(createUserDto.email)) {
-            throw new common_1.ConflictException(HttpError_1.HttpError.getHttpError(HttpError_1.HttpErrorCode.USER_ALREADY_EXIST));
-        }
-        if (await this.getUserByPseudo(createUserDto.pseudo)) {
+        if ((await this.getUserByEmail(createUserDto.email)) ||
+            (await this.getUserByPseudo(createUserDto.pseudo))) {
             throw new common_1.ConflictException(HttpError_1.HttpError.getHttpError(HttpError_1.HttpErrorCode.USER_ALREADY_EXIST));
         }
         const createdUser = await this.userModel.create(createUserDto);
@@ -84,13 +82,16 @@ let UsersService = class UsersService {
             throw new common_1.ConflictException(HttpError_1.HttpError.getHttpError(HttpError_1.HttpErrorCode.DUPLICATE_PSEUDO));
         }
         if (id === user._id.toString()) {
-            if (!updateUserDto.password || !updateUserDto.currentPassword) {
+            if ((updateUserDto.password && !updateUserDto.currentPassword) ||
+                (!updateUserDto.password && updateUserDto.currentPassword)) {
                 throw new common_1.BadRequestException(HttpError_1.HttpError.getHttpError(HttpError_1.HttpErrorCode.MISSING_FIELDS));
             }
-            const userToUpdate = await this.userModel.findOne({ _id: id });
-            const canChange = await bcrypt.compare(updateUserDto.currentPassword, userToUpdate.password);
-            if (!canChange) {
-                throw new common_1.BadRequestException(HttpError_1.HttpError.getHttpError(HttpError_1.HttpErrorCode.WRONG_CURRENT_PASSWORD));
+            else if (updateUserDto.currentPassword && updateUserDto.password) {
+                const userToUpdate = await this.userModel.findOne({ _id: id });
+                const canChange = await bcrypt.compare(updateUserDto.currentPassword, userToUpdate.password);
+                if (!canChange) {
+                    throw new common_1.BadRequestException(HttpError_1.HttpError.getHttpError(HttpError_1.HttpErrorCode.WRONG_CURRENT_PASSWORD));
+                }
             }
         }
         const { currentPassword } = updateUserDto, dataToUpdate = __rest(updateUserDto, ["currentPassword"]);

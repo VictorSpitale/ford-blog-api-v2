@@ -12,14 +12,22 @@ const common_1 = require("@nestjs/common");
 const config_1 = require("@nestjs/config");
 const mongoose_1 = require("@nestjs/mongoose");
 const database_service_1 = require("./database.service");
+const mongodb_memory_server_1 = require("mongodb-memory-server");
 let DatabaseModule = DatabaseModule_1 = class DatabaseModule {
     static forRoot() {
         return {
             module: DatabaseModule_1,
             imports: [
                 mongoose_1.MongooseModule.forRootAsync({
-                    useFactory: (configService) => {
+                    useFactory: async (configService) => {
                         const dbConfig = configService.get('database');
+                        if (configService.get('NODE_ENV') === 'test') {
+                            const tempDb = await mongodb_memory_server_1.MongoMemoryServer.create();
+                            const testUri = tempDb.getUri();
+                            return {
+                                uri: testUri,
+                            };
+                        }
                         return {
                             uri: 'mongodb+srv://' +
                                 dbConfig.username +

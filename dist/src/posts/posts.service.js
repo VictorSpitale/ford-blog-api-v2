@@ -77,7 +77,7 @@ let PostsService = class PostsService {
         let posts;
         let hasMore = false;
         if (!page)
-            posts = await this.find({});
+            posts = await this.find();
         else {
             if (page <= 0)
                 page = 1;
