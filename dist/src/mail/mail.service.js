@@ -14,12 +14,10 @@ var __param = (this && this.__param) || function (paramIndex, decorator) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.MailService = void 0;
 const common_1 = require("@nestjs/common");
-const mailer_1 = require("@nestjs-modules/mailer");
 const bull_1 = require("@nestjs/bull");
 const config_1 = require("@nestjs/config");
 let MailService = class MailService {
-    constructor(mailerService, configService, mailingQueue) {
-        this.mailerService = mailerService;
+    constructor(configService, mailingQueue) {
         this.configService = configService;
         this.mailingQueue = mailingQueue;
     }
@@ -39,12 +37,14 @@ let MailService = class MailService {
             locale: recoveryInfos.locale,
         });
     }
+    async addContactEmailToQueue(contactDto) {
+        await this.mailingQueue.add('contact', contactDto);
+    }
 };
 MailService = __decorate([
     (0, common_1.Injectable)(),
-    __param(2, (0, bull_1.InjectQueue)('mailing')),
-    __metadata("design:paramtypes", [mailer_1.MailerService,
-        config_1.ConfigService, Object])
+    __param(1, (0, bull_1.InjectQueue)('mailing')),
+    __metadata("design:paramtypes", [config_1.ConfigService, Object])
 ], MailService);
 exports.MailService = MailService;
 //# sourceMappingURL=mail.service.js.map
