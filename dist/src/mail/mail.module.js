@@ -15,6 +15,7 @@ const path_1 = require("path");
 const handlebars_adapter_1 = require("@nestjs-modules/mailer/dist/adapters/handlebars.adapter");
 const bull_1 = require("@nestjs/bull");
 const mail_processor_1 = require("./mail.processor");
+const mail_controller_1 = require("./mail.controller");
 let MailModule = class MailModule {
 };
 MailModule = __decorate([
@@ -47,6 +48,7 @@ MailModule = __decorate([
                 name: 'mailing',
             }),
         ],
+        controllers: [mail_controller_1.MailController],
         providers: [mail_service_1.MailService, mail_processor_1.MailProcessor],
         exports: [mail_service_1.MailService],
     })

@@ -12,9 +12,11 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.MailProcessor = void 0;
 const bull_1 = require("@nestjs/bull");
 const mailer_1 = require("@nestjs-modules/mailer");
+const config_1 = require("@nestjs/config");
 let MailProcessor = class MailProcessor {
-    constructor(mailerService) {
+    constructor(mailerService, configService) {
         this.mailerService = mailerService;
+        this.configService = configService;
     }
     handleWelcome(job) {
         try {
@@ -55,6 +57,17 @@ let MailProcessor = class MailProcessor {
         }
         catch (e) { }
     }
+    async handleContact(job) {
+        await this.mailerService.sendMail({
+            to: this.configService.get('email.to'),
+            from: job.data.email,
+            template: 'contact',
+            subject: `Ford Blog : Message de ${job.data.name} | ${job.data.email}`,
+            context: {
+                message: job.data.message,
+            },
+        });
+    }
 };
 __decorate([
     (0, bull_1.Process)('welcome'),
@@ -68,9 +81,16 @@ __decorate([
     __metadata("design:paramtypes", [Object]),
     __metadata("design:returntype", void 0)
 ], MailProcessor.prototype, "handleRecovery", null);
+__decorate([
+    (0, bull_1.Process)('contact'),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", Promise)
+], MailProcessor.prototype, "handleContact", null);
 MailProcessor = __decorate([
     (0, bull_1.Processor)('mailing'),
-    __metadata("design:paramtypes", [mailer_1.MailerService])
+    __metadata("design:paramtypes", [mailer_1.MailerService,
+        config_1.ConfigService])
 ], MailProcessor);
 exports.MailProcessor = MailProcessor;
 //# sourceMappingURL=mail.processor.js.map
