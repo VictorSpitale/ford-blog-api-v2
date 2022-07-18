@@ -223,6 +223,9 @@ let PostsService = class PostsService {
             .populate('categories');
         return posts.map((post) => this.asDto(post));
     }
+    async getPostsCountByCategory(category) {
+        return this.postModel.find({ categories: category._id }).count();
+    }
     async find(match = {}, limit = 0) {
         if (match._id) {
             if (!(0, mongoose_2.isValidObjectId)(match._id)) {

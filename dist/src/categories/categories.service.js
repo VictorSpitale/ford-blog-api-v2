@@ -39,6 +39,15 @@ let CategoriesService = class CategoriesService {
         const categories = await this.find();
         return categories.map((cat) => this.asDto(cat));
     }
+    async getCategoriesWithCount() {
+        const categories = await this.find();
+        const result = [];
+        for (const category of categories) {
+            const categoryDto = this.asDto(category);
+            result.push(Object.assign(Object.assign({}, categoryDto), { count: await this.postsService.getPostsCountByCategory(categoryDto) }));
+        }
+        return result;
+    }
     async getCategoryById(id) {
         const category = await this.findOne({ _id: id });
         if (!category)

@@ -21,6 +21,7 @@ import { Role } from '../auth/decorators/roles.decorator';
 import { IUserRole } from '../users/entities/users.role.interface';
 import { AllowAny } from '../auth/decorators/allow-any.decorator';
 import { HttpErrorDto, HttpValidationError } from '../shared/error/HttpError';
+import { CategoryWithCountDto } from './dto/category-with-count.dto';
 
 @Controller('categories')
 @ApiTags('Categories')
@@ -67,6 +68,19 @@ export class CategoriesController {
   @AllowAny()
   async getCategories(): Promise<CategoryDto[]> {
     return this.categoriesService.getCategories();
+  }
+
+  @Get('/count')
+  @ApiOperation({ summary: 'Get all categories with related posts count' })
+  @ApiResponse({
+    status: 200,
+    description: 'List all categories with related posts count',
+    type: [CategoryWithCountDto],
+  })
+  @Role(IUserRole.ADMIN)
+  @ApiCookieAuth()
+  async getCategoriesWithCount(): Promise<CategoryWithCountDto[]> {
+    return this.categoriesService.getCategoriesWithCount();
   }
 
   @Get(':id')

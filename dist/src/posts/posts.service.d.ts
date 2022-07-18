@@ -14,6 +14,7 @@ import { CreateCommentDto } from './dto/create-comment.dto';
 import { DeleteCommentDto } from './dto/delete-comment.dto';
 import { UpdateCommentDto } from './dto/update-comment.dto';
 import { CategoriesService } from '../categories/categories.service';
+import { CategoryDto } from '../categories/dto/category.dto';
 export declare class PostsService {
     private readonly postModel;
     private readonly googleService;
@@ -42,6 +43,7 @@ export declare class PostsService {
     private checkIfPostIsDuplicatedBySlug;
     getPostLikeStatus(slug: string, user: User): Promise<boolean>;
     getCategorizedPosts(categoryName: string): Promise<PostDto[]>;
+    getPostsCountByCategory(category: CategoryDto): Promise<number>;
     private find;
     findOne(match: MatchType): Promise<Omit<Omit<Post & Mongoose.Document<any, any, any> & {
         _id: any;

@@ -22,6 +22,7 @@ const roles_decorator_1 = require("../auth/decorators/roles.decorator");
 const users_role_interface_1 = require("../users/entities/users.role.interface");
 const allow_any_decorator_1 = require("../auth/decorators/allow-any.decorator");
 const HttpError_1 = require("../shared/error/HttpError");
+const category_with_count_dto_1 = require("./dto/category-with-count.dto");
 let CategoriesController = class CategoriesController {
     constructor(categoriesService) {
         this.categoriesService = categoriesService;
@@ -31,6 +32,9 @@ let CategoriesController = class CategoriesController {
     }
     async getCategories() {
         return this.categoriesService.getCategories();
+    }
+    async getCategoriesWithCount() {
+        return this.categoriesService.getCategoriesWithCount();
     }
     async getCategoryById(id) {
         return this.categoriesService.getCategoryById(id);
@@ -82,6 +86,20 @@ __decorate([
     __metadata("design:paramtypes", []),
     __metadata("design:returntype", Promise)
 ], CategoriesController.prototype, "getCategories", null);
+__decorate([
+    (0, common_1.Get)('/count'),
+    (0, swagger_1.ApiOperation)({ summary: 'Get all categories with related posts count' }),
+    (0, swagger_1.ApiResponse)({
+        status: 200,
+        description: 'List all categories with related posts count',
+        type: [category_with_count_dto_1.CategoryWithCountDto],
+    }),
+    (0, roles_decorator_1.Role)(users_role_interface_1.IUserRole.ADMIN),
+    (0, swagger_1.ApiCookieAuth)(),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", []),
+    __metadata("design:returntype", Promise)
+], CategoriesController.prototype, "getCategoriesWithCount", null);
 __decorate([
     (0, common_1.Get)(':id'),
     (0, swagger_1.ApiOperation)({ summary: 'Get category by id' }),

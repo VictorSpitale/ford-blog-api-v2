@@ -26,6 +26,7 @@ import { DeleteCommentDto } from './dto/delete-comment.dto';
 import { UpdateCommentDto } from './dto/update-comment.dto';
 import { CategoriesService } from '../categories/categories.service';
 import * as _ from 'lodash';
+import { CategoryDto } from '../categories/dto/category.dto';
 
 @Injectable()
 export class PostsService {
@@ -309,6 +310,10 @@ export class PostsService {
       .find({ categories: category._id })
       .populate('categories');
     return posts.map((post) => this.asDto(post));
+  }
+
+  async getPostsCountByCategory(category: CategoryDto): Promise<number> {
+    return this.postModel.find({ categories: category._id }).count();
   }
 
   private async find(match: MatchType = {}, limit = 0) {

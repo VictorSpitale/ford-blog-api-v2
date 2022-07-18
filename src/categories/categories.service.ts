@@ -15,6 +15,7 @@ import { MatchType } from '../shared/types/match.types';
 import { HttpError, HttpErrorCode } from '../shared/error/HttpError';
 import { PostsService } from '../posts/posts.service';
 import { User } from '../users/entities/user.entity';
+import { CategoryWithCountDto } from './dto/category-with-count.dto';
 
 @Injectable()
 export class CategoriesService {
@@ -43,6 +44,19 @@ export class CategoriesService {
   async getCategories(): Promise<CategoryDto[]> {
     const categories = await this.find();
     return categories.map((cat) => this.asDto(cat));
+  }
+
+  async getCategoriesWithCount(): Promise<CategoryWithCountDto[]> {
+    const categories = await this.find();
+    const result: CategoryWithCountDto[] = [];
+    for (const category of categories) {
+      const categoryDto = this.asDto(category);
+      result.push({
+        ...categoryDto,
+        count: await this.postsService.getPostsCountByCategory(categoryDto),
+      });
+    }
+    return result;
   }
 
   async getCategoryById(id: string): Promise<CategoryDto> {
