@@ -13,7 +13,7 @@ exports.CategoryWithCountDto = void 0;
 const category_dto_1 = require("./category.dto");
 const swagger_1 = require("@nestjs/swagger");
 const class_validator_1 = require("class-validator");
-class CategoryWithCountDto extends (0, swagger_1.PartialType)(category_dto_1.CategoryDto) {
+class CategoryWithCountDto extends category_dto_1.CategoryDto {
 }
 __decorate([
     (0, swagger_1.ApiProperty)({

@@ -1,8 +1,8 @@
 import { CategoryDto } from './category.dto';
-import { ApiProperty, PartialType } from '@nestjs/swagger';
+import { ApiProperty } from '@nestjs/swagger';
 import { IsNumber } from 'class-validator';
 
-export class CategoryWithCountDto extends PartialType(CategoryDto) {
+export class CategoryWithCountDto extends CategoryDto {
   @ApiProperty({
     description: 'Number of related posts',
     example: '12',
