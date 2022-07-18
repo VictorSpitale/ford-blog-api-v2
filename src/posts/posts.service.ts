@@ -27,6 +27,7 @@ import { UpdateCommentDto } from './dto/update-comment.dto';
 import { CategoriesService } from '../categories/categories.service';
 import * as _ from 'lodash';
 import { CategoryDto } from '../categories/dto/category.dto';
+import { BasicUserDto } from '../users/dto/basic-user.dto';
 
 @Injectable()
 export class PostsService {
@@ -314,6 +315,11 @@ export class PostsService {
 
   async getPostsCountByCategory(category: CategoryDto): Promise<number> {
     return this.postModel.find({ categories: category._id }).count();
+  }
+
+  async getPostLikers(slug: string): Promise<BasicUserDto[]> {
+    const post = (await this.findOne({ slug })) as Post;
+    return post.likers.map((u) => this.usersService.asBasicDto(u));
   }
 
   private async find(match: MatchType = {}, limit = 0) {

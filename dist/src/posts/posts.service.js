@@ -226,6 +226,10 @@ let PostsService = class PostsService {
     async getPostsCountByCategory(category) {
         return this.postModel.find({ categories: category._id }).count();
     }
+    async getPostLikers(slug) {
+        const post = (await this.findOne({ slug }));
+        return post.likers.map((u) => this.usersService.asBasicDto(u));
+    }
     async find(match = {}, limit = 0) {
         if (match._id) {
             if (!(0, mongoose_2.isValidObjectId)(match._id)) {

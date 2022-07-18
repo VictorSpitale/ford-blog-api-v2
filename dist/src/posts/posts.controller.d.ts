@@ -7,6 +7,7 @@ import { BasicPostDto } from './dto/basic-post.dto';
 import { CreateCommentDto } from './dto/create-comment.dto';
 import { UpdateCommentDto } from './dto/update-comment.dto';
 import { DeleteCommentDto } from './dto/delete-comment.dto';
+import { BasicUserDto } from '../users/dto/basic-user.dto';
 export declare class PostsController {
     private readonly postsService;
     constructor(postsService: PostsService);
@@ -20,6 +21,7 @@ export declare class PostsController {
     getQueriedPosts(search: string | string[]): Promise<BasicPostDto[]>;
     getLikedPosts(req: any, id: any): Promise<BasicPostDto[]>;
     getPost(req: any, slug: any): Promise<PostDto>;
+    getPostLikers(slug: any): Promise<BasicUserDto[]>;
     likePost(req: any, slug: any): Promise<number>;
     unlikePost(req: any, slug: any): Promise<number>;
     deletePost(req: any, slug: any): Promise<void>;

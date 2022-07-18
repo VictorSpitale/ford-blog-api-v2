@@ -198,6 +198,13 @@ let UsersService = class UsersService {
             return null;
         }
     }
+    asBasicDto(user) {
+        return {
+            _id: user._id,
+            pseudo: user.pseudo,
+            picture: user.picture,
+        };
+    }
     asDto(user) {
         return {
             _id: user._id,

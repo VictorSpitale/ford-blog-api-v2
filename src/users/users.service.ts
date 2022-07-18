@@ -25,6 +25,7 @@ import { LocalesTypes } from '../shared/types/locales.types';
 import { PasswordRecoveryDto } from './dto/password-recovery.dto';
 import { PostsService } from '../posts/posts.service';
 import * as bcrypt from 'bcrypt';
+import { BasicUserDto } from './dto/basic-user.dto';
 
 @Injectable()
 export class UsersService {
@@ -254,6 +255,14 @@ export class UsersService {
     }
   }
 
+  asBasicDto(user: User): BasicUserDto {
+    return {
+      _id: user._id,
+      pseudo: user.pseudo,
+      picture: user.picture,
+    };
+  }
+
   asDto(user: User): UserDto {
     return {
       _id: user._id,
@@ -265,6 +274,7 @@ export class UsersService {
       createdAt: user.createdAt,
     } as UserDto;
   }
+
   asDtoWithoutPassword(user: User): UserDto {
     return {
       _id: user._id,

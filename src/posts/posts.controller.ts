@@ -33,6 +33,7 @@ import { BasicPostDto } from './dto/basic-post.dto';
 import { CreateCommentDto } from './dto/create-comment.dto';
 import { UpdateCommentDto } from './dto/update-comment.dto';
 import { DeleteCommentDto } from './dto/delete-comment.dto';
+import { BasicUserDto } from '../users/dto/basic-user.dto';
 
 @Controller('posts')
 @ApiTags('Posts')
@@ -169,6 +170,30 @@ export class PostsController {
   })
   async getPost(@Req() req, @Param('slug') slug): Promise<PostDto> {
     return this.postsService.getPost(slug, req.user);
+  }
+  @Get(':slug/likers')
+  @ApiOperation({ summary: 'Get post likers by slug' })
+  @ApiResponse({
+    status: 200,
+    description: 'The post likers got by its slug',
+    type: [BasicUserDto],
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'The post doesnt exist',
+    type: HttpErrorDto,
+  })
+  @ApiParam({
+    description: "Post's slug to query",
+    name: 'slug',
+    example: 'que-penser-de-la-ford-focus-st-line',
+    required: true,
+    type: String,
+  })
+  @Role(IUserRole.ADMIN)
+  @ApiCookieAuth()
+  async getPostLikers(@Param('slug') slug): Promise<BasicUserDto[]> {
+    return this.postsService.getPostLikers(slug);
   }
 
   @Patch('/like/:slug')

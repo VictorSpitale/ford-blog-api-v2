@@ -10,6 +10,7 @@ import { MailService } from '../mail/mail.service';
 import { LocalesTypes } from '../shared/types/locales.types';
 import { PasswordRecoveryDto } from './dto/password-recovery.dto';
 import { PostsService } from '../posts/posts.service';
+import { BasicUserDto } from './dto/basic-user.dto';
 export declare class UsersService {
     private userModel;
     private readonly googleService;
@@ -33,6 +34,7 @@ export declare class UsersService {
     save(user: UserDto): Promise<void>;
     private find;
     findOne(match: MatchType): Promise<User | null>;
+    asBasicDto(user: User): BasicUserDto;
     asDto(user: User): UserDto;
     asDtoWithoutPassword(user: User): UserDto;
 }

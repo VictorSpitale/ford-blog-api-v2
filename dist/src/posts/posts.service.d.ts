@@ -15,6 +15,7 @@ import { DeleteCommentDto } from './dto/delete-comment.dto';
 import { UpdateCommentDto } from './dto/update-comment.dto';
 import { CategoriesService } from '../categories/categories.service';
 import { CategoryDto } from '../categories/dto/category.dto';
+import { BasicUserDto } from '../users/dto/basic-user.dto';
 export declare class PostsService {
     private readonly postModel;
     private readonly googleService;
@@ -44,6 +45,7 @@ export declare class PostsService {
     getPostLikeStatus(slug: string, user: User): Promise<boolean>;
     getCategorizedPosts(categoryName: string): Promise<PostDto[]>;
     getPostsCountByCategory(category: CategoryDto): Promise<number>;
+    getPostLikers(slug: string): Promise<BasicUserDto[]>;
     private find;
     findOne(match: MatchType): Promise<Omit<Omit<Post & Mongoose.Document<any, any, any> & {
         _id: any;
