@@ -163,7 +163,7 @@ export class PostsService {
   async getCommentedPosts(userId: string, authUser: User): Promise<PostDto[]> {
     await this.usersService.getUserById(userId);
     this.usersService.isSelfOrAdmin(userId, authUser);
-    const posts = await this.postModel.find({
+    const posts = await this.find({
       comments: { $elemMatch: { commenter: userId } },
     });
     return posts.map((p) => this.asDto(p));
