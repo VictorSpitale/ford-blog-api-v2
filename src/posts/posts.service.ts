@@ -308,9 +308,7 @@ export class PostsService {
       name: categoryName,
     });
     if (!category) return [];
-    const posts = await this.postModel
-      .find({ categories: category._id })
-      .populate('categories');
+    const posts = await this.find({ categories: category._id });
     return posts.map((post) => this.asDto(post));
   }
 
