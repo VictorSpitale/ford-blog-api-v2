@@ -124,6 +124,7 @@ export class PostsService {
         .sort({ createdAt: -1 })
         .limit(4)
         .populate('categories')
+        .populate('comments.commenter', ['pseudo', 'picture'])
         .skip(3 * (page - 1));
       if (posts.length > 3) {
         hasMore = true;
