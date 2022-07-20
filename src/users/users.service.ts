@@ -227,17 +227,7 @@ export class UsersService {
     id: string,
     authUser: User,
   ): Promise<PostDto[]> {
-    const posts = await this.postsService.getCommentedPosts(id, authUser);
-    const result: PostDto[] = [];
-    for (const post of posts) {
-      result.push({
-        ...post,
-        comments: post.comments.filter(
-          (c) => c.commenter._id.toString() === id,
-        ),
-      });
-    }
-    return result;
+    return this.postsService.getCommentedPosts(id, authUser);
   }
 
   async save(user: UserDto) {

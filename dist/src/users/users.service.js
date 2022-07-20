@@ -167,12 +167,7 @@ let UsersService = class UsersService {
         });
     }
     async getFilteredCommentedPostsByUserId(id, authUser) {
-        const posts = await this.postsService.getCommentedPosts(id, authUser);
-        const result = [];
-        for (const post of posts) {
-            result.push(Object.assign(Object.assign({}, post), { comments: post.comments.filter((c) => c.commenter._id.toString() === id) }));
-        }
-        return result;
+        return this.postsService.getCommentedPosts(id, authUser);
     }
     async save(user) {
         await this.userModel.replaceOne({ _id: user._id }, user, { upsert: true });
