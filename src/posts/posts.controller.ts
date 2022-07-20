@@ -29,7 +29,6 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { UpdatePostDto } from './dto/update-post.dto';
 import { PaginatedPostDto } from './dto/paginated-post.dto';
 import { HttpErrorDto, HttpValidationError } from '../shared/error/HttpError';
-import { BasicPostDto } from './dto/basic-post.dto';
 import { CreateCommentDto } from './dto/create-comment.dto';
 import { UpdateCommentDto } from './dto/update-comment.dto';
 import { DeleteCommentDto } from './dto/delete-comment.dto';
@@ -136,7 +135,7 @@ export class PostsController {
   @ApiResponse({
     status: 200,
     description: 'Posts list',
-    type: [BasicPostDto],
+    type: [PostDto],
   })
   @ApiResponse({
     status: 401,

@@ -35,7 +35,7 @@ export declare class PostsService {
     }>;
     getLastPosts(user: User): Promise<PostDto[]>;
     getPost(slug: string, user: User): Promise<PostDto>;
-    getLikedPosts(userId: string, authUser: User): Promise<BasicPostDto[]>;
+    getLikedPosts(userId: string, authUser: User): Promise<PostDto[]>;
     getCommentedPosts(userId: string, authUser: User): Promise<PostDto[]>;
     getQueriedPosts(search: string | string[]): Promise<BasicPostDto[]>;
     commentPost(user: User, createCommentDto: CreateCommentDto, slug: string): Promise<PostDto>;

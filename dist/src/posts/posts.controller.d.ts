@@ -3,7 +3,6 @@ import { PostsService } from './posts.service';
 import { PostDto } from './dto/post.dto';
 import { CreatePostDto } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
-import { BasicPostDto } from './dto/basic-post.dto';
 import { CreateCommentDto } from './dto/create-comment.dto';
 import { UpdateCommentDto } from './dto/update-comment.dto';
 import { DeleteCommentDto } from './dto/delete-comment.dto';
@@ -18,8 +17,8 @@ export declare class PostsController {
         page: number;
     }>;
     getLastPosts(req: any): Promise<PostDto[]>;
-    getQueriedPosts(search: string | string[]): Promise<BasicPostDto[]>;
-    getLikedPosts(req: any, id: any): Promise<BasicPostDto[]>;
+    getQueriedPosts(search: string | string[]): Promise<import("./dto/basic-post.dto").BasicPostDto[]>;
+    getLikedPosts(req: any, id: any): Promise<PostDto[]>;
     getPost(req: any, slug: any): Promise<PostDto>;
     getPostLikers(slug: any): Promise<BasicUserDto[]>;
     likePost(req: any, slug: any): Promise<number>;

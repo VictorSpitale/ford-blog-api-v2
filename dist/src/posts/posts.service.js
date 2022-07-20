@@ -113,8 +113,8 @@ let PostsService = class PostsService {
     async getLikedPosts(userId, authUser) {
         await this.usersService.getUserById(userId);
         this.usersService.isSelfOrAdmin(userId, authUser);
-        const posts = await this.postModel.find({ likers: userId });
-        return posts.map((p) => this.asBasicDto(p));
+        const posts = await this.find({ likers: userId });
+        return posts.map((p) => this.asDto(p));
     }
     async getCommentedPosts(userId, authUser) {
         await this.usersService.getUserById(userId);

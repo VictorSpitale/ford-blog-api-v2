@@ -153,11 +153,11 @@ export class PostsService {
     return this.asDto(post, user);
   }
 
-  async getLikedPosts(userId: string, authUser: User): Promise<BasicPostDto[]> {
+  async getLikedPosts(userId: string, authUser: User): Promise<PostDto[]> {
     await this.usersService.getUserById(userId);
     this.usersService.isSelfOrAdmin(userId, authUser);
-    const posts = await this.postModel.find({ likers: userId });
-    return posts.map((p) => this.asBasicDto(p));
+    const posts = await this.find({ likers: userId });
+    return posts.map((p) => this.asDto(p));
   }
 
   async getCommentedPosts(userId: string, authUser: User): Promise<PostDto[]> {

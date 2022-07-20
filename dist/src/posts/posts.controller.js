@@ -25,7 +25,6 @@ const platform_express_1 = require("@nestjs/platform-express");
 const update_post_dto_1 = require("./dto/update-post.dto");
 const paginated_post_dto_1 = require("./dto/paginated-post.dto");
 const HttpError_1 = require("../shared/error/HttpError");
-const basic_post_dto_1 = require("./dto/basic-post.dto");
 const create_comment_dto_1 = require("./dto/create-comment.dto");
 const update_comment_dto_1 = require("./dto/update-comment.dto");
 const delete_comment_dto_1 = require("./dto/delete-comment.dto");
@@ -186,7 +185,7 @@ __decorate([
     (0, swagger_1.ApiResponse)({
         status: 200,
         description: 'Posts list',
-        type: [basic_post_dto_1.BasicPostDto],
+        type: [post_dto_1.PostDto],
     }),
     (0, swagger_1.ApiResponse)({
         status: 401,
