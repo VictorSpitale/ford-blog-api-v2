@@ -26,6 +26,7 @@ import { PasswordRecoveryDto } from './dto/password-recovery.dto';
 import { PostsService } from '../posts/posts.service';
 import * as bcrypt from 'bcrypt';
 import { BasicUserDto } from './dto/basic-user.dto';
+import { PostDto } from '../posts/dto/post.dto';
 
 @Injectable()
 export class UsersService {
@@ -220,6 +221,23 @@ export class UsersService {
         $unset: { recoveryToken: 1 },
       },
     );
+  }
+
+  async getFilteredCommentedPostsByUserId(
+    id: string,
+    authUser: User,
+  ): Promise<PostDto[]> {
+    const posts = await this.postsService.getCommentedPosts(id, authUser);
+    const result: PostDto[] = [];
+    for (const post of posts) {
+      result.push({
+        ...post,
+        comments: post.comments.filter(
+          (c) => c.commenter._id.toString() === id,
+        ),
+      });
+    }
+    return result;
   }
 
   async save(user: UserDto) {

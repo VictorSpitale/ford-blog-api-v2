@@ -25,6 +25,7 @@ const users_role_interface_1 = require("./entities/users.role.interface");
 const platform_express_1 = require("@nestjs/platform-express");
 const password_recovery_dto_1 = require("./dto/password-recovery.dto");
 const HttpError_1 = require("../shared/error/HttpError");
+const post_dto_1 = require("../posts/dto/post.dto");
 let UsersController = class UsersController {
     constructor(usersService) {
         this.usersService = usersService;
@@ -55,6 +56,9 @@ let UsersController = class UsersController {
     }
     async recoverPassword(body, token) {
         return this.usersService.recoverPassword(token, body);
+    }
+    async getCommentsByUserId(id, req) {
+        return this.usersService.getFilteredCommentedPostsByUserId(id, req.user);
     }
 };
 __decorate([
@@ -297,6 +301,37 @@ __decorate([
     __metadata("design:paramtypes", [password_recovery_dto_1.PasswordRecoveryDto, Object]),
     __metadata("design:returntype", Promise)
 ], UsersController.prototype, "recoverPassword", null);
+__decorate([
+    (0, common_1.Get)(':id/comments'),
+    (0, swagger_1.ApiParam)({
+        description: 'User id',
+        type: String,
+        name: 'id',
+    }),
+    (0, swagger_1.ApiOperation)({ summary: 'Get filtered commented posts by user by id' }),
+    (0, swagger_1.ApiResponse)({
+        status: 200,
+        description: "User's commented posts",
+        type: [post_dto_1.PostDto],
+    }),
+    (0, swagger_1.ApiResponse)({
+        status: 400,
+        description: 'Id is not a valid id',
+        type: HttpError_1.HttpErrorDto,
+    }),
+    (0, swagger_1.ApiResponse)({
+        status: 404,
+        description: 'User not found',
+        type: HttpError_1.HttpErrorDto,
+    }),
+    (0, swagger_1.ApiCookieAuth)(),
+    (0, roles_decorator_1.Role)(users_role_interface_1.IUserRole.ADMIN),
+    __param(0, (0, common_1.Param)('id')),
+    __param(1, (0, common_1.Req)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, Object]),
+    __metadata("design:returntype", Promise)
+], UsersController.prototype, "getCommentsByUserId", null);
 UsersController = __decorate([
     (0, common_1.Controller)('users'),
     (0, swagger_1.ApiTags)('Users'),

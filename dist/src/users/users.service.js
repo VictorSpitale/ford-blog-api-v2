@@ -166,6 +166,14 @@ let UsersService = class UsersService {
             $unset: { recoveryToken: 1 },
         });
     }
+    async getFilteredCommentedPostsByUserId(id, authUser) {
+        const posts = await this.postsService.getCommentedPosts(id, authUser);
+        const result = [];
+        for (const post of posts) {
+            result.push(Object.assign(Object.assign({}, post), { comments: post.comments.filter((c) => c.commenter._id.toString() === id) }));
+        }
+        return result;
+    }
     async save(user) {
         await this.userModel.replaceOne({ _id: user._id }, user, { upsert: true });
     }
