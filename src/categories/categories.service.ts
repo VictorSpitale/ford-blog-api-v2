@@ -16,6 +16,7 @@ import { HttpError, HttpErrorCode } from '../shared/error/HttpError';
 import { PostsService } from '../posts/posts.service';
 import { User } from '../users/entities/user.entity';
 import { CategoryWithCountDto } from './dto/category-with-count.dto';
+import { UpdateCategoryDto } from './dto/update-category.dto';
 
 @Injectable()
 export class CategoriesService {
@@ -66,6 +67,24 @@ export class CategoriesService {
         HttpError.getHttpError(HttpErrorCode.CATEGORY_NOT_FOUND),
       );
     return this.asDto(category);
+  }
+
+  async updateCategory(
+    updateCategoryDto: UpdateCategoryDto,
+    categoryId,
+  ): Promise<CategoryDto> {
+    const category = await this.getCategoryById(categoryId);
+    if (await this.getCategoryByName(updateCategoryDto.name)) {
+      throw new ConflictException(
+        HttpError.getHttpError(HttpErrorCode.DUPLICATE_CATEGORY),
+      );
+    }
+    const updated = await this.categoryModel.findOneAndUpdate(
+      { _id: category._id },
+      { ...updateCategoryDto },
+      { new: true },
+    );
+    return this.asDto(updated);
   }
 
   async deleteCategory(id: string, authUser: User) {

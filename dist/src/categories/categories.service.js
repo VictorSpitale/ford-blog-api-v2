@@ -54,6 +54,14 @@ let CategoriesService = class CategoriesService {
             throw new common_1.NotFoundException(HttpError_1.HttpError.getHttpError(HttpError_1.HttpErrorCode.CATEGORY_NOT_FOUND));
         return this.asDto(category);
     }
+    async updateCategory(updateCategoryDto, categoryId) {
+        const category = await this.getCategoryById(categoryId);
+        if (await this.getCategoryByName(updateCategoryDto.name)) {
+            throw new common_1.ConflictException(HttpError_1.HttpError.getHttpError(HttpError_1.HttpErrorCode.DUPLICATE_CATEGORY));
+        }
+        const updated = await this.categoryModel.findOneAndUpdate({ _id: category._id }, Object.assign({}, updateCategoryDto), { new: true });
+        return this.asDto(updated);
+    }
     async deleteCategory(id, authUser) {
         const category = await this.getCategoryById(id);
         const posts = await this.postsService.getCategorizedPosts(category.name);
