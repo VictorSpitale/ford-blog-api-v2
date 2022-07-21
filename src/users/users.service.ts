@@ -81,6 +81,13 @@ export class UsersService {
   async update(id: string, updateUserDto: UpdateUserDto, user: User) {
     await this.getUserById(id);
     this.isSelfOrAdmin(id, user);
+
+    if (user.role !== IUserRole.ADMIN && updateUserDto.role !== undefined) {
+      throw new UnauthorizedException(
+        HttpError.getHttpError(HttpErrorCode.ROLE_UNAUTHORIZED),
+      );
+    }
+
     if (
       updateUserDto.pseudo &&
       (await this.getUserByPseudo(updateUserDto.pseudo))

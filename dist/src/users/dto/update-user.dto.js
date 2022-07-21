@@ -12,6 +12,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.UpdateUserDto = void 0;
 const swagger_1 = require("@nestjs/swagger");
 const class_validator_1 = require("class-validator");
+const users_role_interface_1 = require("../entities/users.role.interface");
 class UpdateUserDto {
 }
 __decorate([
@@ -58,5 +59,20 @@ __decorate([
     (0, class_validator_1.IsOptional)(),
     __metadata("design:type", String)
 ], UpdateUserDto.prototype, "currentPassword", void 0);
+__decorate([
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsNotEmpty)(),
+    (0, class_validator_1.IsEnum)(users_role_interface_1.IUserRole),
+    (0, class_validator_1.IsIn)(Object.values(users_role_interface_1.IUserRole)),
+    (0, swagger_1.ApiProperty)({
+        description: "User's role",
+        default: users_role_interface_1.IUserRole.USER,
+        enum: users_role_interface_1.IUserRole,
+        type: users_role_interface_1.IUserRole,
+        examples: [users_role_interface_1.IUserRole.USER, 'user'],
+        required: false,
+    }),
+    __metadata("design:type", String)
+], UpdateUserDto.prototype, "role", void 0);
 exports.UpdateUserDto = UpdateUserDto;
 //# sourceMappingURL=update-user.dto.js.map
