@@ -1,11 +1,14 @@
 import { ApiProperty } from '@nestjs/swagger';
 import {
+  IsEnum,
+  IsIn,
   IsNotEmpty,
   IsOptional,
   IsString,
   MaxLength,
   MinLength,
 } from 'class-validator';
+import { IUserRole } from '../entities/users.role.interface';
 
 export class UpdateUserDto {
   @ApiProperty({
@@ -48,4 +51,18 @@ export class UpdateUserDto {
   @MinLength(6)
   @IsOptional()
   readonly currentPassword?: string;
+
+  @IsOptional()
+  @IsNotEmpty()
+  @IsEnum(IUserRole)
+  @IsIn(Object.values(IUserRole))
+  @ApiProperty({
+    description: "User's role",
+    default: IUserRole.USER,
+    enum: IUserRole,
+    type: IUserRole,
+    examples: [IUserRole.USER, 'user'],
+    required: false,
+  })
+  readonly role?: IUserRole;
 }

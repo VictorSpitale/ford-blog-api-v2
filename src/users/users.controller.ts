@@ -34,6 +34,7 @@ import {
   PasswordRecoveryDto,
 } from './dto/password-recovery.dto';
 import { HttpErrorDto, HttpValidationError } from '../shared/error/HttpError';
+import { PostDto } from '../posts/dto/post.dto';
 
 @Controller('users')
 @ApiTags('Users')
@@ -265,5 +266,33 @@ export class UsersController {
     @Param('token') token,
   ) {
     return this.usersService.recoverPassword(token, body);
+  }
+
+  @Get(':id/comments')
+  @ApiParam({
+    description: 'User id',
+    type: String,
+    name: 'id',
+  })
+  @ApiOperation({ summary: 'Get filtered commented posts by user by id' })
+  @ApiResponse({
+    status: 200,
+    description: "User's commented posts",
+    type: [PostDto],
+  })
+  @ApiResponse({
+    status: 400,
+    description: 'Id is not a valid id',
+    type: HttpErrorDto,
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'User not found',
+    type: HttpErrorDto,
+  })
+  @ApiCookieAuth()
+  @Role(IUserRole.ADMIN)
+  async getCommentsByUserId(@Param('id') id: string, @Req() req) {
+    return this.usersService.getFilteredCommentedPostsByUserId(id, req.user);
   }
 }

@@ -77,6 +77,9 @@ let UsersService = class UsersService {
     async update(id, updateUserDto, user) {
         await this.getUserById(id);
         this.isSelfOrAdmin(id, user);
+        if (user.role !== users_role_interface_1.IUserRole.ADMIN && updateUserDto.role !== undefined) {
+            throw new common_1.UnauthorizedException(HttpError_1.HttpError.getHttpError(HttpError_1.HttpErrorCode.ROLE_UNAUTHORIZED));
+        }
         if (updateUserDto.pseudo &&
             (await this.getUserByPseudo(updateUserDto.pseudo))) {
             throw new common_1.ConflictException(HttpError_1.HttpError.getHttpError(HttpError_1.HttpErrorCode.DUPLICATE_PSEUDO));
@@ -166,6 +169,9 @@ let UsersService = class UsersService {
             $unset: { recoveryToken: 1 },
         });
     }
+    async getFilteredCommentedPostsByUserId(id, authUser) {
+        return this.postsService.getCommentedPosts(id, authUser);
+    }
     async save(user) {
         await this.userModel.replaceOne({ _id: user._id }, user, { upsert: true });
     }
@@ -197,6 +203,13 @@ let UsersService = class UsersService {
         else {
             return null;
         }
+    }
+    asBasicDto(user) {
+        return {
+            _id: user._id,
+            pseudo: user.pseudo,
+            picture: user.picture,
+        };
     }
     asDto(user) {
         return {

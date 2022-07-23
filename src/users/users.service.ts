@@ -25,6 +25,8 @@ import { LocalesTypes } from '../shared/types/locales.types';
 import { PasswordRecoveryDto } from './dto/password-recovery.dto';
 import { PostsService } from '../posts/posts.service';
 import * as bcrypt from 'bcrypt';
+import { BasicUserDto } from './dto/basic-user.dto';
+import { PostDto } from '../posts/dto/post.dto';
 
 @Injectable()
 export class UsersService {
@@ -79,6 +81,13 @@ export class UsersService {
   async update(id: string, updateUserDto: UpdateUserDto, user: User) {
     await this.getUserById(id);
     this.isSelfOrAdmin(id, user);
+
+    if (user.role !== IUserRole.ADMIN && updateUserDto.role !== undefined) {
+      throw new UnauthorizedException(
+        HttpError.getHttpError(HttpErrorCode.ROLE_UNAUTHORIZED),
+      );
+    }
+
     if (
       updateUserDto.pseudo &&
       (await this.getUserByPseudo(updateUserDto.pseudo))
@@ -221,6 +230,13 @@ export class UsersService {
     );
   }
 
+  async getFilteredCommentedPostsByUserId(
+    id: string,
+    authUser: User,
+  ): Promise<PostDto[]> {
+    return this.postsService.getCommentedPosts(id, authUser);
+  }
+
   async save(user: UserDto) {
     await this.userModel.replaceOne({ _id: user._id }, user, { upsert: true });
   }
@@ -254,6 +270,14 @@ export class UsersService {
     }
   }
 
+  asBasicDto(user: User): BasicUserDto {
+    return {
+      _id: user._id,
+      pseudo: user.pseudo,
+      picture: user.picture,
+    };
+  }
+
   asDto(user: User): UserDto {
     return {
       _id: user._id,
@@ -265,6 +289,7 @@ export class UsersService {
       createdAt: user.createdAt,
     } as UserDto;
   }
+
   asDtoWithoutPassword(user: User): UserDto {
     return {
       _id: user._id,

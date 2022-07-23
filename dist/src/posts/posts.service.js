@@ -86,6 +86,7 @@ let PostsService = class PostsService {
                 .sort({ createdAt: -1 })
                 .limit(4)
                 .populate('categories')
+                .populate('comments.commenter', ['pseudo', 'picture'])
                 .skip(3 * (page - 1));
             if (posts.length > 3) {
                 hasMore = true;
@@ -112,13 +113,13 @@ let PostsService = class PostsService {
     async getLikedPosts(userId, authUser) {
         await this.usersService.getUserById(userId);
         this.usersService.isSelfOrAdmin(userId, authUser);
-        const posts = await this.postModel.find({ likers: userId });
-        return posts.map((p) => this.asBasicDto(p));
+        const posts = await this.find({ likers: userId });
+        return posts.map((p) => this.asDto(p));
     }
     async getCommentedPosts(userId, authUser) {
         await this.usersService.getUserById(userId);
         this.usersService.isSelfOrAdmin(userId, authUser);
-        const posts = await this.postModel.find({
+        const posts = await this.find({
             comments: { $elemMatch: { commenter: userId } },
         });
         return posts.map((p) => this.asDto(p));
@@ -218,10 +219,15 @@ let PostsService = class PostsService {
         });
         if (!category)
             return [];
-        const posts = await this.postModel
-            .find({ categories: category._id })
-            .populate('categories');
+        const posts = await this.find({ categories: category._id });
         return posts.map((post) => this.asDto(post));
+    }
+    async getPostsCountByCategory(category) {
+        return this.postModel.find({ categories: category._id }).count();
+    }
+    async getPostLikers(slug) {
+        const post = (await this.findOne({ slug }));
+        return post.likers.map((u) => this.usersService.asBasicDto(u));
     }
     async find(match = {}, limit = 0) {
         if (match._id) {

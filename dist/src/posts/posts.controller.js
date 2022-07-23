@@ -25,10 +25,10 @@ const platform_express_1 = require("@nestjs/platform-express");
 const update_post_dto_1 = require("./dto/update-post.dto");
 const paginated_post_dto_1 = require("./dto/paginated-post.dto");
 const HttpError_1 = require("../shared/error/HttpError");
-const basic_post_dto_1 = require("./dto/basic-post.dto");
 const create_comment_dto_1 = require("./dto/create-comment.dto");
 const update_comment_dto_1 = require("./dto/update-comment.dto");
 const delete_comment_dto_1 = require("./dto/delete-comment.dto");
+const basic_user_dto_1 = require("../users/dto/basic-user.dto");
 let PostsController = class PostsController {
     constructor(postsService) {
         this.postsService = postsService;
@@ -50,6 +50,9 @@ let PostsController = class PostsController {
     }
     async getPost(req, slug) {
         return this.postsService.getPost(slug, req.user);
+    }
+    async getPostLikers(slug) {
+        return this.postsService.getPostLikers(slug);
     }
     async likePost(req, slug) {
         return this.postsService.likePost(slug, req.user);
@@ -182,7 +185,7 @@ __decorate([
     (0, swagger_1.ApiResponse)({
         status: 200,
         description: 'Posts list',
-        type: [basic_post_dto_1.BasicPostDto],
+        type: [post_dto_1.PostDto],
     }),
     (0, swagger_1.ApiResponse)({
         status: 401,
@@ -223,6 +226,33 @@ __decorate([
     __metadata("design:paramtypes", [Object, Object]),
     __metadata("design:returntype", Promise)
 ], PostsController.prototype, "getPost", null);
+__decorate([
+    (0, common_1.Get)(':slug/likers'),
+    (0, swagger_1.ApiOperation)({ summary: 'Get post likers by slug' }),
+    (0, swagger_1.ApiResponse)({
+        status: 200,
+        description: 'The post likers got by its slug',
+        type: [basic_user_dto_1.BasicUserDto],
+    }),
+    (0, swagger_1.ApiResponse)({
+        status: 404,
+        description: 'The post doesnt exist',
+        type: HttpError_1.HttpErrorDto,
+    }),
+    (0, swagger_1.ApiParam)({
+        description: "Post's slug to query",
+        name: 'slug',
+        example: 'que-penser-de-la-ford-focus-st-line',
+        required: true,
+        type: String,
+    }),
+    (0, roles_decorator_1.Role)(users_role_interface_1.IUserRole.ADMIN),
+    (0, swagger_1.ApiCookieAuth)(),
+    __param(0, (0, common_1.Param)('slug')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", Promise)
+], PostsController.prototype, "getPostLikers", null);
 __decorate([
     (0, common_1.Patch)('/like/:slug'),
     (0, swagger_1.ApiOperation)({ summary: 'Like a post' }),

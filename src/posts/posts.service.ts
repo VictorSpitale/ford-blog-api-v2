@@ -26,6 +26,8 @@ import { DeleteCommentDto } from './dto/delete-comment.dto';
 import { UpdateCommentDto } from './dto/update-comment.dto';
 import { CategoriesService } from '../categories/categories.service';
 import * as _ from 'lodash';
+import { CategoryDto } from '../categories/dto/category.dto';
+import { BasicUserDto } from '../users/dto/basic-user.dto';
 
 @Injectable()
 export class PostsService {
@@ -122,6 +124,7 @@ export class PostsService {
         .sort({ createdAt: -1 })
         .limit(4)
         .populate('categories')
+        .populate('comments.commenter', ['pseudo', 'picture'])
         .skip(3 * (page - 1));
       if (posts.length > 3) {
         hasMore = true;
@@ -150,17 +153,17 @@ export class PostsService {
     return this.asDto(post, user);
   }
 
-  async getLikedPosts(userId: string, authUser: User): Promise<BasicPostDto[]> {
+  async getLikedPosts(userId: string, authUser: User): Promise<PostDto[]> {
     await this.usersService.getUserById(userId);
     this.usersService.isSelfOrAdmin(userId, authUser);
-    const posts = await this.postModel.find({ likers: userId });
-    return posts.map((p) => this.asBasicDto(p));
+    const posts = await this.find({ likers: userId });
+    return posts.map((p) => this.asDto(p));
   }
 
   async getCommentedPosts(userId: string, authUser: User): Promise<PostDto[]> {
     await this.usersService.getUserById(userId);
     this.usersService.isSelfOrAdmin(userId, authUser);
-    const posts = await this.postModel.find({
+    const posts = await this.find({
       comments: { $elemMatch: { commenter: userId } },
     });
     return posts.map((p) => this.asDto(p));
@@ -305,10 +308,17 @@ export class PostsService {
       name: categoryName,
     });
     if (!category) return [];
-    const posts = await this.postModel
-      .find({ categories: category._id })
-      .populate('categories');
+    const posts = await this.find({ categories: category._id });
     return posts.map((post) => this.asDto(post));
+  }
+
+  async getPostsCountByCategory(category: CategoryDto): Promise<number> {
+    return this.postModel.find({ categories: category._id }).count();
+  }
+
+  async getPostLikers(slug: string): Promise<BasicUserDto[]> {
+    const post = (await this.findOne({ slug })) as Post;
+    return post.likers.map((u) => this.usersService.asBasicDto(u));
   }
 
   private async find(match: MatchType = {}, limit = 0) {

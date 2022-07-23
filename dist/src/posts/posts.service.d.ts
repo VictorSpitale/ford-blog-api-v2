@@ -14,6 +14,8 @@ import { CreateCommentDto } from './dto/create-comment.dto';
 import { DeleteCommentDto } from './dto/delete-comment.dto';
 import { UpdateCommentDto } from './dto/update-comment.dto';
 import { CategoriesService } from '../categories/categories.service';
+import { CategoryDto } from '../categories/dto/category.dto';
+import { BasicUserDto } from '../users/dto/basic-user.dto';
 export declare class PostsService {
     private readonly postModel;
     private readonly googleService;
@@ -33,7 +35,7 @@ export declare class PostsService {
     }>;
     getLastPosts(user: User): Promise<PostDto[]>;
     getPost(slug: string, user: User): Promise<PostDto>;
-    getLikedPosts(userId: string, authUser: User): Promise<BasicPostDto[]>;
+    getLikedPosts(userId: string, authUser: User): Promise<PostDto[]>;
     getCommentedPosts(userId: string, authUser: User): Promise<PostDto[]>;
     getQueriedPosts(search: string | string[]): Promise<BasicPostDto[]>;
     commentPost(user: User, createCommentDto: CreateCommentDto, slug: string): Promise<PostDto>;
@@ -42,6 +44,8 @@ export declare class PostsService {
     private checkIfPostIsDuplicatedBySlug;
     getPostLikeStatus(slug: string, user: User): Promise<boolean>;
     getCategorizedPosts(categoryName: string): Promise<PostDto[]>;
+    getPostsCountByCategory(category: CategoryDto): Promise<number>;
+    getPostLikers(slug: string): Promise<BasicUserDto[]>;
     private find;
     findOne(match: MatchType): Promise<Omit<Omit<Post & Mongoose.Document<any, any, any> & {
         _id: any;

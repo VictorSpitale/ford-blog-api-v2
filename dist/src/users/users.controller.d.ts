@@ -4,6 +4,7 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { UserDto } from './dto/user.dto';
 import { PasswordPreRecoveryDto, PasswordRecoveryDto } from './dto/password-recovery.dto';
+import { PostDto } from '../posts/dto/post.dto';
 export declare class UsersController {
     private readonly usersService;
     constructor(usersService: UsersService);
@@ -18,4 +19,5 @@ export declare class UsersController {
     deleteUser(req: any, id: string): Promise<void>;
     sendPasswordRecovery(body: PasswordPreRecoveryDto): Promise<void>;
     recoverPassword(body: PasswordRecoveryDto, token: any): Promise<void>;
+    getCommentsByUserId(id: string, req: any): Promise<PostDto[]>;
 }
