@@ -204,7 +204,7 @@ export class UsersService {
     if (!(await this.getUserByEmail(email))) return;
     const token = uuid();
     const user = await this.userModel.findOneAndUpdate(
-      { email },
+      { $eq: { email } },
       {
         recoveryToken: token,
       },
