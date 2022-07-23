@@ -150,7 +150,7 @@ let UsersService = class UsersService {
         if (!(await this.getUserByEmail(email)))
             return;
         const token = (0, password_utils_1.uuid)();
-        const user = await this.userModel.findOneAndUpdate({ email }, {
+        const user = await this.userModel.findOneAndUpdate({ $eq: { email } }, {
             recoveryToken: token,
         });
         await this.mailService.addPasswordRecoveryEmailToQueue({
