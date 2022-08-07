@@ -4,8 +4,8 @@ import { Document } from 'mongoose';
 import { Category } from '../../categories/entities/category.entity';
 import { Type } from 'class-transformer';
 import { User } from '../../users/entities/user.entity';
-import { CommentDto } from '../dto/comment.dto';
 import { urlRegex } from '../../shared/utils/regex.validation';
+import { CommentEntityDto } from '../dto/comment.entity.dto';
 
 export type PostDocument = Post & Document;
 
@@ -85,7 +85,7 @@ export class Post {
     default: [],
   })
   @Type(() => User)
-  comments: [CommentDto];
+  comments: [CommentEntityDto];
 
   @Prop({
     type: String,
