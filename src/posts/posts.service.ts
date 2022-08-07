@@ -318,6 +318,11 @@ export class PostsService {
 
   async getPostLikers(slug: string): Promise<BasicUserDto[]> {
     const post = (await this.findOne({ slug })) as Post;
+    if (!post) {
+      throw new NotFoundException(
+        HttpError.getHttpError(HttpErrorCode.POST_NOT_FOUND),
+      );
+    }
     return post.likers.map((u) => this.usersService.asBasicDto(u));
   }
 
