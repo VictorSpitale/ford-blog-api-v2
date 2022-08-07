@@ -248,6 +248,16 @@ describe('UsersController (e2e)', () => {
           .set('Cookie', `access_token=${token}`);
         expect(response.status).toBe(409);
       });
+      it('should not update role while user is not admin', async function () {
+        const user = UserStub();
+        await dbConnection.collection('users').insertOne(user);
+        const token = authService.signToken(user);
+        const response = await request
+          .patch(`/users/${user._id}`)
+          .set('Cookie', `access_token=${token}`)
+          .send({ role: '2' });
+        expect(response.status).toBe(401);
+      });
     });
     describe('update user', () => {
       it('should update a user and return the new user', async () => {
@@ -443,6 +453,65 @@ describe('UsersController (e2e)', () => {
 
     afterEach(async () => {
       await clearDatabase(dbConnection, 'users');
+    });
+  });
+
+  describe('getCommentsByUserId', function () {
+    describe('failings', function () {
+      it('should not fetch while unAuth', async function () {
+        const response = await request.get('/users/id/comments');
+        expect(response.status).toBe(401);
+      });
+
+      it('should not fetch while not admin', async function () {
+        const user = UserStub();
+        await dbConnection.collection('users').insertOne(user);
+        const token = authService.signToken(user);
+        const response = await request
+          .get(`/users/${user._id}/comments`)
+          .set('Cookie', `access_token=${token}`);
+        expect(response.status).toBe(401);
+      });
+
+      it('should not fetch if user not found', async function () {
+        const user = UserStub(IUserRole.ADMIN);
+        const id = new Mongoose.Types.ObjectId();
+        await dbConnection.collection('users').insertOne(user);
+        const token = authService.signToken(user);
+        const response = await request
+          .get(`/users/${id}/comments`)
+          .set('Cookie', `access_token=${token}`);
+        expect(response.status).toBe(404);
+      });
+    });
+
+    describe('successfully', function () {
+      it('should fetch the commented posts', async function () {
+        const user = UserStub(IUserRole.ADMIN);
+        const post = {
+          ...PostStub(),
+          comments: [
+            {
+              commenter: user._id,
+              _id: new Mongoose.Types.ObjectId(),
+              comment: 'comment',
+              createdAt: 1,
+            },
+          ],
+        };
+        await dbConnection.collection('users').insertOne(user);
+        await dbConnection.collection('posts').insertOne(post);
+        const token = authService.signToken(user);
+        const response = await request
+          .get(`/users/${user._id}/comments`)
+          .set('Cookie', `access_token=${token}`);
+        expect(response.body.length).toBe(1);
+      });
+    });
+
+    afterEach(async () => {
+      await clearDatabase(dbConnection, 'users');
+      await clearDatabase(dbConnection, 'posts');
     });
   });
 

@@ -227,6 +227,9 @@ let PostsService = class PostsService {
     }
     async getPostLikers(slug) {
         const post = (await this.findOne({ slug }));
+        if (!post) {
+            throw new common_1.NotFoundException(HttpError_1.HttpError.getHttpError(HttpError_1.HttpErrorCode.POST_NOT_FOUND));
+        }
         return post.likers.map((u) => this.usersService.asBasicDto(u));
     }
     async find(match = {}, limit = 0) {

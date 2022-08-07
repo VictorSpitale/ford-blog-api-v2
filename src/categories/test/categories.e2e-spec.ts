@@ -7,7 +7,7 @@ import { initE2eWithGuards } from '../../shared/test/init.e2e';
 import { UserStub } from '../../users/test/stub/user.stub';
 import { AuthService } from '../../auth/auth.service';
 import { IUserRole } from '../../users/entities/users.role.interface';
-import { CreatePostStub } from '../../posts/test/stub/post.stub';
+import { CreatePostStub, PostStub } from '../../posts/test/stub/post.stub';
 import { PostDto } from '../../posts/dto/post.dto';
 
 describe.only('CategoriesController (e2e)', () => {
@@ -173,6 +173,118 @@ describe.only('CategoriesController (e2e)', () => {
           .findOne({ slug: post.slug })) as PostDto;
         expect(queriedPosts.categories).toEqual([snCategory._id]);
         expect(response.status).toBe(200);
+      });
+    });
+
+    afterEach(async () => {
+      await clearDatabase(dbConnection, 'posts');
+      await clearDatabase(dbConnection, 'categories');
+      await clearDatabase(dbConnection, 'users');
+    });
+  });
+
+  describe('getCategoriesWithCount', function () {
+    it('should not return the categories unAuth', async function () {
+      const response = await request.get('/categories/count');
+      expect(response.status).toBe(401);
+    });
+
+    it('should not return the categories while not admin', async function () {
+      const user = UserStub(IUserRole.USER);
+      await dbConnection.collection('users').insertOne(user);
+      const token = authService.signToken(user);
+      const response = await request
+        .get('/categories/count')
+        .set('Cookie', `access_token=${token}`);
+      expect(response.status).toBe(401);
+    });
+
+    it('should return the categories list and the number of related posts', async function () {
+      const categories = [CategoryStub('sport'), CategoryStub('suv')];
+      await dbConnection.collection('categories').insertMany(categories);
+      const posts = [
+        { ...PostStub('slug-1'), categories: [categories[0]._id] },
+        {
+          ...PostStub('slug-2'),
+          categories: [categories[0]._id, categories[1]._id],
+        },
+      ];
+      await dbConnection.collection('posts').insertMany(posts);
+      const user = UserStub(IUserRole.ADMIN);
+      await dbConnection.collection('users').insertOne(user);
+      const token = authService.signToken(user);
+      const response = await request
+        .get('/categories/count')
+        .set('Cookie', `access_token=${token}`);
+
+      expect(response.status).toBe(200);
+      expect(response.body).toEqual([
+        { ...categories[0], _id: categories[0]._id.toString(), count: 2 },
+        { ...categories[1], _id: categories[1]._id.toString(), count: 1 },
+      ]);
+    });
+
+    describe('Update Category', function () {
+      describe('failings', function () {
+        it('should not update unAuth', async function () {
+          const response = await request.patch('/categories/id');
+          expect(response.status).toBe(401);
+        });
+
+        it('should not update while not admin', async function () {
+          const user = UserStub(IUserRole.USER);
+          await dbConnection.collection('users').insertOne(user);
+          const token = authService.signToken(user);
+          const response = await request
+            .patch('/categories/id')
+            .set('Cookie', `access_token=${token}`);
+          expect(response.status).toBe(401);
+        });
+
+        it('should not update a non-existing category', async function () {
+          const user = UserStub(IUserRole.ADMIN);
+          const newCategory = CategoryStub('suv');
+          await dbConnection.collection('users').insertOne(user);
+          const token = authService.signToken(user);
+          const response = await request
+            .patch(`/categories/${newCategory._id}`)
+            .send({ ...newCategory })
+            .set('Cookie', `access_token=${token}`);
+          expect(response.status).toBe(404);
+        });
+
+        it('should not update if name already used', async function () {
+          const user = UserStub(IUserRole.ADMIN);
+          const category = CategoryStub();
+          await dbConnection.collection('users').insertOne(user);
+          const token = authService.signToken(user);
+          await dbConnection.collection('categories').insertOne(category);
+          const response = await request
+            .patch(`/categories/${category._id}`)
+            .send({ ...category })
+            .set('Cookie', `access_token=${token}`);
+          expect(response.status).toBe(409);
+        });
+      });
+      describe('success', function () {
+        it('should update the category', async function () {
+          const user = UserStub(IUserRole.ADMIN);
+          const category = CategoryStub();
+          await dbConnection.collection('users').insertOne(user);
+          const token = authService.signToken(user);
+          await dbConnection.collection('categories').insertOne(category);
+          const response = await request
+            .patch(`/categories/${category._id}`)
+            .send({ ...category, name: 'new' })
+            .set('Cookie', `access_token=${token}`);
+          expect(response.status).toBe(200);
+          expect(response.body).toMatchObject({ ...category, name: 'new' });
+        });
+      });
+
+      afterEach(async () => {
+        await clearDatabase(dbConnection, 'categories');
+        await clearDatabase(dbConnection, 'users');
       });
     });
 
