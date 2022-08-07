@@ -28,6 +28,7 @@ import { CategoriesService } from '../categories/categories.service';
 import * as _ from 'lodash';
 import { CategoryDto } from '../categories/dto/category.dto';
 import { BasicUserDto } from '../users/dto/basic-user.dto';
+import { CommentDto } from './dto/comment.dto';
 
 @Injectable()
 export class PostsService {
@@ -394,7 +395,7 @@ export class PostsService {
       desc: post.desc,
       sourceName: post.sourceName,
       sourceLink: post.sourceLink,
-      comments: post.comments,
+      comments: post.comments as unknown as CommentDto[], // due to population
       picture: post.picture,
       createdAt: post.createdAt,
       updatedAt: post.updatedAt,

@@ -1,7 +1,7 @@
 /// <reference types="multer" />
 import { Post, PostDocument } from './entities/post.entity';
 import * as Mongoose from 'mongoose';
-import { Model } from 'mongoose';
+import { Model, Types } from 'mongoose';
 import { MatchType } from '../shared/types/match.types';
 import { PostDto } from './dto/post.dto';
 import { CreatePostDto } from './dto/create-post.dto';
@@ -48,7 +48,7 @@ export declare class PostsService {
     getPostLikers(slug: string): Promise<BasicUserDto[]>;
     private find;
     findOne(match: MatchType): Promise<Omit<Omit<Post & Mongoose.Document<any, any, any> & {
-        _id: any;
+        _id: Types.ObjectId;
     }, never>, never>>;
     asBasicDto(post: Post): BasicPostDto;
     asDto(post: Post, authUser?: User): PostDto;
