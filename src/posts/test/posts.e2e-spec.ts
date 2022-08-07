@@ -853,4 +853,51 @@ describe('PostsController (e2e)', () => {
       await clearDatabase(dbConnection, 'posts');
     });
   });
+
+  describe('Get post likers', function () {
+    describe('failings', function () {
+      it('should not fetch while unAuth', async function () {
+        const response = await request.get('/posts/slug/likers');
+        expect(response.status).toBe(401);
+      });
+      it('should not fetch while not admin', async function () {
+        const user = UserStub();
+        await dbConnection.collection('users').insertOne(user);
+        const token = authService.signToken(user);
+        const response = await request
+          .get('/posts/slug/likers')
+          .set('Cookie', `access_token=${token}`);
+        expect(response.status).toBe(401);
+      });
+      it('should not fetch if post doesnt exist', async function () {
+        const user = UserStub(IUserRole.ADMIN);
+        await dbConnection.collection('users').insertOne(user);
+        const token = authService.signToken(user);
+        const response = await request
+          .get('/posts/slug/likers')
+          .set('Cookie', `access_token=${token}`);
+        expect(response.status).toBe(404);
+      });
+    });
+
+    it('should get the likers', async function () {
+      const user = UserStub(IUserRole.ADMIN);
+      const post = {
+        ...PostStub(),
+        likers: [user._id],
+      };
+      await dbConnection.collection('users').insertOne(user);
+      await dbConnection.collection('posts').insertOne(post);
+      const token = authService.signToken(user);
+      const response = await request
+        .get(`/posts/${post.slug}/likers`)
+        .set('Cookie', `access_token=${token}`);
+      expect(response.body.length).toBe(1);
+    });
+
+    afterEach(async () => {
+      await clearDatabase(dbConnection, 'posts');
+      await clearDatabase(dbConnection, 'users');
+    });
+  });
 });
