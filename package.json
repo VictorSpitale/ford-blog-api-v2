@@ -44,7 +44,7 @@
     "cookie-parser": "1.4.6",
     "handlebars": "4.7.7",
     "lodash": "4.17.21",
-    "mongoose": "6.5.1",
+    "mongoose": "6.11.3",
     "nodemailer": "6.7.5",
     "passport": "0.6.0",
     "passport-google-oauth20": "2.0.0",
